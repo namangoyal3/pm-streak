@@ -37,12 +37,12 @@ interface Category {
 }
 
 const streakMessages = [
-  "You're on fire! 🔥",
-  "Unstoppable! Keep it up!",
-  "The grind is real 💪",
-  "Consistency is your superpower!",
-  "You're crushing it!",
-  "Product mastery unlocked! 🚀",
+  "You're on fire.",
+  "Unstoppable. Keep it up.",
+  "Consistency is building.",
+  "Consistency is your superpower.",
+  "You're crushing it.",
+  "Product mastery in progress.",
 ];
 
 export default function DashboardPage() {
@@ -275,7 +275,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 {user.streakCount >= user.streakGoal && (
-                  <span className="text-[10px] text-[var(--gold-primary)] font-black">🏆</span>
+                  <Trophy size={12} className="text-[var(--gold-primary)]" />
                 )}
               </div>
             )}
@@ -631,7 +631,7 @@ export default function DashboardPage() {
         {/* ── Share CTA ── */}
         <button
           onClick={() => setShowShare(true)}
-          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[var(--purple-primary)] to-[#a855f7] hover:opacity-90 text-white font-black text-sm flex items-center justify-center gap-2 transition-opacity shadow-lg shadow-purple-900/20"
+          className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-[var(--green-primary)]/20"
         >
           <Share2 size={16} /> Invite Friends & Share Streak
         </button>
