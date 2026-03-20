@@ -144,7 +144,9 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[var(--bg-primary)]">
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} avatarUrl={user.avatarUrl} name={user.name} />
 
-      <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 pt-4 pb-28 space-y-4">
+      <main className="max-w-5xl mx-auto px-4 lg:px-8 pt-4 pb-28">
+        <div className="lg:grid lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-6 lg:items-start">
+        <div className="space-y-4">
 
         {/* ── Earn-Back Banner ── */}
         {earnBack && (
@@ -451,6 +453,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        </div>{/* end left sidebar */}
+        <div className="space-y-4 mt-4 lg:mt-0">
+
         {/* ── Activity Calendar ── */}
         {stats?.calendar && <StreakCalendar calendar={stats.calendar} />}
 
@@ -640,6 +645,8 @@ export default function DashboardPage() {
         >
           <LogOut size={15} /> Sign Out
         </button>
+        </div>{/* end right content */}
+        </div>{/* end grid */}
       </main>
 
       <ShareCard isOpen={showShare} onClose={() => setShowShare(false)} />
