@@ -86,7 +86,7 @@ export default function OnboardingPage() {
                 </p>
                 <button
                   onClick={() => setStep("why")}
-                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
                 >
                   Let&apos;s Go <ArrowRight size={16} />
                 </button>
@@ -123,7 +123,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep("streak")}
                   disabled={!selectedWhy}
-                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -172,7 +172,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep("goal")}
                   disabled={!streakGoal}
-                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -225,7 +225,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep("ready")}
                   disabled={!dailyGoal}
-                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -280,7 +280,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleFinish}
                   disabled={saving}
-                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors disabled:opacity-50"
+                  className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-50"
                 >
                   {saving ? "Starting..." : "Commit to My Goal"}
                 </button>

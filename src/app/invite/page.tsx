@@ -72,7 +72,7 @@ function InviteContent() {
 
         <Link
           href={`/signup${ref ? `?ref=${ref}` : ""}`}
-          className="block w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors mb-3"
+          className="block w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors mb-3 text-center"
         >
           Join Free
         </Link>
