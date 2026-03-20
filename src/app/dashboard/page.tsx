@@ -112,7 +112,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <Flame size={48} className="text-[var(--orange-primary)] streak-flame" />
         <div className="text-[var(--green-primary)] text-lg font-black animate-pulse tracking-wide">
-          Loading your streak...
+          Loading your streak…
         </div>
         <div className="flex gap-1.5">
           {[0, 1, 2].map((i) => (
@@ -203,7 +203,7 @@ export default function DashboardPage() {
                   Welcome back
                 </p>
                 <h1 className="text-xl font-black text-white leading-tight">
-                  {user.name?.split(" ")[0] ?? "PM"} 👋
+                  {user.name?.split(" ")[0] ?? "PM"}
                 </h1>
                 <p className={cn(
                   "text-sm mt-0.5 font-semibold",
