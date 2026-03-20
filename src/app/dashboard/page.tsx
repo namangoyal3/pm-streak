@@ -144,7 +144,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[var(--bg-primary)]">
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} avatarUrl={user.avatarUrl} name={user.name} />
 
-      <main className="max-w-2xl mx-auto px-4 pt-4 pb-28 space-y-4">
+      <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 pt-4 pb-28 space-y-4">
 
         {/* ── Earn-Back Banner ── */}
         {earnBack && (

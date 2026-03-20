@@ -84,7 +84,7 @@ export default function ExplorePage() {
     <div className="min-h-screen">
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
 
-      <main className="max-w-2xl mx-auto px-4 py-6 pb-28 space-y-6">
+      <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 py-6 pb-28 space-y-6">
         <div className="text-center">
           <Sparkles size={40} className="mx-auto text-[var(--green-primary)] mb-2" />
           <h1 className="text-xl font-bold">Explore & Generate</h1>
