@@ -68,7 +68,7 @@ export default function LeaderboardPage() {
     <div className="min-h-screen">
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
 
-      <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-2xl mx-auto px-4 py-6 pb-28 space-y-6">
         <div className="text-center">
           <Trophy size={40} className="mx-auto text-[var(--gold-primary)] mb-2" />
           <h1 className="text-xl font-bold">Leaderboard</h1>

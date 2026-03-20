@@ -63,11 +63,15 @@ export async function GET(req: NextRequest) {
           gems: 50,
         },
       });
-    } else if (!user.googleId) {
-      // Existing email/password user — link Google account
+    } else {
+      // Existing user — link Google and sync name + avatar from Google
       user = await prisma.user.update({
         where: { id: user.id },
-        data: { googleId, avatarUrl: user.avatarUrl || picture },
+        data: {
+          googleId: user.googleId || googleId,
+          name: name || user.name,
+          avatarUrl: picture || user.avatarUrl,
+        },
       });
     }
 

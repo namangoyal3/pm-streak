@@ -1102,6 +1102,519 @@ Kyle's insight: "The best pricing model is the one where your customers' success
     ],
   });
 
+  // ======== LOCKED PREVIEW LESSONS (from Lenny's 289-episode archive) ========
+  await createLesson(strategy.id, {
+    dayNumber: 15,
+    title: "Jason Cohen's 5 Questions When Growth Stops",
+    slug: "jason-cohen-growth-stops",
+    description: "2x unicorn founder's framework when your product plateaus",
+    difficulty: 2,
+    xpReward: 20,
+    isLocked: true,
+    guestName: "Jason Cohen",
+    episodeTitle: "5 questions to ask when your product stops growing | Jason Cohen (2x unicorn founder)",
+    content: `Jason Cohen, founder of WP Engine and SmartBear (both unicorns), shared his definitive framework for diagnosing growth stalls on Lenny's Podcast.
+
+HIS 5 DIAGNOSTIC QUESTIONS:
+1. LOGO RETENTION — Are you keeping customers? If logo retention (not revenue) is below 85%, you have a product-market fit problem, not a growth problem. Fix this first.
+2. PRICING — Are you charging enough? Most founders underprice by 2-3x. If customers aren't pushing back on price, you're too cheap. Run a pricing experiment immediately.
+3. NET REVENUE RETENTION (NRR) — Are existing customers expanding? World-class SaaS: 120%+ NRR. If NRR is below 100%, you're shrinking even while acquiring new customers.
+4. MARKETING CHANNELS — Where are your best customers coming from? Double down on the one channel that works. Most companies spread too thin.
+5. TARGET MARKET — Are you selling to the right people? The wrong ICP will always churn regardless of product quality.
+
+KEY INSIGHT: "Most founders think they have a growth problem when they actually have a retention problem. You can't grow a leaky bucket."
+
+Jason's order matters: Check retention before acquisition. Fix the floor before pouring more water in.`,
+    questions: [
+      {
+        questionText: "According to Jason Cohen, what logo retention rate indicates a product-market fit problem?",
+        options: ["Below 95%", "Below 90%", "Below 85%", "Below 70%"],
+        correctIndex: 2,
+        explanation: "Jason says logo retention below 85% signals a PMF problem — no growth tactic will fix a product people don't want to keep.",
+      },
+      {
+        questionText: "What does Jason say about pricing if customers aren't pushing back?",
+        options: ["Your pricing is perfect", "You're overpriced", "You're underpriced — raise it", "Focus on other problems first"],
+        correctIndex: 2,
+        explanation: "If no customer objects to price, you're underpriced. Most founders underprice by 2-3x. Test higher pricing immediately.",
+      },
+      {
+        questionText: "What NRR do world-class SaaS companies achieve?",
+        options: ["90%+", "100%+", "110%+", "120%+"],
+        correctIndex: 3,
+        explanation: "World-class SaaS targets 120%+ NRR — existing customers expand faster than others churn, creating growth without new acquisition.",
+      },
+    ],
+  });
+
+  await createLesson(growth.id, {
+    dayNumber: 16,
+    title: "Albert Cheng: Finding Hidden Growth at Duolingo",
+    slug: "albert-cheng-hidden-growth",
+    description: "How Duolingo, Grammarly & Chess.com find growth no one else sees",
+    difficulty: 2,
+    xpReward: 20,
+    isLocked: true,
+    guestName: "Albert Cheng",
+    episodeTitle: "How to find hidden growth opportunities in your product | Albert Cheng (Duolingo, Grammarly, Chess.com)",
+    content: `Albert Cheng, who drove growth at Duolingo, Grammarly, and Chess.com, shared his framework for finding non-obvious growth levers on Lenny's Podcast.
+
+THE HIDDEN GROWTH FRAMEWORK:
+Most PMs look for growth in obvious places (acquisition, onboarding, referrals). Albert looks in three underexplored areas:
+
+1. RESURRECTION — Dormant users are your cheapest acquisition channel. At Duolingo, reactivating lapsed users cost 1/10th the CAC of new users. Who stopped using your product 90 days ago? Why?
+
+2. FREQUENCY EXPANSION — Most products are used less than they could be. At Chess.com, Albert found that casual players who played 3x/week vs 1x/week had 5x higher LTV. What would make users come back tomorrow instead of next week?
+
+3. DEPTH OF VALUE — Not all features are equal. Identify the features correlated with long-term retention. At Grammarly, users who enabled tone suggestions had 40% higher retention than those who didn't. What's your "tone suggestions"?
+
+THE ANALYSIS METHOD:
+1. Segment users by cohort (signup date)
+2. Find cohorts with unusually high retention
+3. Ask: What did these users do differently in week 1?
+4. That behavior is your hidden growth lever
+
+KEY INSIGHT: "The best growth opportunity is almost always hiding in your existing user base, not in finding new users."`,
+    questions: [
+      {
+        questionText: "According to Albert Cheng, what makes resurrection campaigns so valuable?",
+        options: [
+          "Dormant users have more money",
+          "Reactivating lapsed users costs ~1/10th the CAC of new users",
+          "They're easier to convert",
+          "They give better reviews",
+        ],
+        correctIndex: 1,
+        explanation: "Resurrection is cheap — at Duolingo, reactivating dormant users cost 1/10th the CAC of acquiring new users.",
+      },
+      {
+        questionText: "What is 'depth of value' analysis?",
+        options: [
+          "Measuring feature usage frequency",
+          "Identifying features correlated with long-term retention",
+          "Analyzing user lifetime value",
+          "Studying power user behavior",
+        ],
+        correctIndex: 1,
+        explanation: "Depth of value means finding which features (like Grammarly's tone suggestions) correlate with 40%+ higher retention.",
+      },
+      {
+        questionText: "What is Albert's recommended approach to find hidden growth levers?",
+        options: [
+          "Run A/B tests on the homepage",
+          "Interview churned users",
+          "Find cohorts with unusually high retention and study week-1 behavior",
+          "Benchmark against competitors",
+        ],
+        correctIndex: 2,
+        explanation: "Find cohorts with unusually high retention → identify what they did differently in week 1 → that behavior is your growth lever.",
+      },
+    ],
+  });
+
+  await createLesson(pricing.id, {
+    dayNumber: 17,
+    title: "Madhavan Ramanujam: Pricing Your AI Product",
+    slug: "madhavan-ai-pricing",
+    description: "Lessons from 400+ companies on pricing the new generation of AI products",
+    difficulty: 3,
+    xpReward: 25,
+    isLocked: true,
+    guestName: "Madhavan Ramanujam",
+    episodeTitle: "Pricing your AI product: Lessons from 400+ companies and 50 unicorns | Madhavan Ramanujam",
+    content: `Madhavan Ramanujam returned to Lenny's Podcast specifically to address pricing in the AI era — after studying 400+ companies and 50 unicorns.
+
+THE AI PRICING CHALLENGE:
+AI products break traditional pricing models because:
+1. Costs are variable (token usage, inference)
+2. Value is often hard to quantify upfront
+3. Users don't know what they're willing to pay for something new
+
+THE 3 AI PRICING MODELS:
+1. OUTCOME-BASED — Charge for results, not usage. "We save you $X" → charge a % of savings. Example: AI legal review tools charging per contract reviewed, not per hour.
+2. SEAT-BASED + USAGE CAP — Familiar SaaS model with guardrails. Safe but leaves money on the table with power users.
+3. CONSUMPTION-BASED — Pure usage pricing. Highest ceiling but lowest floor — volatile revenue.
+
+MADHAVAN'S RECOMMENDATION FOR MOST AI STARTUPS:
+Start with outcome-based pricing for your first 10 customers. This forces you to understand where you actually deliver value. Then standardize into consumption or seat-based once you understand usage patterns.
+
+THE WILLINGNESS TO PAY RESEARCH METHOD:
+Ask: "At what price would this feel expensive but still worth it?" (not "what would you pay?"). The Van Westendorp method gives you a price band, not a single number.
+
+KEY INSIGHT: "AI products that charge per outcome rather than per token will win. Customers don't want to buy tokens — they want to buy results."`,
+    questions: [
+      {
+        questionText: "Why do AI products break traditional pricing models?",
+        options: [
+          "They're too new",
+          "Variable costs, hard-to-quantify value, and unknown willingness to pay",
+          "Customers refuse to pay for AI",
+          "Pricing tools don't work for AI",
+        ],
+        correctIndex: 1,
+        explanation: "AI pricing is hard because costs vary (token inference), value is unclear upfront, and users lack reference points for what AI is worth.",
+      },
+      {
+        questionText: "What does Madhavan recommend for the first 10 customers of an AI startup?",
+        options: [
+          "Offer it free to build traction",
+          "Use consumption-based pricing",
+          "Outcome-based pricing — charge for results",
+          "Copy competitor pricing",
+        ],
+        correctIndex: 2,
+        explanation: "Start outcome-based for first 10 customers — it forces clarity on where you actually deliver value before standardizing.",
+      },
+      {
+        questionText: "What is the Van Westendorp pricing question?",
+        options: [
+          "'What would you pay for this?'",
+          "'What price would feel expensive but still worth it?'",
+          "'What is your monthly budget?'",
+          "'How much does your current solution cost?'",
+        ],
+        correctIndex: 1,
+        explanation: "Van Westendorp asks 'At what price would this feel expensive but still worth it?' — giving a price band, not a single point.",
+      },
+    ],
+  });
+
+  await createLesson(leadership.id, {
+    dayNumber: 18,
+    title: "Molly Graham: Leading Through Chaos and Scale",
+    slug: "molly-graham-scale",
+    description: "Frameworks from Facebook, Square & Quip for leading rapid growth",
+    difficulty: 2,
+    xpReward: 20,
+    isLocked: true,
+    guestName: "Molly Graham",
+    episodeTitle: "The high-growth handbook: Molly Graham's frameworks for leading through chaos, change, and scale",
+    content: `Molly Graham — who worked under Zuckerberg, Sheryl Sandberg, Chamath, and Bret Taylor — shared her playbook for leading through hypergrowth on Lenny's Podcast.
+
+HER CORE FRAMEWORK: "Give Away Your Legos"
+As companies scale, every leader must give away their legos — the pieces of their job they built and love. Leaders who can't do this become bottlenecks that kill growth.
+
+The 4 stages of scaling leadership:
+1. BUILDER (0-10 people) — You do everything. The more legos you touch, the better.
+2. TEAM LEAD (10-50 people) — You start giving away legos to direct reports. This feels like loss. It is loss. Do it anyway.
+3. FUNCTIONAL LEADER (50-200 people) — You're now giving away entire Lego sets — whole functions. Your job becomes culture and strategy, not execution.
+4. EXECUTIVE (200+ people) — You're largely giving away the ability to know exactly what's happening. Radical trust or you go crazy.
+
+THE BIGGEST MISTAKE: Holding onto legos you've outgrown. Every leader who failed to scale did so because they couldn't let go of the thing that made them successful at the previous level.
+
+MOLLY'S "ORGANIZATIONAL ADOLESCENCE" CONCEPT:
+At 50-150 people, companies hit a painful adolescence — too big to be scrappy, too small to have real systems. Leaders must architect through this phase, not just manage it.
+
+KEY INSIGHT: "The job description of a leader changes completely every time the company doubles. The people who fail to scale are those who don't realize their job changed."`,
+    questions: [
+      {
+        questionText: "What does 'Give Away Your Legos' mean in Molly's framework?",
+        options: [
+          "Delegate tasks you don't like",
+          "Give away parts of your job you built and love as the company scales",
+          "Hire people to replace you",
+          "Share equity with employees",
+        ],
+        correctIndex: 1,
+        explanation: "Giving away legos means handing off pieces of your job you built and love — the things that made you successful at the previous stage.",
+      },
+      {
+        questionText: "What is 'organizational adolescence'?",
+        options: [
+          "When a company is less than 2 years old",
+          "When founders are young",
+          "The painful 50-150 person phase — too big to be scrappy, too small for real systems",
+          "When a company goes through leadership changes",
+        ],
+        correctIndex: 2,
+        explanation: "Organizational adolescence at 50-150 people is when companies are too big to operate scrappily but too small to have mature systems.",
+      },
+      {
+        questionText: "According to Molly, why do leaders fail to scale?",
+        options: [
+          "They don't hire fast enough",
+          "They can't let go of what made them successful at the previous level",
+          "They lose technical skills",
+          "They run out of funding",
+        ],
+        correctIndex: 1,
+        explanation: "Leaders fail to scale when they hold onto legos they've outgrown — the skills and ownership that worked at the previous stage.",
+      },
+    ],
+  });
+
+  await createLesson(strategy.id, {
+    dayNumber: 19,
+    title: "Melanie Perkins: Building Canva to $42B",
+    slug: "melanie-perkins-canva",
+    description: "The founder of Canva on building from zero to $42B with design-first thinking",
+    difficulty: 2,
+    xpReward: 20,
+    isLocked: true,
+    guestName: "Melanie Perkins",
+    episodeTitle: "The woman behind Canva shares how she built a $42B company from nothing | Melanie Perkins",
+    content: `Melanie Perkins, co-founder and CEO of Canva, shared her story on Lenny's Podcast — from being rejected by 100 VCs to building a $42B company used by 170M+ people.
+
+THE CANVA ORIGIN STORY:
+Melanie's insight came while teaching design software at university. Students spent weeks learning Photoshop before making anything. Her hypothesis: design could be radically simpler.
+
+She tested with Fusion Books (school yearbooks) before building Canva — proving demand before the big bet.
+
+THE "EVERYONE CAN BE A DESIGNER" PRINCIPLE:
+Canva's core insight wasn't "make design tools easier" — it was "eliminate the need for design expertise entirely." This framing led to very different product decisions:
+- Remove features that imply expertise (layers, bezier curves)
+- Add features that produce results (one-click resize, brand kits)
+- Make the output (the design) look professional even with zero skill
+
+MELANIE'S FUNDRAISING LESSON:
+100+ rejections before getting funded. Her persistence strategy: Get 1 meeting, ask them who else they'd recommend. Build a network through rejection. Every "no" was a referral opportunity.
+
+THE PRODUCT LESSON: Start with a constraint.
+Canva was constrained to the web browser (couldn't be a desktop app) — this became a feature: real-time collaboration, no installs, always up-to-date.
+
+KEY INSIGHT: "The best products don't target power users. They target people who need the outcome but can't afford the expertise."`,
+    questions: [
+      {
+        questionText: "What was Canva's core insight beyond 'make design easier'?",
+        options: [
+          "Eliminate the need for design expertise entirely",
+          "Make Photoshop cheaper",
+          "Target professional designers",
+          "Build on mobile first",
+        ],
+        correctIndex: 0,
+        explanation: "Canva's insight was eliminating expertise requirements, not just simplifying tools — leading to removing layers/bezier curves but adding one-click resizing.",
+      },
+      {
+        questionText: "How did Melanie turn 100+ VC rejections into an advantage?",
+        options: [
+          "She gave up and bootstrapped",
+          "She asked each rejector to recommend who else to talk to — turning rejections into referrals",
+          "She found angel investors instead",
+          "She launched a crowdfunding campaign",
+        ],
+        correctIndex: 1,
+        explanation: "Melanie asked every investor who rejected her for referrals — systematically building a network through rejection.",
+      },
+      {
+        questionText: "How did Canva's web browser constraint become a feature?",
+        options: [
+          "It reduced development costs",
+          "It enabled real-time collaboration and no-install access",
+          "It was required for app store approval",
+          "It made the product more secure",
+        ],
+        correctIndex: 1,
+        explanation: "Being web-only became real-time collaboration, no installs, and always-updated — constraint became competitive advantage.",
+      },
+    ],
+  });
+
+  await createLesson(psychology.id, {
+    dayNumber: 20,
+    title: "Ravi Mehta: The AI Prototype Method",
+    slug: "ravi-mehta-ai-prototype",
+    description: "Why Tinder's CPO starts with JSON, not wireframes",
+    difficulty: 2,
+    xpReward: 20,
+    isLocked: true,
+    guestName: "Ravi Mehta",
+    episodeTitle: "The secret to better AI prototypes: Why Tinder's CPO starts with JSON, not design | Ravi Mehta",
+    content: `Ravi Mehta, former CPO of Tinder and product advisor, shared a counter-intuitive AI prototyping framework on Lenny's Podcast.
+
+THE OLD PROTOTYPE PROCESS:
+Idea → Wireframe → Design → Engineering builds → User testing → Learn
+
+THE AI PROTOTYPE PROCESS (Ravi's method):
+Idea → JSON spec → Prompt engineering → Live AI prototype → User testing → Design → Engineering
+
+WHY JSON FIRST?
+Most product ideas fail at the "will users actually engage with this?" stage — not the design stage. By starting with JSON (structured data output), you can:
+1. Test the core value proposition in hours, not weeks
+2. Learn if users want the content before spending on design
+3. Iterate on the "what" (data/output) separately from the "how" (UX)
+
+THE TINDER LESSON:
+At Tinder, Ravi tested "would users engage with AI-generated conversation starters?" by creating a JSON spec of 50 conversation types, prompting Claude to generate them, and showing raw output to 20 users. 3-day test. No design. No engineering. Clear signal.
+
+THE FRAMEWORK:
+- Days 1-3: JSON spec + prompt → raw output test
+- Days 4-7: Simple UI wrapper (v0 / lovable)
+- Days 8-14: If signal positive → design & engineer properly
+
+KEY INSIGHT: "The biggest waste in product development is building beautiful designs for ideas users don't want. Validate the content before the container."`,
+    questions: [
+      {
+        questionText: "Why does Ravi Mehta recommend starting AI prototypes with JSON, not wireframes?",
+        options: [
+          "JSON is easier to build",
+          "It tests core value (content) before spending on design",
+          "Designers aren't needed anymore",
+          "Engineers prefer JSON specs",
+        ],
+        correctIndex: 1,
+        explanation: "JSON-first tests whether users want the content in hours — before investing weeks in design and engineering.",
+      },
+      {
+        questionText: "What is the timeline for Ravi's AI prototype framework?",
+        options: [
+          "Days 1-7: Design, Days 8-14: Build",
+          "Days 1-3: JSON test, Days 4-7: Simple UI, Days 8-14: Proper build",
+          "Days 1-14: Full sprint with engineering",
+          "Days 1-5: Wireframes, Days 6-14: Engineering",
+        ],
+        correctIndex: 1,
+        explanation: "JSON spec + prompt test (3 days) → simple UI wrapper (4 days) → full design + engineering only if signal is positive.",
+      },
+      {
+        questionText: "What was the Tinder AI conversation starters test?",
+        options: [
+          "A full product launch to 1M users",
+          "A 3-day raw JSON output test with 20 users — no design, no engineering",
+          "A 6-month research project",
+          "An A/B test with 100K users",
+        ],
+        correctIndex: 1,
+        explanation: "Ravi tested AI conversation starters in 3 days with raw JSON output shown to 20 users — fast signal with zero engineering.",
+      },
+    ],
+  });
+
+  await createLesson(duolingo.id, {
+    dayNumber: 21,
+    title: "Elena Verna 4.0: Growth in the AI Era",
+    slug: "elena-verna-ai-growth",
+    description: "How growth models are shifting in 2025 — from PLG to AI-led growth",
+    difficulty: 3,
+    xpReward: 25,
+    isLocked: true,
+    guestName: "Elena Verna",
+    episodeTitle: "Elena Verna 4.0 — AI-led growth, lovability, and the death of traditional funnels",
+    content: `Elena Verna returned for her 4th episode on Lenny's Podcast to discuss how AI is fundamentally changing growth models.
+
+THE SHIFT: FROM PLG TO ALG (AI-LED GROWTH)
+Traditional PLG: User discovers product → self-serves to value → converts
+AI-Led Growth: AI surfaces personalized value → user experiences magic → converts at higher rates with less friction
+
+THE 4 AI GROWTH LEVERS:
+1. AI ONBOARDING — Instead of linear onboarding flows, AI personalizes the experience to each user's goals. Duolingo's AI tutor adapts difficulty in real-time, reducing churn by 23%.
+2. AI RESURRECTION — AI predicts which dormant users are likely to return and what message will bring them back. 10x more effective than batch email campaigns.
+3. AI PRICING — Dynamic pricing based on user's willingness to pay (usage patterns, company size, engagement). Early results: 30-40% revenue uplift.
+4. AI FEATURE DISCOVERY — AI surfaces features based on user behavior, not hardcoded tooltips. Users discover features 5x faster.
+
+THE LOVABILITY FRAMEWORK:
+Elena argues growth in 2025 isn't about acquisition — it's about making products people love. "If NPS > 60, word of mouth does your growth job. Focus on love, not loops."
+
+WHAT'S DYING:
+- Generic email drip campaigns (AI personalization beats them)
+- One-size-fits-all onboarding
+- Relying purely on social referrals
+
+KEY INSIGHT: "The companies winning in AI growth aren't the ones with the best growth teams — they're the ones with the best data about their users."`,
+    questions: [
+      {
+        questionText: "What is AI-Led Growth (ALG) vs. traditional PLG?",
+        options: [
+          "ALG uses chatbots instead of sales teams",
+          "ALG has AI surface personalized value, reducing friction to conversion",
+          "ALG is just PLG with AI features",
+          "ALG eliminates the need for a product team",
+        ],
+        correctIndex: 1,
+        explanation: "ALG uses AI to surface personalized value for each user, vs PLG's generic self-serve flow — higher conversion with less friction.",
+      },
+      {
+        questionText: "What NPS threshold does Elena say triggers word-of-mouth growth?",
+        options: ["NPS > 30", "NPS > 45", "NPS > 60", "NPS > 75"],
+        correctIndex: 2,
+        explanation: "Elena's rule: NPS > 60 means word of mouth handles growth — focus on making the product lovable, not on growth loops.",
+      },
+      {
+        questionText: "What growth tactic is Elena declaring dead in the AI era?",
+        options: [
+          "SEO",
+          "Paid acquisition",
+          "Generic email drip campaigns (AI personalization beats them)",
+          "Product-led growth",
+        ],
+        correctIndex: 2,
+        explanation: "Generic drip emails are dying — AI-personalized outreach based on individual behavior is 10x more effective.",
+      },
+    ],
+  });
+
+  await createLesson(leadership.id, {
+    dayNumber: 22,
+    title: "Nick Turley: Inside ChatGPT's Fastest-Growing Product",
+    slug: "nick-turley-chatgpt",
+    description: "How ChatGPT went from 0 to 200M weekly users — and what's next",
+    difficulty: 2,
+    xpReward: 20,
+    isLocked: true,
+    guestName: "Nick Turley",
+    episodeTitle: "Inside ChatGPT: The fastest-growing product in history | Nick Turley (Head of ChatGPT at OpenAI)",
+    content: `Nick Turley, Head of Product at ChatGPT, joined Lenny's Podcast to share what he's learned building the fastest-growing product in history.
+
+THE CHATGPT GROWTH STORY:
+- 1M users: 5 days (fastest ever at the time)
+- 100M users: 2 months (prev record: TikTok at 9 months)
+- 200M weekly users: 2 years post-launch
+
+THE PRODUCT DECISION THAT UNLOCKED GROWTH:
+The biggest unlock wasn't a feature — it was removing friction. Early ChatGPT required signup. When they added a "try without an account" option, usage exploded. Friction is often more important than features.
+
+HOW THEY PRIORITIZE AT CHATGPT SCALE:
+With 200M weekly users, even a 0.1% engagement change affects 200K people. Nick's prioritization principle:
+1. Safety and trust first — always
+2. Core quality (does the model actually help?) second
+3. Everything else third
+
+This sounds obvious but in practice, teams often deprioritize quality for new feature work.
+
+THE PM'S ROLE IN AI PRODUCTS:
+Traditional PM: Define requirements, manage stakeholders, ship features
+ChatGPT PM: Evaluate model outputs, define evals, understand training data
+
+Nick's insight: "The PM role is evolving. In AI products, the most important PM skill is no longer roadmap prioritization — it's knowing how to evaluate model quality."
+
+KEY INSIGHT: "Every company will have AI products. The ones that win will be the ones that best understand what good looks like for their specific domain."`,
+    questions: [
+      {
+        questionText: "What was ChatGPT's biggest growth unlock according to Nick Turley?",
+        options: [
+          "Launching the mobile app",
+          "Adding GPT-4",
+          "Removing signup friction with 'try without an account'",
+          "Launching ChatGPT Plus",
+        ],
+        correctIndex: 2,
+        explanation: "Removing account requirement and allowing anonymous use caused usage to explode — friction removal beat any feature.",
+      },
+      {
+        questionText: "What is Nick's prioritization framework at ChatGPT scale?",
+        options: [
+          "Growth → Features → Quality",
+          "Safety → Core quality → Everything else",
+          "Revenue → Users → Safety",
+          "Speed → Scale → Trust",
+        ],
+        correctIndex: 1,
+        explanation: "Safety and trust first, core model quality second, new features third — this order is non-negotiable at 200M weekly users.",
+      },
+      {
+        questionText: "How is the PM role evolving in AI products according to Nick?",
+        options: [
+          "PMs are being replaced by AI",
+          "PMs need more engineering skills",
+          "The most important skill is now evaluating model quality, not roadmap prioritization",
+          "PMs should focus more on design",
+        ],
+        correctIndex: 2,
+        explanation: "In AI products, PMs must understand how to evaluate model outputs and define quality evals — not just manage roadmaps.",
+      },
+    ],
+  });
+
   // Create achievements
   const achievements = [
     { name: "First Lesson", description: "Complete your first lesson", icon: "🎯", requirement: '{"type":"lessons","value":1}' },
@@ -1109,7 +1622,7 @@ Kyle's insight: "The best pricing model is the one where your customers' success
     { name: "Month Master", description: "30-day streak", icon: "💎", requirement: '{"type":"streak","value":30}' },
     { name: "XP Centurion", description: "Earn 100 XP", icon: "⚡", requirement: '{"type":"xp","value":100}' },
     { name: "Half Marathon", description: "Complete 7 lessons", icon: "🏃", requirement: '{"type":"lessons","value":7}' },
-    { name: "Scholar", description: "Complete all lessons", icon: "🎓", requirement: '{"type":"lessons","value":14}' },
+    { name: "Scholar", description: "Complete all unlocked lessons", icon: "🎓", requirement: '{"type":"lessons","value":14}' },
     { name: "Perfect Score", description: "Get 100% on a quiz", icon: "💯", requirement: '{"type":"perfect","value":1}' },
     { name: "Social Climber", description: "Reach top 3 on leaderboard", icon: "🏆", requirement: '{"type":"leaderboard","value":3}' },
   ];
@@ -1118,7 +1631,7 @@ Kyle's insight: "The best pricing model is the one where your customers' success
     await prisma.achievement.create({ data: a });
   }
 
-  console.log("Seed completed! 14 lessons across 6 categories, 8 achievements, and a demo user (demo@pmstreak.com / demo123)");
+  console.log("Seed completed! 14 active + 8 locked preview lessons across 6 categories, 8 achievements, and a demo user (demo@pmstreak.com / demo123)");
 }
 
 interface LessonInput {
@@ -1129,6 +1642,7 @@ interface LessonInput {
   difficulty: number;
   xpReward: number;
   content: string;
+  isLocked?: boolean;
   youtubeId?: string;
   youtubeStart?: number;
   youtubeEnd?: number;
@@ -1153,6 +1667,7 @@ async function createLesson(categoryId: string, input: LessonInput) {
       difficulty: input.difficulty,
       dayNumber: input.dayNumber,
       categoryId,
+      isLocked: input.isLocked ?? false,
       youtubeId: input.youtubeId ?? null,
       youtubeStart: input.youtubeStart ?? null,
       youtubeEnd: input.youtubeEnd ?? null,

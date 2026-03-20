@@ -34,6 +34,7 @@ export async function GET() {
       difficulty: lesson.difficulty,
       dayNumber: lesson.dayNumber,
       completed: lesson.completedLessons.length > 0,
+      isLocked: lesson.isLocked,
       score: lesson.completedLessons[0]?.score ?? null,
     })),
   }));

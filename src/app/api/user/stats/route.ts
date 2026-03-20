@@ -26,7 +26,8 @@ export async function GET() {
   });
 
   const completedCount = await prisma.completedLesson.count({ where: { userId } });
-  const totalLessons = await prisma.lesson.count();
+  const totalLessons = await prisma.lesson.count({ where: { isLocked: false } });
+  const totalArchive = 289; // Full Lenny's Podcast archive available
 
   const last30Days: string[] = [];
   for (let i = 29; i >= 0; i--) {
@@ -53,6 +54,7 @@ export async function GET() {
     streak: streakInfo,
     completedCount,
     totalLessons,
+    totalArchive,
     calendar,
   });
 }

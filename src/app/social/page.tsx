@@ -160,7 +160,7 @@ export default function SocialPage() {
     <div className="min-h-screen">
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
 
-      <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-2xl mx-auto px-4 py-6 pb-28 space-y-6">
         <div className="text-center">
           <Users size={40} className="mx-auto text-[var(--purple-primary)] mb-2" />
           <h1 className="text-xl font-bold">Social</h1>

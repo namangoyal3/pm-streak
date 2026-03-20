@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Flame, Zap } from "lucide-react";
+import { Flame, Zap, Trophy, BookOpen } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -46,24 +46,45 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
+
+        {/* Logo & branding */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Flame size={40} className="text-[var(--orange-primary)] streak-flame" />
+          <div className="flex items-center justify-center mb-3">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--green-primary)] to-[var(--green-dark)] flex items-center justify-center shadow-xl shadow-[var(--green-primary)]/30">
+              <Flame size={44} className="text-white streak-flame" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold">
-            <span className="text-[var(--green-primary)]">PM</span> Streak
+          <h1 className="text-3xl font-black tracking-tight">
+            <span className="text-[var(--green-primary)]">PM</span>
+            <span className="text-white"> Streak</span>
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-2">
-            Daily product wisdom in 2-3 minutes
+          <p className="text-[var(--text-secondary)] text-sm mt-1.5 font-medium">
+            Daily product wisdom in 2–3 minutes
           </p>
+        </div>
+
+        {/* Feature pills */}
+        <div className="flex items-center justify-center gap-2 mb-7">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)]">
+            <Flame size={13} className="text-[var(--orange-primary)]" />
+            <span className="text-xs font-bold text-white">Streaks</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)]">
+            <Zap size={13} className="text-[var(--gold-primary)]" />
+            <span className="text-xs font-bold text-white">XP System</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)]">
+            <Trophy size={13} className="text-[var(--purple-primary)]" />
+            <span className="text-xs font-bold text-white">Ranks</span>
+          </div>
         </div>
 
         {/* Google Sign-In */}
         <a
           href="/api/auth/google"
-          className="flex items-center justify-center gap-3 w-full py-3 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--bg-card)] hover:border-white/30 text-white text-sm font-bold transition-colors mb-4"
+          className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--bg-card)] hover:bg-white/5 hover:border-white/20 text-white text-sm font-bold transition-all mb-4"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -76,68 +97,53 @@ function LoginForm() {
 
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px bg-[var(--border-color)]" />
-          <span className="text-xs text-[var(--text-secondary)]">or</span>
+          <span className="text-xs text-[var(--text-secondary)] font-medium">or</span>
           <div className="flex-1 h-px bg-[var(--border-color)]" />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm"
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm font-medium transition-colors"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm font-medium transition-colors"
+          />
 
           {error && (
-            <p className="text-[var(--red-primary)] text-sm text-center">{error}</p>
+            <div className="bg-[var(--red-primary)]/10 border border-[var(--red-primary)]/30 rounded-xl p-3">
+              <p className="text-[var(--red-primary)] text-xs font-bold text-center">{error}</p>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors disabled:opacity-50"
+            className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] active:scale-98 text-white font-black text-sm uppercase tracking-widest transition-all disabled:opacity-50 shadow-lg shadow-[var(--green-primary)]/20"
           >
             {loading ? "Signing in..." : "Log In"}
           </button>
         </form>
 
-        <p className="text-center mt-6 text-sm text-[var(--text-secondary)]">
+        <p className="text-center mt-5 text-sm text-[var(--text-secondary)]">
           New here?{" "}
-          <Link href="/signup" className="text-[var(--green-primary)] font-bold hover:underline">
+          <Link href="/signup" className="text-[var(--green-primary)] font-black hover:underline">
             Create account
           </Link>
         </p>
 
-        <div className="mt-8 bg-[var(--bg-card)] rounded-2xl p-4 text-center">
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <Flame size={16} className="text-[var(--orange-primary)]" />
-              <span>Streaks</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Zap size={16} className="text-[var(--gold-primary)]" />
-              <span>XP System</span>
-            </div>
-            <div className="text-[var(--purple-primary)]">Leaderboards</div>
-          </div>
-          <p className="text-xs text-[var(--text-secondary)] mt-2">
-            Powered by insights from Lenny&apos;s Podcast
-          </p>
-        </div>
+        <p className="text-center mt-3 text-[10px] text-[var(--text-secondary)]/60">
+          Powered by insights from Lenny&apos;s Podcast
+        </p>
       </div>
     </div>
   );

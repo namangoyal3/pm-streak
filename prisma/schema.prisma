@@ -70,6 +70,7 @@ model Lesson {
   guestName    String?  // Podcast guest name
   episodeTitle String?  // Full episode title
   sourceTranscript String? // Raw transcript excerpt from Lenny MCP
+  isLocked     Boolean  @default(false)
   aiGenerated  Boolean  @default(false)
   createdAt    DateTime @default(now())
 

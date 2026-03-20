@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Flame } from "lucide-react";
+import { Flame, Zap, BookOpen } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -40,22 +40,45 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
+
+        {/* Logo */}
         <div className="text-center mb-8">
-          <Flame size={40} className="text-[var(--orange-primary)] streak-flame mx-auto mb-4" />
-          <h1 className="text-3xl font-bold">
-            Join <span className="text-[var(--green-primary)]">PM</span> Streak
+          <div className="flex items-center justify-center mb-3">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--green-primary)] to-[var(--green-dark)] flex items-center justify-center shadow-xl shadow-[var(--green-primary)]/30">
+              <Flame size={44} className="text-white streak-flame" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-black tracking-tight">
+            Join <span className="text-[var(--green-primary)]">PM</span>
+            <span className="text-white"> Streak</span>
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-2">
-            Build your product skills, one streak at a time
+          <p className="text-[var(--text-secondary)] text-sm mt-1.5 font-medium">
+            Build product skills one streak at a time
           </p>
+        </div>
+
+        {/* Value props */}
+        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-4 mb-6 space-y-2.5">
+          {[
+            { icon: <BookOpen size={15} className="text-[var(--blue-primary)]" />, text: "Learn from Lenny's best PM frameworks" },
+            { icon: <Flame size={15} className="text-[var(--orange-primary)]" />, text: "Keep a daily streak to track consistency" },
+            { icon: <Zap size={15} className="text-[var(--gold-primary)]" />, text: "Earn XP and climb the leaderboard" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
+                {item.icon}
+              </div>
+              <span className="text-xs font-medium text-[var(--text-secondary)]">{item.text}</span>
+            </div>
+          ))}
         </div>
 
         {/* Google Sign-In */}
         <a
           href="/api/auth/google"
-          className="flex items-center justify-center gap-3 w-full py-3 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--bg-card)] hover:border-white/30 text-white text-sm font-bold transition-colors mb-4"
+          className="flex items-center justify-center gap-3 w-full py-3.5 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--bg-card)] hover:bg-white/5 hover:border-white/20 text-white text-sm font-bold transition-all mb-4"
         >
           <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -68,26 +91,26 @@ export default function SignupPage() {
 
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px bg-[var(--border-color)]" />
-          <span className="text-xs text-[var(--text-secondary)]">or</span>
+          <span className="text-xs text-[var(--text-secondary)] font-medium">or</span>
           <div className="flex-1 h-px bg-[var(--border-color)]" />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="text"
             placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm"
+            className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm font-medium transition-colors"
           />
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm"
+            className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm font-medium transition-colors"
           />
           <input
             type="password"
@@ -96,25 +119,27 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm"
+            className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm font-medium transition-colors"
           />
 
           {error && (
-            <p className="text-[var(--red-primary)] text-sm text-center">{error}</p>
+            <div className="bg-[var(--red-primary)]/10 border border-[var(--red-primary)]/30 rounded-xl p-3">
+              <p className="text-[var(--red-primary)] text-xs font-bold text-center">{error}</p>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors disabled:opacity-50"
+            className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm uppercase tracking-widest transition-all disabled:opacity-50 shadow-lg shadow-[var(--green-primary)]/20"
           >
             {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
-        <p className="text-center mt-6 text-sm text-[var(--text-secondary)]">
+        <p className="text-center mt-5 text-sm text-[var(--text-secondary)]">
           Already have an account?{" "}
-          <Link href="/login" className="text-[var(--green-primary)] font-bold hover:underline">
+          <Link href="/login" className="text-[var(--green-primary)] font-black hover:underline">
             Log in
           </Link>
         </p>
