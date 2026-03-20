@@ -454,40 +454,37 @@ export default function DashboardPage() {
         {/* ── Activity Calendar ── */}
         {stats?.calendar && <StreakCalendar calendar={stats.calendar} />}
 
-        {/* ── 2C: PM Knowledge Map ── */}
+        {/* ── PM Knowledge Map ── */}
         {categories.length > 0 && (
           <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin size={16} className="text-[var(--blue-primary)]" />
-              <h2 className="text-base font-black">Your PM Knowledge Map</h2>
+              <TrendingUp size={16} className="text-[var(--green-primary)]" />
+              <h2 className="text-base font-black">PM Knowledge Map</h2>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-3">
               {categories.map((category) => {
                 const catCompleted = category.lessons.filter((l) => l.completed).length;
                 const catTotal = category.lessons.filter((l) => !l.isLocked).length;
                 const catPct = catTotal > 0 ? Math.round((catCompleted / catTotal) * 100) : 0;
                 const catColor = category.color || "#58cc02";
                 return (
-                  <div key={category.id} className="flex flex-col items-center gap-1.5">
-                    <div
-                      className="relative w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{
-                        background: `conic-gradient(${catColor} ${catPct * 3.6}deg, rgba(255,255,255,0.05) ${catPct * 3.6}deg)`,
-                        boxShadow: catPct > 0 ? `0 0 12px ${catColor}40` : "none",
-                      }}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-                        style={{ background: "var(--bg-card)", border: `2px solid ${catColor}40` }}
-                      >
-                        {category.icon}
+                  <div key={category.id} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-base flex-shrink-0">
+                      {category.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold truncate">{category.name}</span>
+                        <span className="text-xs font-bold ml-2 flex-shrink-0 tabular-nums" style={{ color: catPct > 0 ? catColor : "var(--text-secondary)" }}>
+                          {catCompleted}/{catTotal}
+                        </span>
                       </div>
-                    </div>
-                    <div className="text-[10px] font-black text-center leading-tight" style={{ color: catColor }}>
-                      {catPct}%
-                    </div>
-                    <div className="text-[9px] font-bold text-center leading-tight max-w-[64px] break-words" style={{ color: "var(--text-secondary)" }}>
-                      {category.name}
+                      <div className="h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${catPct}%`, background: catColor }}
+                        />
+                      </div>
                     </div>
                   </div>
                 );
