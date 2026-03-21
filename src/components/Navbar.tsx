@@ -11,9 +11,10 @@ interface NavbarProps {
   gems: number;
   avatarUrl?: string | null;
   name?: string;
+  unreadNotifications?: number;
 }
 
-export default function Navbar({ streakCount, xp, gems, avatarUrl, name }: NavbarProps) {
+export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadNotifications = 0 }: NavbarProps) {
   const pathname = usePathname();
   const unlocked = streakCount >= 7;
 
@@ -102,6 +103,7 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name }: Navba
                 </div>
               );
             }
+            const showBadge = item.href === "/social" && unreadNotifications > 0;
             return (
               <Link
                 key={item.href}
@@ -118,6 +120,11 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name }: Navba
                   active ? "bg-[var(--green-primary)]/15" : ""
                 )}>
                   <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+                  {showBadge && (
+                    <span className="absolute top-0 right-0.5 min-w-[16px] h-4 bg-red-500 rounded-full text-[10px] font-black text-white flex items-center justify-center px-1 leading-none">
+                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                    </span>
+                  )}
                 </div>
                 <span className={cn(
                   "text-[10px] font-bold",

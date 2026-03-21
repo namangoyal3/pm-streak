@@ -139,6 +139,12 @@ export default function SocialPage() {
     if (challengeRes.ok) setChallenges(await challengeRes.json());
   };
 
+  const handleChallengesTabOpen = () => {
+    setTab("challenges");
+    // Mark all notifications as read
+    fetch("/api/notifications", { method: "PATCH" }).catch(() => {});
+  };
+
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
@@ -158,7 +164,7 @@ export default function SocialPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
+      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} unreadNotifications={0} />
 
       <main className="max-w-2xl mx-auto px-4 py-6 pb-28 space-y-6">
         <div className="text-center">
@@ -183,15 +189,20 @@ export default function SocialPage() {
           {(["friends", "find", "challenges"] as const).map((t) => (
             <button
               key={t}
-              onClick={() => setTab(t)}
+              onClick={() => t === "challenges" ? handleChallengesTabOpen() : setTab(t)}
               className={cn(
-                "flex-1 py-2 rounded-xl text-xs font-bold transition-colors capitalize",
+                "flex-1 py-2 rounded-xl text-xs font-bold transition-colors capitalize relative",
                 tab === t
                   ? "bg-[var(--purple-primary)] text-white"
                   : "text-[var(--text-secondary)] hover:text-white"
               )}
             >
               {t === "find" ? "Find Friends" : t}
+              {t === "challenges" && challenges.received.length > 0 && (
+                <span className="absolute top-1 right-2 min-w-[14px] h-3.5 bg-red-500 rounded-full text-[9px] font-black text-white flex items-center justify-center px-1">
+                  {challenges.received.length}
+                </span>
+              )}
             </button>
           ))}
         </div>

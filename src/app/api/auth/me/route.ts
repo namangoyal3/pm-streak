@@ -8,31 +8,34 @@ export async function GET() {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      avatarUrl: true,
-      xp: true,
-      level: true,
-      streakCount: true,
-      longestStreak: true,
-      streakFreezes: true,
-      gems: true,
-      streakGoal: true,
-      onboarded: true,
-      lastActiveAt: true,
-      createdAt: true,
-    },
-  });
+  const [user, unreadNotifications] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUrl: true,
+        xp: true,
+        level: true,
+        streakCount: true,
+        longestStreak: true,
+        streakFreezes: true,
+        gems: true,
+        streakGoal: true,
+        onboarded: true,
+        lastActiveAt: true,
+        createdAt: true,
+      },
+    }),
+    prisma.notification.count({ where: { userId, readAt: null } }),
+  ]);
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ user });
+  return NextResponse.json({ user: { ...user, unreadNotifications } });
 }
 
 export async function DELETE() {

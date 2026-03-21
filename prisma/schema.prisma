@@ -40,6 +40,21 @@ model User {
   followers          Follow[]         @relation("following")
   sentChallenges     FriendChallenge[] @relation("challenger")
   receivedChallenges FriendChallenge[] @relation("challengee")
+  notifications      Notification[]    @relation("notifRecipient")
+  sentNotifications  Notification[]    @relation("notifSender")
+}
+
+model Notification {
+  id         String    @id @default(cuid())
+  userId     String    // recipient
+  fromUserId String?   // who triggered it
+  type       String    // challenge_received | challenge_accepted | challenge_declined | challenge_completed
+  payload    String?   // JSON: { challengeId, challengerName, challengeeName, message }
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  user     User  @relation("notifRecipient", fields: [userId], references: [id])
+  fromUser User? @relation("notifSender", fields: [fromUserId], references: [id])
 }
 
 model Category {

@@ -10,7 +10,7 @@ import {
   Flame, Shield, LogOut, Snowflake, Gem, Calendar, Zap,
   ArrowRight, Share2, Target, RotateCcw, Trophy, Star,
   TrendingUp, BookOpen, ChevronRight, Sparkles, Lock, MapPin,
-  Bot, MessageSquare, Brain, Cpu
+  Bot, MessageSquare, Brain, Cpu, Swords
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -55,6 +55,7 @@ export default function DashboardPage() {
   const [showShare, setShowShare] = useState(false);
   const [earnBack, setEarnBack] = useState<any>(null);
   const [milestone, setMilestone] = useState<string | null>(null);
+  const [pendingChallenges, setPendingChallenges] = useState<any[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -79,10 +80,17 @@ export default function DashboardPage() {
         setCategories(lessonsData.categories);
 
         try {
-          const ebRes = await fetch("/api/earn-back");
+          const [ebRes, challengeRes] = await Promise.all([
+            fetch("/api/earn-back"),
+            fetch("/api/social/challenges"),
+          ]);
           if (ebRes.ok) {
             const ebData = await ebRes.json();
             if (ebData.eligible) setEarnBack(ebData);
+          }
+          if (challengeRes.ok) {
+            const cData = await challengeRes.json();
+            setPendingChallenges(cData.received || []);
           }
         } catch { /* ignore */ }
       } catch {
@@ -143,9 +151,28 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
-      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} avatarUrl={user.avatarUrl} name={user.name} />
+      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} avatarUrl={user.avatarUrl} name={user.name} unreadNotifications={user.unreadNotifications} />
 
       <main className="max-w-5xl mx-auto px-4 lg:px-8 pt-4 pb-28">
+        {/* ── Pending challenge alert ── */}
+        {pendingChallenges.length > 0 && (
+          <Link href="/social" className="block mb-4">
+            <div className="flex items-center gap-3 bg-[var(--orange-primary)]/10 border border-[var(--orange-primary)]/30 rounded-2xl px-4 py-3 hover:bg-[var(--orange-primary)]/15 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-[var(--orange-primary)]/20 flex items-center justify-center flex-shrink-0">
+                <Swords size={16} className="text-[var(--orange-primary)]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-black">
+                  {pendingChallenges.length === 1
+                    ? `${pendingChallenges[0].challenger.name} challenged you!`
+                    : `${pendingChallenges.length} challenges waiting for you`}
+                </div>
+                <div className="text-xs text-[var(--text-secondary)]">Tap to accept or decline</div>
+              </div>
+              <ChevronRight size={16} className="text-[var(--text-secondary)]" />
+            </div>
+          </Link>
+        )}
         <div className="lg:grid lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-6 lg:items-start">
         <div className="space-y-4">
 
