@@ -106,6 +106,9 @@ export async function recordLessonCompletion(userId: string, xpEarned: number) {
   // Milestone detection
   const milestone = detectMilestone(user.streakCount, newStreak);
 
+  // Gem bonus for streak milestones
+  const milestoneGems = detectMilestoneGems(user.streakCount, newStreak);
+
   await prisma.user.update({
     where: { id: userId },
     data: {
@@ -115,10 +118,11 @@ export async function recordLessonCompletion(userId: string, xpEarned: number) {
       longestStreak: Math.max(user.longestStreak, newStreak),
       perfectStreak: newPerfectStreak,
       lastActiveAt: new Date(),
+      ...(milestoneGems > 0 ? { gems: { increment: milestoneGems } } : {}),
     },
   });
 
-  return { newStreak, newXP, newLevel, perfectStreak: newPerfectStreak, milestone };
+  return { newStreak, newXP, newLevel, perfectStreak: newPerfectStreak, milestone, milestoneGems };
 }
 
 function detectMilestone(oldStreak: number, newStreak: number): string | null {
@@ -127,4 +131,13 @@ function detectMilestone(oldStreak: number, newStreak: number): string | null {
     if (oldStreak < m && newStreak >= m) return `${m}-day streak`;
   }
   return null;
+}
+
+function detectMilestoneGems(oldStreak: number, newStreak: number): number {
+  // Gem rewards at streak milestones
+  const gemMilestones: Record<number, number> = { 3: 10, 7: 25, 14: 25, 30: 50, 50: 50, 100: 100 };
+  for (const [m, gems] of Object.entries(gemMilestones)) {
+    if (oldStreak < Number(m) && newStreak >= Number(m)) return gems;
+  }
+  return 0;
 }

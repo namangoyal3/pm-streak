@@ -452,6 +452,30 @@ export default function DashboardPage() {
               />
             ))}
           </div>
+
+          {/* How to earn gems */}
+          <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
+            <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2 flex items-center gap-1">
+              <Gem size={10} className="text-[var(--gold-primary)]" /> How to earn gems
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { label: "Complete a lesson", gems: "+5" },
+                { label: "Perfect score", gems: "+10" },
+                { label: "3-day streak", gems: "+10" },
+                { label: "7-day streak", gems: "+25" },
+                { label: "30-day streak", gems: "+50" },
+                { label: "100-day streak", gems: "+100" },
+              ].map(({ label, gems }) => (
+                <div key={label} className="flex items-center justify-between bg-[var(--bg-secondary)] rounded-xl px-2.5 py-1.5">
+                  <span className="text-[10px] text-[var(--text-secondary)]">{label}</span>
+                  <span className="text-[10px] font-black text-[var(--gold-primary)] flex items-center gap-0.5">
+                    <Gem size={9} /> {gems}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         </div>{/* end left sidebar */}
