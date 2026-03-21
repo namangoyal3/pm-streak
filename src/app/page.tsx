@@ -26,7 +26,7 @@ export default async function Home() {
             <span className="text-white">Streak</span>
           </div>
           <a
-            href="/api/auth/google"
+            href="/login"
             className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
           >
             Start Free
@@ -51,7 +51,7 @@ export default async function Home() {
         </p>
 
         <a
-          href="/api/auth/google"
+          href="/login"
           className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-xl shadow-[var(--green-primary)]/25 hover:scale-[1.02] active:scale-[0.98]"
         >
           <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
@@ -209,7 +209,7 @@ export default async function Home() {
             Join product managers building the habit of continuous learning — 2 minutes at a time.
           </p>
           <a
-            href="/api/auth/google"
+            href="/login"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-xl shadow-[var(--green-primary)]/25 hover:scale-[1.02] active:scale-[0.98]"
           >
             <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
