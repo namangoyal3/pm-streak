@@ -52,6 +52,14 @@ export async function POST(
 
   totalXP += lesson.xpReward;
 
+  // Apply XP boost if active (2× XP, then clear it)
+  const userForBoost = await prisma.user.findUnique({ where: { id: userId }, select: { xpBoostActive: true } });
+  const boostApplied = userForBoost?.xpBoostActive ?? false;
+  if (boostApplied) {
+    totalXP = totalXP * 2;
+    await prisma.user.update({ where: { id: userId }, data: { xpBoostActive: false } });
+  }
+
   const existing = await prisma.completedLesson.findUnique({
     where: { userId_lessonId: { userId, lessonId: id } },
   });
@@ -93,6 +101,7 @@ export async function POST(
     correctCount,
     totalQuestions: lesson.questions.length,
     gemsEarned: totalGemsEarned,
+    xpBoostApplied: boostApplied,
     ...streakResult,
   });
 }

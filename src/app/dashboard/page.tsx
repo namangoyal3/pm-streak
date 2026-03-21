@@ -108,12 +108,28 @@ export default function DashboardPage() {
     router.push("/login");
   };
 
-  const handleBuyFreeze = async () => {
-    const res = await fetch("/api/user/streak-freeze", { method: "POST" });
-    if (res.ok) {
-      const data = await res.json();
-      setUser((u: any) => ({ ...u, streakFreezes: data.streakFreezes, gems: data.gems }));
+  const [shopMsg, setShopMsg] = useState<string | null>(null);
+
+  const handleShopBuy = async (itemId: string) => {
+    const res = await fetch("/api/shop", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setShopMsg(data.error ?? "Purchase failed");
+      setTimeout(() => setShopMsg(null), 3000);
+      return;
     }
+    setUser((u: any) => ({ ...u, ...data }));
+    const labels: Record<string, string> = {
+      streak_freeze: "Streak Freeze added!",
+      xp_boost: "2× XP Boost active for your next lesson!",
+      streak_repair: `Streak restored to ${data.streakCount} days!`,
+    };
+    setShopMsg(labels[itemId] ?? "Purchased!");
+    setTimeout(() => setShopMsg(null), 4000);
   };
 
   if (loading) {
@@ -430,46 +446,110 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* ── Streak Freeze ── */}
-        {user.streakCount > 0 && <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[var(--blue-primary)]/10 border border-[var(--blue-primary)]/20 flex items-center justify-center">
+        {/* ── Gem Shop ── */}
+        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-[var(--border-color)] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gem size={16} className="text-[var(--blue-primary)]" />
+              <span className="text-sm font-black">Gem Shop</span>
+            </div>
+            <div className="flex items-center gap-1 bg-[var(--blue-primary)]/10 px-2.5 py-1 rounded-full">
+              <Gem size={12} className="text-[var(--blue-primary)]" />
+              <span className="text-xs font-black text-[var(--blue-primary)] tabular-nums">{user.gems}</span>
+            </div>
+          </div>
+
+          {/* Toast message */}
+          {shopMsg && (
+            <div className="mx-4 mt-3 px-3 py-2 rounded-xl bg-[var(--green-primary)]/15 border border-[var(--green-primary)]/30 text-xs font-bold text-[var(--green-primary)] text-center">
+              {shopMsg}
+            </div>
+          )}
+
+          <div className="p-4 space-y-3">
+
+            {/* Streak Freeze */}
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+              <div className="w-10 h-10 rounded-xl bg-[var(--blue-primary)]/15 flex items-center justify-center flex-shrink-0">
                 <Snowflake size={20} className="text-[var(--blue-primary)]" />
               </div>
-              <div>
-                <div className="text-sm font-black flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-black flex items-center gap-1.5">
                   Streak Freeze
-                  <span className="text-xs font-bold text-[var(--blue-primary)] bg-[var(--blue-primary)]/10 px-1.5 py-0.5 rounded-lg">
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)] bg-[var(--border-color)] px-1.5 py-0.5 rounded-md">
                     {user.streakFreezes}/5
                   </span>
                 </div>
-                <div className="text-xs text-[var(--text-secondary)]">Skip a day, keep your streak</div>
+                <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Skip a day without losing your streak</p>
+                <div className="flex gap-1 mt-1.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className={cn("flex-1 h-1 rounded-full", i < user.streakFreezes ? "bg-[var(--blue-primary)]" : "bg-[var(--border-color)]")} />
+                  ))}
+                </div>
               </div>
+              <button
+                onClick={() => handleShopBuy("streak_freeze")}
+                disabled={user.gems < 50 || user.streakFreezes >= 5}
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+              >
+                <Gem size={11} /> 50
+              </button>
             </div>
-            <button
-              onClick={handleBuyFreeze}
-              disabled={user.gems < 50 || user.streakFreezes >= 5}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              <Gem size={12} /> 50
-            </button>
-          </div>
-          {/* Freeze slots */}
-          <div className="flex gap-1.5 mt-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "flex-1 h-1.5 rounded-full transition-all",
-                  i < user.streakFreezes ? "bg-[var(--blue-primary)]" : "bg-[var(--bg-secondary)]"
-                )}
-              />
-            ))}
+
+            {/* XP Boost */}
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+              <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", user.xpBoostActive ? "bg-[var(--gold-primary)]/30" : "bg-[var(--gold-primary)]/15")}>
+                <Zap size={20} className="text-[var(--gold-primary)]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-black flex items-center gap-1.5">
+                  2× XP Boost
+                  {user.xpBoostActive && (
+                    <span className="text-[10px] font-black text-[var(--gold-primary)] bg-[var(--gold-primary)]/15 px-1.5 py-0.5 rounded-md border border-[var(--gold-primary)]/30">
+                      ACTIVE
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+                  {user.xpBoostActive ? "Your next lesson earns double XP!" : "Double XP on your next lesson"}
+                </p>
+              </div>
+              <button
+                onClick={() => handleShopBuy("xp_boost")}
+                disabled={user.gems < 75 || user.xpBoostActive}
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[var(--gold-primary)] hover:opacity-90 text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+              >
+                <Gem size={11} /> 75
+              </button>
+            </div>
+
+            {/* Streak Repair — only show if broken within 48h */}
+            {user.lostStreakVal > 0 && user.streakLostAt && (
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--orange-primary)]/10 border border-[var(--orange-primary)]/30">
+                <div className="w-10 h-10 rounded-xl bg-[var(--orange-primary)]/20 flex items-center justify-center flex-shrink-0">
+                  <RotateCcw size={20} className="text-[var(--orange-primary)]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-black text-[var(--orange-primary)]">Streak Repair</div>
+                  <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+                    Restore your {user.lostStreakVal}-day streak instantly
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleShopBuy("streak_repair")}
+                  disabled={user.gems < 150}
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[var(--orange-primary)] hover:opacity-90 text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                >
+                  <Gem size={11} /> 150
+                </button>
+              </div>
+            )}
+
           </div>
 
-          {/* How to earn gems */}
-          <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
+          {/* How to earn */}
+          <div className="px-4 pb-4">
             <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2 flex items-center gap-1">
               <Gem size={10} className="text-[var(--gold-primary)]" /> How to earn gems
             </div>
@@ -482,7 +562,7 @@ export default function DashboardPage() {
                 { label: "30-day streak", gems: "+50" },
                 { label: "100-day streak", gems: "+100" },
               ].map(({ label, gems }) => (
-                <div key={label} className="flex items-center justify-between bg-[var(--bg-secondary)] rounded-xl px-2.5 py-1.5">
+                <div key={label} className="flex items-center justify-between bg-[var(--bg-primary)] rounded-xl px-2.5 py-1.5">
                   <span className="text-[10px] text-[var(--text-secondary)]">{label}</span>
                   <span className="text-[10px] font-black text-[var(--gold-primary)] flex items-center gap-0.5">
                     <Gem size={9} /> {gems}
@@ -491,7 +571,7 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-        </div>}
+        </div>
 
         </div>{/* end left sidebar */}
         <div className="space-y-4 mt-4 lg:mt-0">

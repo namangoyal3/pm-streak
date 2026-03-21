@@ -28,6 +28,7 @@ model User {
   perfectStreak Int      @default(0)    // consecutive days without using a freeze
   streakLostAt  DateTime?               // when streak was last broken (for earn-back)
   lostStreakVal Int      @default(0)    // the streak value that was lost
+  xpBoostActive Boolean  @default(false) // next lesson gives 2× XP
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
