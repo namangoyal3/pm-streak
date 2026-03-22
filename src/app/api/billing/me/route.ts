@@ -26,7 +26,6 @@ export async function GET() {
       trialEndsAt: true,
       renewsAt: true,
       cancelsAt: true,
-      paddleCustomerId: true,
       proPreviewConsumed: true,
     },
   });
@@ -49,7 +48,6 @@ export async function GET() {
     trialEndsAt: user.trialEndsAt,
     renewsAt: user.renewsAt,
     cancelsAt: user.cancelsAt,
-    paddleCustomerId: user.paddleCustomerId,
     proPreviewConsumed: user.proPreviewConsumed,
     isPro,
     ai: {

@@ -4,19 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Loader2, Sparkles } from "lucide-react";
-import type { BillingInterval } from "@/lib/billing/catalog";
 
 type PricesPayload = {
   country: string;
   priceBand: string;
-  currency: string;
   display: {
     monthly: string;
     quarterly: string;
     yearly: string;
     yearlyNote: string;
   };
-  defaultInterval: "yearly";
 };
 
 const PRO_FEATURES = [
@@ -27,50 +24,96 @@ const PRO_FEATURES = [
   "Premium recap emails & progress insights",
 ];
 
+const RC_PUBLIC_KEY = process.env.NEXT_PUBLIC_REVENUECAT_API_KEY ?? "";
+
 export default function PricingPage() {
   const router = useRouter();
   const [prices, setPrices] = useState<PricesPayload | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [rcReady, setRcReady] = useState(false);
 
   useEffect(() => {
     fetch("/api/billing/prices")
       .then((r) => r.json())
       .then((d) => setPrices(d))
-      .catch(() => setErr("Could not load localized prices."));
+      .catch(() => setErr("Could not load regional pricing hints."));
   }, []);
 
-  async function checkout(interval: BillingInterval) {
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.user) setUser(d.user);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!RC_PUBLIC_KEY || !user?.id) {
+      setRcReady(false);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { Purchases } = await import("@revenuecat/purchases-js");
+        if (cancelled) return;
+        if (Purchases.isConfigured()) {
+          await Purchases.getSharedInstance().changeUser(user.id);
+        } else {
+          Purchases.configure({ apiKey: RC_PUBLIC_KEY, appUserId: user.id });
+        }
+        if (!cancelled) setRcReady(true);
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) {
+          setErr("Could not initialize RevenueCat. Check your API key.");
+          setRcReady(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  async function openPaywall() {
+    if (!user?.id) {
+      router.push("/login");
+      return;
+    }
+    if (!RC_PUBLIC_KEY) {
+      setErr("Missing NEXT_PUBLIC_REVENUECAT_API_KEY.");
+      return;
+    }
     setErr(null);
-    setLoading(interval);
+    setLoading("paywall");
     try {
-      const res = await fetch("/api/billing/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interval }),
+      const { Purchases } = await import("@revenuecat/purchases-js");
+      const purchases = Purchases.getSharedInstance();
+      await purchases.presentPaywall({
+        customerEmail: user.email,
       });
-      const data = await res.json();
-      if (res.status === 401) {
-        router.push("/login");
+      const syncRes = await fetch("/api/billing/sync", { method: "POST" });
+      if (!syncRes.ok) {
+        const j = await syncRes.json().catch(() => ({}));
+        setErr(j.error ?? "Could not sync subscription status.");
         return;
       }
-      if (!res.ok) {
-        setErr(data.error ?? "Checkout unavailable");
-        return;
+      router.push("/dashboard");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Paywall closed or failed";
+      if (!/cancel/i.test(msg)) {
+        setErr(msg);
       }
-      if (data.url) {
-        window.location.href = data.url;
-        return;
-      }
-      setErr("No checkout URL returned");
-    } catch {
-      setErr("Network error");
     } finally {
       setLoading(null);
     }
   }
 
-  async function openPortal() {
+  async function openManagement() {
     setErr(null);
     setLoading("portal");
     try {
@@ -81,7 +124,7 @@ export default function PricingPage() {
         return;
       }
       if (!res.ok) {
-        setErr(data.error ?? "Billing portal unavailable");
+        setErr(data.error ?? "Could not open subscription management.");
         return;
       }
       if (data.url) {
@@ -129,15 +172,26 @@ export default function PricingPage() {
           Free core. Upgrade for depth.
         </h1>
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-2">
-          The full Lenny-based curriculum, streaks, and community stay free.
-          Pro unlocks unlimited AI lessons, interview prep, roadmaps, and
-          premium study tools.
+          Checkout and subscription management are powered by{" "}
+          <span className="text-[var(--text-primary)] font-bold">RevenueCat Web Billing</span>{" "}
+          (connect Stripe or Paddle in the RevenueCat dashboard).
         </p>
         {prices && (
-          <p className="text-[10px] text-[var(--text-secondary)] mb-8">
-            Prices shown for region {prices.country} (band {prices.priceBand}) ·
-            Taxes handled at checkout where applicable.
+          <p className="text-[10px] text-[var(--text-secondary)] mb-6">
+            Marketing anchors for region {prices.country} (band {prices.priceBand}
+            ): {d?.yearly} yearly · {d?.quarterly} quarterly · {d?.monthly} monthly — final
+            price comes from your RevenueCat products at checkout.
           </p>
+        )}
+
+        {!RC_PUBLIC_KEY && (
+          <div className="mb-6 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-sm text-amber-100">
+            Set{" "}
+            <code className="text-xs bg-black/30 px-1 rounded">
+              NEXT_PUBLIC_REVENUECAT_API_KEY
+            </code>{" "}
+            to your Web Billing public API key from the RevenueCat dashboard.
+          </div>
         )}
 
         {err && (
@@ -147,68 +201,41 @@ export default function PricingPage() {
         )}
 
         <div className="rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] p-6 mb-8">
-          <div className="flex items-center justify-between gap-4 mb-6">
-            <div>
-              <div className="text-xs font-black text-[var(--gold-primary)] uppercase tracking-wide">
-                Default · save more
-              </div>
-              <div className="text-3xl font-black mt-1">
-                {d ? d.yearly : "—"}
-                <span className="text-sm font-bold text-[var(--text-secondary)]">
-                  {" "}
-                  / year
-                </span>
-              </div>
-              <p className="text-xs text-[var(--text-secondary)] mt-1">
-                {d?.yearlyNote}
-              </p>
-            </div>
+          <p className="text-xs text-[var(--text-secondary)] mb-4">
+            {user
+              ? rcReady
+                ? "You’re signed in — open the RevenueCat paywall to subscribe."
+                : "Connecting to RevenueCat…"
+              : "Sign in so we can attach the subscription to your PM Streak account."}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
-              disabled={loading !== null}
-              onClick={() => checkout("yearly")}
-              className="px-5 py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm disabled:opacity-50"
+              disabled={loading !== null || !user || !rcReady || !RC_PUBLIC_KEY}
+              onClick={openPaywall}
+              className="flex-1 px-5 py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading === "yearly" ? (
+              {loading === "paywall" ? (
                 <Loader2 className="animate-spin" size={18} />
+              ) : null}
+              Subscribe with RevenueCat
+            </button>
+            <button
+              type="button"
+              disabled={loading !== null || !user}
+              onClick={openManagement}
+              className="px-5 py-3 rounded-2xl border border-[var(--border-color)] text-sm font-bold text-[var(--text-secondary)] hover:text-white disabled:opacity-50"
+            >
+              {loading === "portal" ? (
+                <Loader2 className="animate-spin mx-auto" size={18} />
               ) : (
-                "Choose annual"
+                "Manage subscription"
               )}
             </button>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-3 mb-8">
-            <button
-              type="button"
-              disabled={loading !== null}
-              onClick={() => checkout("quarterly")}
-              className="text-left rounded-2xl border border-[var(--border-color)] px-4 py-3 hover:border-[var(--green-primary)]/50 transition-colors disabled:opacity-50"
-            >
-              <div className="text-[10px] font-black text-[var(--text-secondary)] uppercase">
-                Quarterly
-              </div>
-              <div className="text-lg font-black">{d?.quarterly ?? "—"}</div>
-              <div className="text-[10px] text-[var(--text-secondary)]">
-                Lower commitment
-              </div>
-            </button>
-            <button
-              type="button"
-              disabled={loading !== null}
-              onClick={() => checkout("monthly")}
-              className="text-left rounded-2xl border border-[var(--border-color)] px-4 py-3 hover:border-[var(--green-primary)]/50 transition-colors disabled:opacity-50"
-            >
-              <div className="text-[10px] font-black text-[var(--text-secondary)] uppercase">
-                Monthly
-              </div>
-              <div className="text-lg font-black">{d?.monthly ?? "—"}</div>
-              <div className="text-[10px] text-[var(--text-secondary)]">
-                Flexible
-              </div>
-            </button>
-          </div>
-
-          <ul className="space-y-2.5">
+          <ul className="space-y-2.5 mt-8">
             {PRO_FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm">
                 <Check
@@ -224,44 +251,37 @@ export default function PricingPage() {
         <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/40 p-4 text-xs text-[var(--text-secondary)] space-y-2">
           <p>
             <span className="text-[var(--text-primary)] font-bold">Free</span>{" "}
-            includes the full core curriculum, streaks, XP/gems, daily
-            challenge, leaderboard & social, and{" "}
+            includes the full core curriculum, streaks, XP/gems, daily challenge,
+            leaderboard & social, and{" "}
             <span className="text-[var(--text-primary)] font-bold">
               5 AI bonus lessons / month
             </span>
             .
           </p>
           <p>
-            7-day Pro preview unlocks after{" "}
-            <span className="font-bold text-[var(--text-primary)]">
-              3 core lessons
-            </span>{" "}
-            or a{" "}
-            <span className="font-bold text-[var(--text-primary)]">
-              3-day streak
-            </span>{" "}
-            — no card required.
+            Create a <span className="font-bold text-[var(--text-primary)]">pro</span>{" "}
+            entitlement in RevenueCat and set{" "}
+            <code className="text-[10px] bg-black/30 px-1 rounded">
+              REVENUECAT_ENTITLEMENT_ID
+            </code>{" "}
+            if you use a different identifier (default:{" "}
+            <code className="text-[10px] bg-black/30 px-1 rounded">pro</code>).
+          </p>
+          <p>
+            Webhook URL:{" "}
+            <code className="text-[10px] bg-black/30 px-1 rounded break-all">
+              {(process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "")}
+              /api/billing/webhook/revenuecat
+            </code>
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            onClick={openPortal}
-            disabled={loading !== null}
-            className="px-4 py-3 rounded-2xl border border-[var(--border-color)] text-sm font-bold text-[var(--text-secondary)] hover:text-white disabled:opacity-50"
-          >
-            {loading === "portal" ? (
-              <Loader2 className="animate-spin mx-auto" size={18} />
-            ) : (
-              "Manage subscription"
-            )}
-          </button>
+        <div className="mt-8">
           <Link
             href="/dashboard"
-            className="px-4 py-3 rounded-2xl text-center text-sm font-bold text-[var(--green-primary)]"
+            className="text-sm font-bold text-[var(--green-primary)]"
           >
-            Back to app
+            ← Back to app
           </Link>
         </div>
       </div>
