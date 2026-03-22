@@ -52,6 +52,8 @@ export default function QuizView({ lessonTitle, content, questions, xpReward, yo
   const [showXPPop, setShowXPPop] = useState(false);
   const [streakResult, setStreakResult] = useState<StreakResult | null>(null);
   const [milestoneToShow, setMilestoneToShow] = useState<string | null>(null);
+  const [newBatchUnlocked, setNewBatchUnlocked] = useState(false);
+  const [newBatchCount, setNewBatchCount] = useState(0);
 
   const question = questions[currentQ];
   const isCorrect = selected === question?.correctIndex;
@@ -83,6 +85,12 @@ export default function QuizView({ lessonTitle, content, questions, xpReward, yo
       if (result) {
         setStreakResult(result);
         if (result.milestone) setMilestoneToShow(result.milestone);
+        if ((result as any).newBatchUnlocked) {
+          setNewBatchUnlocked(true);
+          setNewBatchCount((result as any).newBatchCount ?? 5);
+          // Signal dashboard to show celebration on return
+          try { sessionStorage.setItem("lessonsUnlocked", String((result as any).newBatchCount ?? 5)); } catch { /* ignore */ }
+        }
       }
     }
   }, [currentQ, questions.length, answers, onComplete]);
@@ -194,11 +202,29 @@ export default function QuizView({ lessonTitle, content, questions, xpReward, yo
             </div>
           </div>
 
+          {/* New lessons unlocked celebration */}
+          {newBatchUnlocked && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+              className="bg-gradient-to-r from-[var(--green-primary)]/20 to-[var(--blue-primary)]/20 border border-[var(--green-primary)]/40 rounded-2xl p-4 mb-4 text-center"
+            >
+              <div className="text-3xl mb-1">🎉</div>
+              <div className="text-sm font-black text-[var(--green-primary)]">
+                {newBatchCount} new lessons unlocked!
+              </div>
+              <div className="text-xs text-[var(--text-secondary)] mt-1">
+                You completed all available lessons. Fresh content waiting on the dashboard.
+              </div>
+            </motion.div>
+          )}
+
           <a
             href="/dashboard"
             className="block w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm uppercase tracking-wide transition-colors mb-3 flex items-center justify-center gap-2"
           >
-            Keep My Streak Going <ArrowRight size={16} />
+            {newBatchUnlocked ? "See New Lessons" : "Keep My Streak Going"} <ArrowRight size={16} />
           </a>
 
           <button

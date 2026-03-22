@@ -152,10 +152,10 @@ export async function GET() {
     };
   });
 
-  // Recent users
+  // Recent users (last 25)
   const recentUsersRaw = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
-    take: 10,
+    take: 25,
     select: {
       name: true,
       email: true,

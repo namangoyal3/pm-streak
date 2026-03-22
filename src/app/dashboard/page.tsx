@@ -56,6 +56,7 @@ export default function DashboardPage() {
   const [earnBack, setEarnBack] = useState<any>(null);
   const [milestone, setMilestone] = useState<string | null>(null);
   const [pendingChallenges, setPendingChallenges] = useState<any[]>([]);
+  const [lessonsUnlockedCount, setLessonsUnlockedCount] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -78,6 +79,18 @@ export default function DashboardPage() {
         setUser(userData.user);
         setStats(statsData);
         setCategories(lessonsData.categories);
+        if (lessonsData.unlockedBatch !== undefined) {
+          setUser((u: any) => ({ ...u, unlockedBatch: lessonsData.unlockedBatch }));
+        }
+
+        // Check if lessons were just unlocked (set by QuizView on completion)
+        try {
+          const unlocked = sessionStorage.getItem("lessonsUnlocked");
+          if (unlocked) {
+            setLessonsUnlockedCount(Number(unlocked));
+            sessionStorage.removeItem("lessonsUnlocked");
+          }
+        } catch { /* ignore */ }
 
         try {
           const [ebRes, challengeRes] = await Promise.all([
@@ -189,7 +202,7 @@ export default function DashboardPage() {
             </div>
           </Link>
         )}
-        <div className="lg:grid lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-6 lg:items-start">
+        <div className="lg:grid lg:grid-cols-[340px_1fr] lg:gap-6 lg:items-start">
         <div className="space-y-4">
 
         {/* ── Earn-Back Banner ── */}
@@ -241,42 +254,43 @@ export default function DashboardPage() {
 
           <div className="relative">
             {/* Top row */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1 min-w-0 pr-4">
-                <p className="text-[var(--text-secondary)] text-xs font-bold uppercase tracking-wider mb-1">
-                  Welcome back
-                </p>
-                <h1 className="text-2xl font-black text-white leading-tight">
-                  {user.name?.split(" ")[0] ?? "PM"}
-                </h1>
-                <p className={cn(
-                  "text-sm mt-1 font-semibold",
-                  isPerfect ? "text-[var(--gold-primary)]" : user.streakCount > 0 ? "text-[var(--orange-primary)]" : "text-[var(--green-primary)]"
-                )}>
-                  {streakMsg}
-                </p>
-              </div>
-
-              {/* Big streak number */}
-              <div className="flex flex-col items-center flex-shrink-0">
+            <div className="flex items-center justify-between mb-4 gap-3">
+              {/* Big streak number — left */}
+              <div className="flex items-center gap-3 flex-shrink-0">
                 <Flame
-                  size={44}
+                  size={40}
                   className={cn(
                     "streak-flame",
                     isPerfect ? "text-[var(--gold-primary)]" :
                     user.streakCount > 0 ? "text-[var(--orange-primary)]" : "text-[var(--green-primary)]"
                   )}
                 />
-                <span className={cn(
-                  "text-4xl font-black tabular-nums leading-none -mt-1",
-                  isPerfect ? "text-[var(--gold-primary)]" :
-                  user.streakCount > 0 ? "text-[var(--orange-primary)]" : "text-[var(--green-primary)]"
+                <div>
+                  <span className={cn(
+                    "text-4xl font-black tabular-nums leading-none block",
+                    isPerfect ? "text-[var(--gold-primary)]" :
+                    user.streakCount > 0 ? "text-[var(--orange-primary)]" : "text-[var(--green-primary)]"
+                  )}>
+                    {user.streakCount}
+                  </span>
+                  <span className="text-xs text-[var(--text-secondary)] font-bold">day streak</span>
+                </div>
+              </div>
+
+              {/* Name + message — right */}
+              <div className="flex-1 min-w-0 text-right">
+                <p className="text-[var(--text-secondary)] text-[10px] font-bold uppercase tracking-wider">
+                  Welcome back
+                </p>
+                <h1 className="text-xl font-black text-white leading-tight truncate">
+                  {user.name?.split(" ")[0] ?? "PM"}
+                </h1>
+                <p className={cn(
+                  "text-xs mt-0.5 font-semibold leading-snug",
+                  isPerfect ? "text-[var(--gold-primary)]" : user.streakCount > 0 ? "text-[var(--orange-primary)]" : "text-[var(--green-primary)]"
                 )}>
-                  {user.streakCount}
-                </span>
-                <span className="text-xs text-[var(--text-secondary)] font-bold mt-0.5">
-                  day streak
-                </span>
+                  {streakMsg}
+                </p>
               </div>
             </div>
 
@@ -691,64 +705,93 @@ export default function DashboardPage() {
           );
         })}
 
-        {/* ── 200+ More Lessons Teaser ── */}
-        <div className="rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)]">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-[#1a1a2e] to-[#16213e] px-5 py-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
-              <BookOpen size={20} className="text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-white">200+ More Lessons Coming</span>
-                <span className="px-1.5 py-0.5 rounded-md bg-[var(--green-primary)]/20 text-[var(--green-primary)] text-[9px] font-black uppercase tracking-wide border border-[var(--green-primary)]/30">
-                  LENNY&apos;S ARCHIVE
-                </span>
-              </div>
-              <p className="text-xs text-white/50 mt-0.5">289 podcast episodes · New lessons added weekly</p>
-            </div>
-          </div>
-
-          {/* Upcoming previews */}
-          <div className="divide-y divide-[var(--border-color)]">
-            {[
-              { title: "Marc Andreessen on the AI Boom", guest: "Marc Andreessen (a16z)", Icon: Bot, color: "var(--blue-primary)" },
-              { title: "Ben Horowitz: Why Founders Fail", guest: "Ben Horowitz (a16z)", Icon: Target, color: "var(--orange-primary)" },
-              { title: "Stewart Butterfield: Building Slack", guest: "Stewart Butterfield (Slack founder)", Icon: MessageSquare, color: "var(--green-primary)" },
-              { title: "Dr. Fei-Fei Li on AI & Jobs", guest: "Dr. Fei-Fei Li (Stanford)", Icon: Brain, color: "var(--gold-primary)" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 px-5 py-3.5 opacity-60">
-                <div className="w-9 h-9 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
-                  <item.Icon size={18} style={{ color: item.color }} />
+        {/* ── Coming Soon Lessons (dynamic) ── */}
+        {(() => {
+          const previewLessons = categories.flatMap((c) => c.lessons.filter((l) => l.isLocked));
+          const allCompleted = categories
+            .flatMap((c) => c.lessons.filter((l) => !l.isLocked))
+            .every((l) => l.completed);
+          const hasMore = previewLessons.length > 0 || allCompleted;
+          if (!hasMore) return null;
+          return (
+            <div className="rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)]">
+              <div className="bg-gradient-to-r from-[#1a1a2e] to-[#16213e] px-5 py-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <BookOpen size={20} className="text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-[var(--text-primary)] truncate">{item.title}</p>
-                  <p className="text-[10px] text-[var(--text-secondary)] truncate">{item.guest}</p>
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <Lock size={13} className="text-[var(--text-secondary)]" />
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-black text-white">
+                      {previewLessons.length > 0 ? "Coming Up Next" : "200+ Lessons Coming"}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded-md bg-[var(--green-primary)]/20 text-[var(--green-primary)] text-[9px] font-black uppercase tracking-wide border border-[var(--green-primary)]/30">
+                      LENNY&apos;S ARCHIVE
+                    </span>
+                  </div>
+                  <p className="text-xs text-white/50 mt-0.5">
+                    {previewLessons.length > 0
+                      ? `${previewLessons.length} lessons queued · Complete all active lessons to unlock`
+                      : "289 podcast episodes · New lessons added weekly"}
+                  </p>
                 </div>
               </div>
-            ))}
 
-            {/* "and 285 more" row */}
-            <div className="px-5 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[BookOpen, Zap, TrendingUp, Trophy, Sparkles].map((Icon, i) => (
-                    <div key={i} className="w-7 h-7 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center">
-                      <Icon size={12} className="text-[var(--text-secondary)]" />
+              <div className="divide-y divide-[var(--border-color)]">
+                {previewLessons.length > 0 ? (
+                  previewLessons.map((lesson) => (
+                    <div key={lesson.id} className="flex items-center gap-3 px-5 py-3.5 opacity-60">
+                      <div className="w-9 h-9 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
+                        <Lock size={16} className="text-[var(--text-secondary)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[var(--text-primary)] truncate">{lesson.title}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] truncate">
+                          {lesson.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Lock size={13} className="text-[var(--text-secondary)]" />
+                      </div>
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  [{title: "Marc Andreessen on the AI Boom", desc: "Marc Andreessen (a16z)"},
+                   {title: "Ben Horowitz: Why Founders Fail", desc: "Ben Horowitz (a16z)"},
+                   {title: "Stewart Butterfield: Building Slack", desc: "Slack founder"},
+                   {title: "Dr. Fei-Fei Li on AI & Jobs", desc: "Stanford AI Lab"},
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 px-5 py-3.5 opacity-60">
+                      <div className="w-9 h-9 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
+                        <BookOpen size={16} className="text-[var(--text-secondary)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[var(--text-primary)] truncate">{item.title}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] truncate">{item.desc}</p>
+                      </div>
+                      <Lock size={13} className="text-[var(--text-secondary)]" />
+                    </div>
+                  ))
+                )}
+
+                <div className="px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      {[BookOpen, Zap, TrendingUp, Trophy, Sparkles].map((Icon, i) => (
+                        <div key={i} className="w-7 h-7 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center">
+                          <Icon size={12} className="text-[var(--text-secondary)]" />
+                        </div>
+                      ))}
+                    </div>
+                    <span className="text-xs text-[var(--text-secondary)] font-bold">+ 285 more episodes</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-[var(--green-primary)] font-black">
+                    <Sparkles size={12} /> Coming soon
+                  </div>
                 </div>
-                <span className="text-xs text-[var(--text-secondary)] font-bold">+ 285 more episodes</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-[var(--green-primary)] font-black">
-                <Sparkles size={12} /> Coming soon
               </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* ── Share CTA ── */}
         <button
@@ -770,6 +813,52 @@ export default function DashboardPage() {
       </main>
 
       <ShareCard isOpen={showShare} onClose={() => setShowShare(false)} />
+
+      {/* New lessons unlocked overlay */}
+      {lessonsUnlockedCount > 0 && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center" onClick={() => setLessonsUnlockedCount(0)}>
+          <div className="absolute inset-0 bg-black/70" />
+          <div className="relative w-full max-w-xs mx-4">
+            <div className="bg-gradient-to-br from-[#0d2a18] to-[#1a3a25] border border-[var(--green-primary)]/40 rounded-3xl p-6 text-center shadow-2xl">
+              {/* Confetti particles */}
+              {[...Array(16)].map((_, i) => {
+                const emojis = ["🎉", "⭐", "🏆", "✨", "🔥", "💡", "📚", "🎯"];
+                return (
+                  <div
+                    key={i}
+                    className="absolute text-xl pointer-events-none animate-bounce"
+                    style={{
+                      top: `${10 + Math.random() * 80}%`,
+                      left: `${5 + Math.random() * 90}%`,
+                      animationDelay: `${i * 0.1}s`,
+                      animationDuration: `${0.6 + Math.random() * 0.8}s`,
+                      opacity: 0.7,
+                    }}
+                  >
+                    {emojis[i % emojis.length]}
+                  </div>
+                );
+              })}
+              <div className="text-5xl mb-3">🎉</div>
+              <h2 className="text-2xl font-black text-white mb-2">New Lessons Unlocked!</h2>
+              <p className="text-sm text-white/70 mb-1">
+                {lessonsUnlockedCount} fresh lessons just dropped into your curriculum.
+              </p>
+              <p className="text-xs text-[var(--green-primary)] font-bold mb-5">Keep the streak alive — new content awaits!</p>
+              <button
+                onClick={() => {
+                  setLessonsUnlockedCount(0);
+                  document.getElementById("lessons")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <Sparkles size={16} /> See New Lessons
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <StreakCelebration
         milestone={milestone}
         streakCount={user.streakCount}

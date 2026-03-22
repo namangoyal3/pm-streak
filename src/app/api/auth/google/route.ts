@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", "email profile");
-  url.searchParams.set("access_type", "offline");
   url.searchParams.set("prompt", "select_account");
 
   return NextResponse.redirect(url.toString());

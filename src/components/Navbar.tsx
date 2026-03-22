@@ -110,16 +110,15 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
               return (
                 <div
                   key={item.href}
-                  className="flex-1 flex flex-col items-center justify-center text-[var(--border-color)] cursor-not-allowed relative"
+                  className="flex-1 flex flex-col items-center justify-center gap-0.5 text-[var(--border-color)] cursor-not-allowed relative"
                 >
-                  <div className="relative mb-0.5">
-                    <Icon size={20} />
-                    <div className="absolute -top-1 -right-1.5 bg-[var(--bg-secondary)] rounded-full">
+                  <div className="relative w-10 h-8 flex items-center justify-center rounded-xl">
+                    <Icon size={22} strokeWidth={2} />
+                    <div className="absolute top-0 right-0.5 bg-[var(--bg-secondary)] rounded-full p-0.5">
                       <Lock size={8} className="text-[var(--border-color)]" />
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold leading-tight">{item.label}</span>
-                  <span className="text-[9px] text-[var(--orange-primary)]/70 font-bold leading-tight">7-day streak</span>
+                  <span className="text-[10px] font-bold">{item.label}</span>
                 </div>
               );
             }

@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import BrowserLink from "@/components/BrowserLink";
+import SafariBar from "@/components/SafariBar";
 
 export default async function Home() {
   // Logged-in users skip the landing page entirely
@@ -16,6 +18,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-white">
+      <SafariBar />
 
       {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/90 backdrop-blur-md">
@@ -25,12 +28,12 @@ export default async function Home() {
             <span className="text-[var(--green-primary)]">PM</span>
             <span className="text-white">Streak</span>
           </div>
-          <a
+          <BrowserLink
             href="/login"
             className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
           >
             Start Free
-          </a>
+          </BrowserLink>
         </div>
       </nav>
 
@@ -50,7 +53,7 @@ export default async function Home() {
               One lesson a day. Streak tracking. XP and leaderboards. The best PM frameworks from Lenny&apos;s podcast — turned into 2-minute lessons that actually stick.
             </p>
 
-            <a
+            <BrowserLink
               href="/login"
               className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-lg shadow-[var(--green-primary)]/20 hover:scale-[1.02] active:scale-[0.98]"
             >
@@ -61,7 +64,7 @@ export default async function Home() {
                 <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="white" fillOpacity="0.9"/>
               </svg>
               Start free with Google
-            </a>
+            </BrowserLink>
             <p className="mt-3 text-xs text-[var(--text-secondary)]">No credit card · 30 seconds to set up</p>
           </div>
 
@@ -287,7 +290,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-3 flex-shrink-0">
-              <a
+              <BrowserLink
                 href="/login"
                 className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[var(--green-primary)]/20"
               >
@@ -298,7 +301,7 @@ export default async function Home() {
                   <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="white" fillOpacity="0.9"/>
                 </svg>
                 Start free with Google
-              </a>
+              </BrowserLink>
               <p className="text-center text-xs text-[var(--text-secondary)]">No password · Takes 30 seconds</p>
             </div>
           </div>

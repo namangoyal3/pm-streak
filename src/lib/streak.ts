@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { getToday, getYesterday } from "./utils";
+import { sendStreakMilestoneEmail } from "./email";
 
 export async function checkAndUpdateStreak(userId: string): Promise<{
   streakCount: number;
@@ -99,6 +100,7 @@ export async function recordLessonCompletion(userId: string, xpEarned: number) {
   if (!user) throw new Error("User not found");
 
   const newStreak = existingEntry ? user.streakCount : user.streakCount + 1;
+
   const newXP = user.xp + xpEarned;
   const newLevel = Math.floor(newXP / 100) + 1;
   const newPerfectStreak = existingEntry ? user.perfectStreak : user.perfectStreak + 1;
@@ -121,6 +123,16 @@ export async function recordLessonCompletion(userId: string, xpEarned: number) {
       ...(milestoneGems > 0 ? { gems: { increment: milestoneGems } } : {}),
     },
   });
+
+  // Fire milestone email (non-blocking)
+  if (milestone && milestoneGems > 0) {
+    sendStreakMilestoneEmail({
+      toEmail: user.email,
+      toName: user.name,
+      streakCount: newStreak,
+      gemsEarned: milestoneGems,
+    }).catch(() => {});
+  }
 
   return { newStreak, newXP, newLevel, perfectStreak: newPerfectStreak, milestone, milestoneGems };
 }

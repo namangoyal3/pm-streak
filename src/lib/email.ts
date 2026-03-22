@@ -291,3 +291,35 @@ export async function sendChallengeAcceptedEmail({
     html: wrap(`${fromName} is ready. Are you?`, body),
   });
 }
+
+export async function sendStreakMilestoneEmail({
+  toEmail, toName, streakCount, gemsEarned,
+}: { toEmail: string; toName: string; streakCount: number; gemsEarned: number }) {
+  if (!process.env.RESEND_API_KEY) return;
+  const first = toName.split(" ")[0];
+  const milestoneEmoji: Record<number, string> = { 3: "🔥", 7: "⚡", 14: "💎", 30: "👑", 50: "🏆", 100: "🌟", 365: "🦉" };
+  const emoji = milestoneEmoji[streakCount] ?? "🔥";
+  const body = `
+    <div style="text-align:center;margin-bottom:24px">
+      <span style="font-size:48px">${emoji}</span>
+    </div>
+    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px;text-align:center">${streakCount}-Day Streak, ${first}!</h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#6b7280;line-height:1.6;text-align:center">
+      ${streakCount} consecutive days of PM learning. You're in the top tier of learners on PM Streak.
+    </p>
+
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px;margin-bottom:24px;text-align:center">
+      <div style="font-size:13px;color:#166534;line-height:1.6">
+        🏅 Milestone bonus: <strong>+${gemsEarned} gems</strong> added to your account.<br>
+        Use them to buy Streak Freezes, XP Boosts, or save your streak.
+      </div>
+    </div>
+
+    ${btn(`Keep your streak alive →`, `${APP_URL}/dashboard`, "#58cc02")}
+  `;
+  await getResend().emails.send({
+    from: FROM, replyTo: REPLY_TO, to: toEmail,
+    subject: `${emoji} ${streakCount}-day streak! You're unstoppable`,
+    html: wrap(`${streakCount} days in a row. ${emoji}`, body),
+  });
+}

@@ -1,6 +1,8 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import BrowserLink from "@/components/BrowserLink";
+import SafariBar from "@/components/SafariBar";
 import { useSearchParams } from "next/navigation";
 
 function LoginForm() {
@@ -15,6 +17,8 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex">
+      <SafariBar />
+
       {/* Left panel — branding */}
       <div className="hidden lg:flex flex-col justify-between w-80 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] p-8 flex-shrink-0">
         <div>
@@ -59,7 +63,7 @@ function LoginForm() {
             </div>
           )}
 
-          <a
+          <BrowserLink
             href="/api/auth/google"
             className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] hover:bg-white/5 hover:border-white/20 text-white text-sm font-bold transition-all"
           >
@@ -70,7 +74,7 @@ function LoginForm() {
               <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
             </svg>
             Continue with Google
-          </a>
+          </BrowserLink>
 
           <p className="text-center mt-8 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed">
             By signing in you agree to our{" "}

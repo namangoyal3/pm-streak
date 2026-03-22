@@ -306,21 +306,31 @@ export default function SocialPage() {
                       Level {u.level} - {u.xp} XP
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleFollow(u.id)}
-                    className={cn(
-                      "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-colors",
-                      u.isFollowing
-                        ? "bg-[var(--bg-secondary)] text-[var(--text-secondary)]"
-                        : "bg-[var(--purple-primary)] text-white"
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {u.isFollowing && (
+                      <button
+                        onClick={() => handleChallenge(u.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-[var(--orange-primary)]/15 text-[var(--orange-primary)] hover:bg-[var(--orange-primary)]/25 transition-colors"
+                      >
+                        <Swords size={12} /> Challenge
+                      </button>
                     )}
-                  >
-                    {u.isFollowing ? (
-                      <><UserCheck size={12} /> Following</>
-                    ) : (
-                      <><UserPlus size={12} /> Follow</>
-                    )}
-                  </button>
+                    <button
+                      onClick={() => handleFollow(u.id)}
+                      className={cn(
+                        "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-colors",
+                        u.isFollowing
+                          ? "bg-[var(--bg-secondary)] text-[var(--text-secondary)]"
+                          : "bg-[var(--purple-primary)] text-white"
+                      )}
+                    >
+                      {u.isFollowing ? (
+                        <><UserCheck size={12} /> Following</>
+                      ) : (
+                        <><UserPlus size={12} /> Follow</>
+                      )}
+                    </button>
+                  </div>
                 </div>
               ))}
               {searchQuery.length >= 2 && searchResults.length === 0 && (
