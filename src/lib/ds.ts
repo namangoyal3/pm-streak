@@ -3,6 +3,14 @@
  * Tokens live in globals.css (`:root`).
  */
 export const ds = {
+  /** Full viewport app background */
+  pageShell: "min-h-screen bg-[var(--surface-0)]",
+  /** Search / text field on card surfaces */
+  inputSearch:
+    "rounded-[var(--ds-radius-lg)] border-2 border-[var(--border-color)] bg-[var(--surface-2)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm",
+  /** Suggested-topic pills (Explore) */
+  topicChip:
+    "px-3 py-1.5 rounded-full border-2 border-[var(--border-color)] bg-[var(--surface-2)] text-xs text-[var(--text-secondary)] hover:text-white hover:border-[var(--green-primary)] transition-colors disabled:opacity-50",
   /** Raised surface: lesson tiles, settings panels */
   panel:
     "rounded-[var(--ds-radius-lg)] border-2 border-[var(--border-color)] bg-[var(--surface-2)] p-4 shadow-[var(--shadow-ds-card)]",
