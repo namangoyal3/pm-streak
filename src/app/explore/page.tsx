@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { Sparkles, Search, Loader2, ArrowRight, BookOpen, Zap } from "lucide-react";
+import {
+  Sparkles,
+  Search,
+  Loader2,
+  ArrowRight,
+  Zap,
+  Compass,
+} from "lucide-react";
 import Link from "next/link";
 
 const SUGGESTED_TOPICS = [
@@ -21,30 +28,72 @@ const SUGGESTED_TOPICS = [
   "Customer interviews",
 ];
 
-export default function ExplorePage() {
+type GeneratedLesson = {
+  id: string;
+  title: string;
+  description: string;
+  xpReward: number;
+  guestName?: string | null;
+  generationMode?: string | null;
+  category?: { name: string; icon: string } | null;
+};
+
+function mergeLessons(lessons: GeneratedLesson[]) {
+  const seen = new Set<string>();
+  return lessons.filter((lesson) => {
+    if (seen.has(lesson.id)) return false;
+    seen.add(lesson.id);
+    return true;
+  });
+}
+
+function ExplorePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [topic, setTopic] = useState("");
   const [generating, setGenerating] = useState(false);
-  const [generatedLessons, setGeneratedLessons] = useState<any[]>([]);
+  const [generatedLessons, setGeneratedLessons] = useState<GeneratedLesson[]>([]);
   const [error, setError] = useState("");
+
+  const sourceLessonId = searchParams.get("sourceLessonId");
+  const generationMode =
+    searchParams.get("mode") === "deep_dive" ? "deep_dive" : "explore";
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
+      const [userRes, generatedRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/generated-lessons"),
+      ]);
+
+      if (!userRes.ok) {
         router.push("/login");
         return;
       }
-      const data = await res.json();
-      setUser(data.user);
+
+      const userData = await userRes.json();
+      setUser(userData.user);
+
+      if (generatedRes.ok) {
+        const generatedData = await generatedRes.json();
+        setGeneratedLessons(generatedData.lessons ?? []);
+      }
     }
+
     load();
   }, [router]);
 
+  useEffect(() => {
+    const prefilledTopic = searchParams.get("topic");
+    if (prefilledTopic) {
+      setTopic(prefilledTopic);
+    }
+  }, [searchParams]);
+
   const handleGenerate = async (selectedTopic?: string) => {
-    const t = selectedTopic || topic;
-    if (!t || t.length < 2) return;
+    const nextTopic = selectedTopic || topic;
+    if (!nextTopic || nextTopic.length < 2) return;
 
     setGenerating(true);
     setError("");
@@ -53,17 +102,20 @@ export default function ExplorePage() {
       const res = await fetch("/api/generate-lesson", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic: t }),
+        body: JSON.stringify({
+          topic: nextTopic,
+          generationMode,
+          sourceLessonId,
+        }),
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         setError(data.error || "Failed to generate");
         return;
       }
 
-      const data = await res.json();
-      setGeneratedLessons((prev) => [data.lesson, ...prev]);
+      setGeneratedLessons((prev) => mergeLessons([data.lesson, ...prev]));
       setTopic("");
     } catch {
       setError("Something went wrong");
@@ -75,7 +127,9 @@ export default function ExplorePage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-[var(--green-primary)] text-lg font-bold">Loading...</div>
+        <div className="animate-pulse text-[var(--green-primary)] text-lg font-bold">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -89,11 +143,21 @@ export default function ExplorePage() {
           <Sparkles size={40} className="mx-auto text-[var(--green-primary)] mb-2" />
           <h1 className="text-xl font-bold">Explore & Generate</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Generate custom lessons from Lenny&apos;s Podcast on any PM topic
+            Bonus lessons for deeper learning, separate from your core curriculum unlocks
           </p>
         </div>
 
-        {/* Search input */}
+        {generationMode === "deep_dive" && (
+          <div className="bg-[var(--blue-primary)]/10 border border-[var(--blue-primary)]/30 rounded-2xl p-4">
+            <div className="text-sm font-black text-[var(--blue-primary)]">
+              Deep-dive mode
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] mt-1">
+              You&apos;re turning a lesson you just viewed into a richer follow-up. It still earns XP and streak credit, but it won&apos;t change which core lesson unlocks next.
+            </p>
+          </div>
+        )}
+
         <div className="relative">
           <Search
             size={16}
@@ -129,33 +193,31 @@ export default function ExplorePage() {
           <p className="text-[var(--red-primary)] text-sm text-center">{error}</p>
         )}
 
-        {/* Suggested topics */}
         <div>
           <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
             Suggested Topics
           </h3>
           <div className="flex flex-wrap gap-2">
-            {SUGGESTED_TOPICS.map((t) => (
+            {SUGGESTED_TOPICS.map((suggestedTopic) => (
               <button
-                key={t}
+                key={suggestedTopic}
                 onClick={() => {
-                  setTopic(t);
-                  handleGenerate(t);
+                  setTopic(suggestedTopic);
+                  handleGenerate(suggestedTopic);
                 }}
                 disabled={generating}
                 className="px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-white hover:border-[var(--green-primary)] transition-colors disabled:opacity-50"
               >
-                {t}
+                {suggestedTopic}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Generated lessons */}
         {generatedLessons.length > 0 && (
           <div>
             <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
-              Generated Lessons
+              Your Custom Lessons
             </h3>
             <div className="space-y-3">
               {generatedLessons.map((lesson) => (
@@ -167,9 +229,13 @@ export default function ExplorePage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-bold truncate">{lesson.title}</h3>
-                        <p className="text-xs text-[var(--text-secondary)] truncate">
+                        <p className="text-xs text-[var(--text-secondary)] line-clamp-2">
                           {lesson.description}
                         </p>
+                        <div className="text-[10px] text-[var(--text-secondary)] mt-1">
+                          {lesson.generationMode === "deep_dive" ? "Deep dive" : "Explore"} ·{" "}
+                          {lesson.category?.icon} {lesson.category?.name}
+                        </div>
                       </div>
                       <div className="flex items-center gap-1 text-xs font-bold text-[var(--gold-primary)]">
                         <Zap size={12} /> {lesson.xpReward}
@@ -188,29 +254,54 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {/* How it works */}
         <div className="bg-[var(--bg-card)] rounded-2xl p-4">
           <h3 className="text-sm font-bold mb-2">How it works</h3>
           <div className="space-y-2 text-xs text-[var(--text-secondary)]">
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">1.</span>
-              <span>Enter any PM topic you want to learn about</span>
+              <span>Choose a PM topic or launch a deeper dive from a lesson page</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">2.</span>
-              <span>We search Lenny&apos;s 300+ podcast transcripts for relevant insights</span>
+              <span>We search Lenny&apos;s transcript archive for the strongest relevant excerpts</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">3.</span>
-              <span>A micro-lesson with quiz is generated from real podcast content</span>
+              <span>A richer lesson is generated just for you and saved here for later</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">4.</span>
-              <span>Complete it to earn XP and keep your streak alive</span>
+              <span>Custom lessons keep your streak alive, but your core curriculum still unlocks category by category</span>
             </div>
           </div>
         </div>
+
+        <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
+          <div className="flex items-center gap-2 mb-2">
+            <Compass size={16} className="text-[var(--blue-primary)]" />
+            <h3 className="text-sm font-bold">What this is best for</h3>
+          </div>
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+            Use Explore when a lesson summary feels too short, when the video made the idea click and you want more depth, or when you finish a category and want extra practice on that theme.
+          </p>
+        </div>
       </main>
     </div>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-pulse text-[var(--green-primary)] text-lg font-bold">
+            Loading...
+          </div>
+        </div>
+      }
+    >
+      <ExplorePageContent />
+    </Suspense>
   );
 }

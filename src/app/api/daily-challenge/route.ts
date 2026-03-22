@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getCoreCurriculumForUser, getCoreLessonAccess } from "@/lib/lesson-access";
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -22,29 +23,26 @@ export async function GET() {
     },
   });
 
+  if (challenge) {
+    const access = await getCoreLessonAccess(challenge.lessonId, userId);
+    if (challenge.lesson.aiGenerated || !access.canAccess) {
+      await prisma.dailyChallenge.delete({ where: { id: challenge.id } });
+      challenge = null;
+    }
+  }
+
   if (!challenge) {
-    const completedIds = (
-      await prisma.completedLesson.findMany({
-        where: { userId },
-        select: { lessonId: true },
-      })
-    ).map((c) => c.lessonId);
+    const curriculum = await getCoreCurriculumForUser(userId);
+    const availableLessons = curriculum
+      .flatMap((category) => category.lessons)
+      .filter((lesson) => !lesson.isLocked);
 
-    let lesson;
-    if (completedIds.length > 0) {
-      // Pick a random uncompleted lesson, or a random completed one if all done
-      lesson = await prisma.lesson.findFirst({
-        where: { id: { notIn: completedIds } },
-        orderBy: { dayNumber: "asc" },
-      });
-    }
-
-    if (!lesson) {
-      // All completed or none — pick random
-      const count = await prisma.lesson.count();
-      const skip = Math.floor(Math.random() * count);
-      lesson = await prisma.lesson.findFirst({ skip });
-    }
+    const uncompletedLessons = availableLessons.filter((lesson) => !lesson.completed);
+    const lessonCandidate =
+      (uncompletedLessons.length > 0 ? uncompletedLessons : availableLessons)[0];
+    const lesson = lessonCandidate
+      ? await prisma.lesson.findUnique({ where: { id: lessonCandidate.id } })
+      : null;
 
     if (!lesson) {
       return NextResponse.json({ error: "No lessons available" }, { status: 404 });

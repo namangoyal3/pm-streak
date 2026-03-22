@@ -8,13 +8,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { topic } = await req.json();
+  const { topic, generationMode, sourceLessonId } = await req.json();
   if (!topic || topic.length < 2) {
     return NextResponse.json({ error: "Topic is required (min 2 chars)" }, { status: 400 });
   }
 
   try {
-    const lesson = await generateLesson(topic, userId);
+    const lesson = await generateLesson({
+      topic,
+      userId,
+      generationMode: generationMode === "deep_dive" ? "deep_dive" : "explore",
+      sourceLessonId: typeof sourceLessonId === "string" ? sourceLessonId : null,
+    });
     return NextResponse.json({ lesson });
   } catch (err) {
     return NextResponse.json(

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { recordLessonCompletion } from "@/lib/streak";
+import {
+  getCoreLessonAccess,
+  getNextUnlockedCoreLesson,
+} from "@/lib/lesson-access";
 
 export async function POST(
   req: NextRequest,
@@ -13,6 +17,17 @@ export async function POST(
   }
 
   const { id } = await params;
+  const access = await getCoreLessonAccess(id, userId);
+  if (!access.exists) {
+    return NextResponse.json({ error: "Lesson not found" }, { status: 404 });
+  }
+  if (!access.canAccess) {
+    return NextResponse.json(
+      { error: access.lockedReason ?? "Lesson is not available" },
+      { status: 403 }
+    );
+  }
+
   const { score, answers } = await req.json();
 
   const lesson = await prisma.lesson.findUnique({
@@ -53,9 +68,11 @@ export async function POST(
   totalXP += lesson.xpReward;
 
   // Apply XP boost if active (2× XP, then clear it)
-  const userForBoost = await prisma.user.findUnique({ where: { id: userId }, select: { xpBoostActive: true, unlockedBatch: true } });
+  const userForBoost = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { xpBoostActive: true },
+  });
   const boostApplied = userForBoost?.xpBoostActive ?? false;
-  const currentBatch = userForBoost?.unlockedBatch ?? 0;
   if (boostApplied) {
     totalXP = totalXP * 2;
     await prisma.user.update({ where: { id: userId }, data: { xpBoostActive: false } });
@@ -97,43 +114,10 @@ export async function POST(
   const streakResult = await recordLessonCompletion(userId, totalXP);
   const totalGemsEarned = gemsEarned + (streakResult.milestoneGems ?? 0);
 
-  // ── Dynamic lesson unlocking ──
-  // Check if user has completed all currently available lessons for their batch
-  let newBatchUnlocked = false;
-  let newBatchCount = 0;
+  let nextUnlockedLesson = null;
 
-  if (!existing) {
-    // Get all available lesson IDs for this user (non-locked + unlocked batches)
-    const allLessons = await prisma.lesson.findMany({
-      orderBy: { dayNumber: "asc" },
-      select: { id: true, isLocked: true, dayNumber: true },
-    });
-
-    const lockedLessons = allLessons.filter((l) => l.isLocked).sort((a, b) => a.dayNumber - b.dayNumber);
-    const unlockedLockedIds = new Set(lockedLessons.slice(0, currentBatch * 5).map((l) => l.id));
-    const availableIds = allLessons
-      .filter((l) => !l.isLocked || unlockedLockedIds.has(l.id))
-      .map((l) => l.id);
-
-    // Count how many are completed after this completion
-    const completedCount = await prisma.completedLesson.count({
-      where: { userId, lessonId: { in: availableIds } },
-    });
-
-    // All available lessons are now completed — unlock next batch
-    if (completedCount >= availableIds.length) {
-      const nextBatchStart = currentBatch * 5;
-      const nextBatchLessons = lockedLessons.slice(nextBatchStart, nextBatchStart + 5);
-
-      if (nextBatchLessons.length > 0) {
-        await prisma.user.update({
-          where: { id: userId },
-          data: { unlockedBatch: currentBatch + 1 },
-        });
-        newBatchUnlocked = true;
-        newBatchCount = nextBatchLessons.length;
-      }
-    }
+  if (!existing && !lesson.aiGenerated) {
+    nextUnlockedLesson = await getNextUnlockedCoreLesson(lesson.categoryId, userId);
   }
 
   return NextResponse.json({
@@ -142,8 +126,7 @@ export async function POST(
     totalQuestions: lesson.questions.length,
     gemsEarned: totalGemsEarned,
     xpBoostApplied: boostApplied,
-    newBatchUnlocked,
-    newBatchCount,
+    nextUnlockedLesson,
     ...streakResult,
   });
 }

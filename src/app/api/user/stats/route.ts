@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkAndUpdateStreak } from "@/lib/streak";
+import { CORE_LESSON_WHERE } from "@/lib/lesson-access";
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -25,8 +26,23 @@ export async function GET() {
     },
   });
 
-  const completedCount = await prisma.completedLesson.count({ where: { userId } });
-  const totalLessons = await prisma.lesson.count({ where: { isLocked: false } });
+  const today = new Date().toISOString().split("T")[0];
+  const [completedCount, totalLessons, completedToday] = await Promise.all([
+    prisma.completedLesson.count({
+      where: {
+        userId,
+        lesson: { is: CORE_LESSON_WHERE },
+      },
+    }),
+    prisma.lesson.count({ where: CORE_LESSON_WHERE }),
+    prisma.completedLesson.count({
+      where: {
+        userId,
+        completedAt: { gte: new Date(today) },
+        lesson: { is: CORE_LESSON_WHERE },
+      },
+    }),
+  ]);
   const totalArchive = 289; // Full Lenny's Podcast archive available
 
   const last30Days: string[] = [];
@@ -54,6 +70,7 @@ export async function GET() {
     streak: streakInfo,
     completedCount,
     totalLessons,
+    completedToday: completedToday > 0,
     totalArchive,
     calendar,
   });

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
-import { getCoreCurriculumForUser } from "@/lib/lesson-access";
+import { getGeneratedLessonsForUser } from "@/lib/lesson-access";
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -8,6 +8,6 @@ export async function GET() {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const categories = await getCoreCurriculumForUser(userId);
-  return NextResponse.json({ categories });
+  const lessons = await getGeneratedLessonsForUser(userId);
+  return NextResponse.json({ lessons });
 }

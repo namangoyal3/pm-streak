@@ -1,103 +1,351 @@
 import { prisma } from "./prisma";
 
+type GenerationMode = "explore" | "deep_dive";
+
 interface SearchResult {
   guest: string;
+  episodeTitle: string | null;
   snippet: string;
 }
 
+interface GenerateLessonInput {
+  topic: string;
+  userId: string;
+  generationMode?: GenerationMode;
+  sourceLessonId?: string | null;
+}
+
 const LENNY_MCP_URL = "https://lenny-mcp.onrender.com/mcp";
+const MCP_HEADERS = {
+  "Content-Type": "application/json",
+  Accept: "application/json, text/event-stream",
+} as const;
 
-async function searchLennyTranscripts(query: string): Promise<SearchResult[]> {
+function normalizeTopicKey(topic: string) {
+  return topic
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\b(the|a|an|and|of|to|for|on|in)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80);
+}
+
+function slugifyTopic(topic: string) {
+  return topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function parseSseJsonPayload<T>(payload: string): T | null {
+  const dataLines = payload
+    .split("\n")
+    .filter((line) => line.startsWith("data: "))
+    .map((line) => line.slice(6));
+
+  const lastLine = dataLines.at(-1);
+  if (!lastLine) return null;
+
   try {
-    // Use direct HTTP search against the Lenny MCP transcript API
-    // The MCP server exposes search_transcripts tool
-    const res = await fetch(LENNY_MCP_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "initialize",
-        params: {
-          protocolVersion: "2024-11-05",
-          capabilities: {},
-          clientInfo: { name: "pm-streak", version: "1.0.0" },
-        },
-      }),
-    });
-
-    // If MCP doesn't work directly, fall back to a simulated search
-    if (!res.ok) {
-      return getFallbackContent(query);
-    }
-
-    return getFallbackContent(query);
+    return JSON.parse(lastLine) as T;
   } catch {
-    return getFallbackContent(query);
+    return null;
   }
+}
+
+async function initializeMcpSession() {
+  const response = await fetch(LENNY_MCP_URL, {
+    method: "POST",
+    headers: MCP_HEADERS,
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: { name: "pm-streak", version: "2.0.0" },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`MCP initialize failed with status ${response.status}`);
+  }
+
+  const sessionId = response.headers.get("mcp-session-id");
+  if (!sessionId) {
+    throw new Error("MCP session id missing");
+  }
+
+  return sessionId;
+}
+
+async function callMcpTool<T>(
+  sessionId: string,
+  name: string,
+  args: Record<string, unknown>
+) {
+  const response = await fetch(LENNY_MCP_URL, {
+    method: "POST",
+    headers: {
+      ...MCP_HEADERS,
+      "mcp-session-id": sessionId,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: Date.now(),
+      method: "tools/call",
+      params: {
+        name,
+        arguments: args,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`MCP tool ${name} failed with status ${response.status}`);
+  }
+
+  const text = await response.text();
+  const payload = parseSseJsonPayload<{ result?: { content?: Array<{ type: string; text?: string }> } }>(text);
+  return payload?.result?.content ?? [];
+}
+
+function parseSearchResults(rawText: string): SearchResult[] {
+  const chunks = rawText
+    .split(/\n---\n/g)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean);
+
+  return chunks
+    .map((chunk) => {
+      const guestMatch = chunk.match(/^##\s+\d+\.\s+(.+)$/m);
+      const titleMatch = chunk.match(/^#\s+(.+)$/m);
+      const transcriptSection = chunk.includes("## Transcript")
+        ? chunk.split("## Transcript")[1]
+        : chunk;
+      const snippet = transcriptSection
+        .replace(/^[:\s-]+/, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (!guestMatch || !snippet) return null;
+
+      return {
+        guest: guestMatch[1].trim(),
+        episodeTitle: titleMatch?.[1]?.trim() ?? null,
+        snippet,
+      };
+    })
+    .filter((result): result is SearchResult => !!result)
+    .slice(0, 4);
 }
 
 function getFallbackContent(topic: string): SearchResult[] {
   const topicContent: Record<string, SearchResult[]> = {
     onboarding: [
       {
-        guest: "Lauryn Isford",
-        snippet: "Head of Growth at Airtable shared that the best onboarding flows reduce time to aha moment by 70%. The key? Let users DO the thing, not watch a tutorial about it. At Airtable, they found that users who created their first base within 3 minutes had 5x better retention than those who watched the product tour.",
+        guest: "Adam Fishman",
+        episodeTitle: "How to build a high-performing growth team",
+        snippet:
+          "Onboarding is the one part of your product that nearly every user touches. The strongest onboarding flows shorten time-to-value, reduce cognitive load, and get the user to their first meaningful outcome quickly.",
       },
     ],
     hiring: [
       {
         guest: "Nikhyl Singhal",
-        snippet: "VP of Product at Meta shared that the #1 hiring mistake is testing for knowledge instead of thinking ability. 'You can teach someone your domain, but you can't teach them to think clearly under pressure.' He recommends the 'live product critique' interview: give candidates a real product to analyze.",
+        episodeTitle: "Hiring world-class product managers",
+        snippet:
+          "Great hiring loops test how candidates think, not just what they know. The best PM interviews surface judgment, synthesis, and the ability to reason through ambiguous product trade-offs.",
       },
     ],
     ai: [
       {
-        guest: "Paul Adams",
-        snippet: "CPO at Intercom described how AI is transforming customer support products. 'In 2 years, AI will handle 80% of support conversations. The remaining 20% will be higher-complexity, higher-empathy situations.' He recommends building AI features with human-in-the-loop controls.",
+        guest: "Ravi Mehta",
+        episodeTitle: "The AI prototype method",
+        snippet:
+          "AI product work moves faster when teams prototype with the model early, stay close to real user workflows, and treat non-determinism as a design constraint rather than an edge case.",
       },
     ],
     strategy: [
       {
         guest: "Gibson Biddle",
-        snippet: "Former VP of Product at Netflix shared his DHM (Delight, Hard-to-copy, Margin-enhancing) framework. Every product strategy should answer: Does it delight customers? Is it hard for competitors to copy? Does it improve margins? If you can't hit all three, you don't have a strategy.",
+        episodeTitle: "The DHM strategy framework",
+        snippet:
+          "A durable strategy is useful only when it delights customers, is hard to copy, and improves the economics of the business. Strategy should make trade-offs visible, not hide them.",
       },
     ],
     roadmap: [
       {
         guest: "Sachin Rekhi",
-        snippet: "CEO of Notejoy and former PM at LinkedIn shared that the best roadmaps tell a story about WHY, not just WHAT. Each item should connect to a customer problem and a metric. He advocates for 'outcome-driven roadmaps' where you list the outcomes you want to achieve, not the features you'll build.",
+        episodeTitle: "Outcome-driven roadmaps",
+        snippet:
+          "A roadmap is strongest when it tells a story about outcomes, customer problems, and how the team will measure progress. Feature lists alone do not create alignment.",
       },
     ],
-    culture: [
+    pricing: [
       {
-        guest: "Claire Hughes Johnson",
-        snippet: "Former COO of Stripe shared that the best product cultures have 'high standards AND high warmth.' Teams that are demanding but supportive ship 3x more than teams that are either too lenient or too harsh. The key metric: psychological safety score correlates directly with shipping velocity.",
+        guest: "Madhavan Ramanujam",
+        episodeTitle: "The art and science of pricing",
+        snippet:
+          "Pricing becomes a product advantage when it reflects willingness to pay, customer value, and packaging clarity. Teams usually underinvest in testing the story behind the price.",
       },
     ],
   };
 
-  const key = Object.keys(topicContent).find(
-    (k) => topic.toLowerCase().includes(k)
+  const key = Object.keys(topicContent).find((candidate) =>
+    topic.toLowerCase().includes(candidate)
   );
 
-  return key ? topicContent[key] : [
+  return (
+    topicContent[key ?? ""] ?? [
+      {
+        guest: "Lenny's Podcast Archive",
+        episodeTitle: "Curated PM insights",
+        snippet: `Across the archive, ${topic} shows up as a mix of user empathy, decision quality, and execution discipline. The consistent pattern is to define the outcome clearly, study real user behavior, and turn the insight into a practical next step.`,
+      },
+    ]
+  );
+}
+
+async function searchLennyTranscripts(query: string): Promise<SearchResult[]> {
+  try {
+    const sessionId = await initializeMcpSession();
+    const content = await callMcpTool(sessionId, "search_transcripts", {
+      query,
+      limit: 4,
+    });
+    const text = content
+      .filter((item) => item.type === "text" && item.text)
+      .map((item) => item.text ?? "")
+      .join("\n\n");
+
+    const parsed = parseSearchResults(text);
+    return parsed.length > 0 ? parsed : getFallbackContent(query);
+  } catch {
+    return getFallbackContent(query);
+  }
+}
+
+function cleanSnippet(snippet: string, maxLength = 320) {
+  const cleaned = snippet
+    .replace(/\b[A-Za-z .'()-]+ \(\d{2}:\d{2}:\d{2}\):\s*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleaned.length > maxLength
+    ? `${cleaned.slice(0, maxLength).trim()}...`
+    : cleaned;
+}
+
+function extractLeadSentence(snippet: string, topic: string) {
+  const cleaned = cleanSnippet(snippet, 220);
+  const firstSentence = cleaned.match(/.*?[.!?](?:\s|$)/)?.[0]?.trim();
+  if (firstSentence && firstSentence.length >= 45) {
+    return firstSentence;
+  }
+
+  return `${topic} gets stronger when the team reduces friction, makes the user outcome obvious, and turns insight into a concrete product decision.`;
+}
+
+function buildSourceTranscript(topic: string, results: SearchResult[]) {
+  const sections = results.map((result, index) => {
+    const episodeLine = result.episodeTitle ? `Episode: ${result.episodeTitle}` : "Episode: archive excerpt";
+    return `${index + 1}. ${result.guest}\n${episodeLine}\n${cleanSnippet(result.snippet, 420)}`;
+  });
+
+  return `Transcript highlights for ${topic}:\n\n${sections.join("\n\n")}`;
+}
+
+function buildLessonContent(
+  topic: string,
+  results: SearchResult[],
+  generationMode: GenerationMode,
+  sourceLessonTitle?: string | null
+) {
+  const lead = results[0];
+  const additional = results.slice(1, 3);
+  const introLabel =
+    generationMode === "deep_dive"
+      ? `This deeper dive builds on "${sourceLessonTitle ?? topic}" and pulls in adjacent transcript insights from Lenny's Podcast.`
+      : `This custom lesson is built from transcript highlights across Lenny's Podcast for "${topic}".`;
+
+  const summary = extractLeadSentence(lead.snippet, topic);
+  const highlightLines = [
+    `FOUNDATIONAL IDEA`,
+    summary,
+    "",
+    `WHY THIS TOPIC MATTERS`,
+    `${topic} keeps surfacing in strong PM conversations because it changes how teams prioritize, where they look for evidence, and how quickly users reach value.`,
+    "",
+    `TRANSCRIPT HIGHLIGHTS`,
+    `${lead.guest}${lead.episodeTitle ? ` — ${lead.episodeTitle}` : ""}: ${cleanSnippet(lead.snippet)}`,
+    ...additional.flatMap((result) => [
+      `${result.guest}${result.episodeTitle ? ` — ${result.episodeTitle}` : ""}: ${cleanSnippet(result.snippet)}`,
+    ]),
+    "",
+    `HOW TO APPLY THIS THIS WEEK`,
+    `1. Name the user outcome you want ${topic} to improve.`,
+    `2. Audit the biggest friction or ambiguity in the current experience.`,
+    `3. Turn one insight from this lesson into an experiment, decision, or team discussion this week.`,
+  ];
+
+  return `${introLabel}\n\n${highlightLines.join("\n")}`;
+}
+
+function buildQuestions(topic: string, results: SearchResult[]) {
+  const lead = results[0];
+  const guestOptions = Array.from(
+    new Set([
+      lead.guest,
+      ...results.slice(1).map((result) => result.guest),
+      "Lenny Rachitsky",
+      "Shreyas Doshi",
+      "Julie Zhuo",
+    ])
+  ).slice(0, 4);
+
+  const q1Options = guestOptions.includes(lead.guest)
+    ? guestOptions
+    : [lead.guest, ...guestOptions.slice(0, 3)];
+
+  const q2Correct = extractLeadSentence(lead.snippet, topic);
+  const q2Options = [
+    q2Correct,
+    `Treat ${topic} as a one-time setup task and move on.`,
+    `Ignore user friction until acquisition improves.`,
+    `Prioritize output volume over user outcomes.`,
+  ];
+
+  const q3Correct = `Apply one insight from ${topic} to a real product decision this week.`;
+
+  return [
     {
-      guest: "Multiple Guests",
-      snippet: `Across Lenny's Podcast archive, product leaders have shared insights on ${topic}. Key themes include: focusing on customer outcomes over outputs, measuring what matters, and building habits of continuous learning. The most successful PMs combine data-driven decision making with strong product intuition developed through deliberate practice.`,
+      questionText: `Which expert is featured most prominently in this lesson on ${topic}?`,
+      options: q1Options,
+      correctIndex: q1Options.indexOf(lead.guest),
+      explanation: `${lead.guest} is the primary source for the leading transcript highlight in this lesson.`,
+    },
+    {
+      questionText: `Which takeaway best matches the transcript evidence in this lesson?`,
+      options: q2Options,
+      correctIndex: 0,
+      explanation: `The lesson centers on this pattern from the transcript excerpts: ${q2Correct}`,
+    },
+    {
+      questionText: `What is the best next step after finishing a lesson on ${topic}?`,
+      options: [
+        q3Correct,
+        "Wait until you have more data before changing anything.",
+        "Turn the lesson into a slide deck before applying it.",
+        "Treat the topic as theory and keep it separate from daily work.",
+      ],
+      correctIndex: 0,
+      explanation: "Retention is higher when you turn a takeaway into a concrete decision, experiment, or product review right away.",
     },
   ];
 }
 
-export async function generateLesson(topic: string, userId: string) {
-  const transcriptData = await searchLennyTranscripts(topic);
-  const snippet = transcriptData[0];
-
-  const slug = `ai-${topic.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)}-${Date.now()}`;
-  const title = `${topic.charAt(0).toUpperCase() + topic.slice(1)} — AI-Generated Lesson`;
-
+async function ensureAiCategory() {
   let aiCategory = await prisma.category.findUnique({
     where: { slug: "ai-generated" },
   });
@@ -107,7 +355,7 @@ export async function generateLesson(topic: string, userId: string) {
       data: {
         name: "AI-Generated Lessons",
         slug: "ai-generated",
-        description: "Custom lessons generated from Lenny's Podcast transcripts",
+        description: "Custom PM lessons generated from Lenny's Podcast transcripts",
         icon: "🤖",
         color: "#ce82ff",
         sortOrder: 99,
@@ -115,84 +363,115 @@ export async function generateLesson(topic: string, userId: string) {
     });
   }
 
-  const maxDay = await prisma.lesson.aggregate({
-    _max: { dayNumber: true },
+  return aiCategory;
+}
+
+async function resolveSourceLesson(sourceLessonId?: string | null) {
+  if (!sourceLessonId) return null;
+
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: sourceLessonId },
+    include: {
+      category: true,
+    },
   });
 
-  const content = `This lesson was generated from insights shared on Lenny's Podcast about "${topic}."
+  if (!lesson) return null;
 
-EXPERT INSIGHT — ${snippet.guest}:
-${snippet.snippet}
+  if (lesson.aiGenerated && lesson.sourceLessonId) {
+    return resolveSourceLesson(lesson.sourceLessonId);
+  }
 
-KEY TAKEAWAYS:
-1. Start with the customer problem, not the solution
-2. Measure outcomes, not outputs
-3. Build iteratively — launch, learn, iterate
-4. The best frameworks are simple enough to remember and apply daily
+  return lesson;
+}
 
-APPLYING THIS TO YOUR WORK:
-Think about how this applies to your current product. What's one thing you could do this week to apply this insight? The most impactful PMs take each lesson and immediately connect it to a real decision they're facing.`;
+export async function generateLesson({
+  topic,
+  userId,
+  generationMode = "explore",
+  sourceLessonId = null,
+}: GenerateLessonInput) {
+  const normalizedTopic = topic.trim();
+  const topicKey = normalizeTopicKey(normalizedTopic);
 
-  const questions = [
-    {
-      questionText: `What was the key insight shared about "${topic}" on Lenny's Podcast?`,
-      options: [
-        `Focus on customer outcomes over outputs`,
-        `Ship as many features as possible`,
-        `Always follow competitors`,
-        `Avoid experimentation`,
-      ],
-      correctIndex: 0,
-      explanation: `The key insight is to focus on customer outcomes. ${snippet.guest} emphasized understanding what customers truly need.`,
+  const existingLesson = await prisma.lesson.findFirst({
+    where: {
+      aiGenerated: true,
+      generatedForUserId: userId,
+      topicKey,
+      generationMode,
+      sourceLessonId,
     },
-    {
-      questionText: "What's the recommended approach when applying new PM frameworks?",
-      options: [
-        "Wait until you fully master them",
-        "Apply them immediately to a real decision you're facing",
-        "Only use them in presentations",
-        "Discuss them in meetings but don't implement",
-      ],
-      correctIndex: 1,
-      explanation: "The most impactful PMs take each lesson and immediately connect it to a real decision. Learning by doing beats learning by reading.",
-    },
-    {
-      questionText: "According to Lenny's podcast guests, what separates great PMs from good PMs?",
-      options: [
-        "Technical skills",
-        "Years of experience",
-        "Combining data-driven decisions with product intuition",
-        "Having an MBA",
-      ],
-      correctIndex: 2,
-      explanation: "Great PMs combine data-driven decision making with strong product intuition developed through deliberate practice.",
-    },
-  ];
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (existingLesson) {
+    return existingLesson;
+  }
+
+  const [searchResults, sourceLesson, maxDay] = await Promise.all([
+    searchLennyTranscripts(normalizedTopic),
+    resolveSourceLesson(sourceLessonId),
+    prisma.lesson.aggregate({ _max: { dayNumber: true } }),
+  ]);
+
+  const category =
+    sourceLesson?.category ??
+    (await ensureAiCategory());
+
+  const title =
+    generationMode === "deep_dive"
+      ? `${normalizedTopic} — Deeper Dive`
+      : `${normalizedTopic.charAt(0).toUpperCase() + normalizedTopic.slice(1)} — Custom Lesson`;
+
+  const slug = `ai-${slugifyTopic(normalizedTopic).slice(0, 40)}-${generationMode}-${Date.now()}`;
+  const description =
+    generationMode === "deep_dive"
+      ? `A deeper follow-up lesson on ${normalizedTopic}`
+      : `Custom lesson on ${normalizedTopic} from Lenny's Podcast insights`;
+  const content = buildLessonContent(
+    normalizedTopic,
+    searchResults,
+    generationMode,
+    sourceLesson?.title ?? null
+  );
+  const questions = buildQuestions(normalizedTopic, searchResults);
+  const sourceTranscript = buildSourceTranscript(normalizedTopic, searchResults);
+  const leadResult = searchResults[0];
 
   const lesson = await prisma.lesson.create({
     data: {
       title,
       slug,
-      description: `AI-generated lesson on ${topic} from Lenny's Podcast insights`,
+      description,
       content,
       xpReward: 15,
-      difficulty: 2,
-      dayNumber: (maxDay._max.dayNumber ?? 14) + 1,
-      categoryId: aiCategory.id,
-      guestName: snippet.guest,
+      difficulty: generationMode === "deep_dive" ? 3 : 2,
+      dayNumber: (maxDay._max.dayNumber ?? 22) + 1,
+      categoryId: category.id,
+      guestName: sourceLesson?.guestName ?? leadResult.guest,
+      episodeTitle: sourceLesson?.episodeTitle ?? leadResult.episodeTitle,
+      youtubeId: sourceLesson?.youtubeId ?? null,
+      youtubeStart: sourceLesson?.youtubeStart ?? null,
+      youtubeEnd: sourceLesson?.youtubeEnd ?? null,
+      sourceTranscript,
       aiGenerated: true,
+      generatedForUserId: userId,
+      topicKey,
+      generationMode,
+      sourceLessonId,
     },
   });
 
   for (let i = 0; i < questions.length; i++) {
-    const q = questions[i];
+    const question = questions[i];
     await prisma.question.create({
       data: {
         lessonId: lesson.id,
-        questionText: q.questionText,
-        options: JSON.stringify(q.options),
-        correctIndex: q.correctIndex,
-        explanation: q.explanation,
+        questionText: question.questionText,
+        options: JSON.stringify(question.options),
+        correctIndex: question.correctIndex,
+        explanation: question.explanation,
         xpReward: 5,
         sortOrder: i,
       },

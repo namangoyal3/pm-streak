@@ -12,6 +12,7 @@ interface LessonCardProps {
   xpReward: number;
   completed: boolean;
   locked: boolean;
+  lockedReason?: string | null;
   index: number;
 }
 
@@ -23,6 +24,7 @@ export default function LessonCard({
   xpReward,
   completed,
   locked,
+  lockedReason,
   index,
 }: LessonCardProps) {
   const palette = [
@@ -37,16 +39,19 @@ export default function LessonCard({
 
   if (locked) {
     return (
-      <div className="lesson-card bg-[var(--bg-card)] rounded-2xl p-4 opacity-40 cursor-not-allowed border border-[var(--border-color)]">
+      <div className="lesson-card bg-[var(--bg-card)] rounded-2xl p-4 cursor-not-allowed border border-[var(--border-color)]">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
-            <Lock size={18} className="text-gray-500" />
+          <div className="w-11 h-11 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0">
+            <Lock size={18} className="text-[var(--text-secondary)]" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-sm truncate text-[var(--text-secondary)]">{title}</h3>
-            <p className="text-xs text-[var(--text-secondary)]/60 truncate mt-0.5">{description}</p>
+            <h3 className="font-bold text-sm truncate text-[var(--text-primary)]">{title}</h3>
+            <p className="text-xs text-[var(--text-secondary)] truncate mt-0.5">{description}</p>
+            <p className="text-[10px] text-[var(--gold-primary)] font-bold mt-2 line-clamp-2">
+              {lockedReason ?? "Finish the previous lesson in this category to unlock this one."}
+            </p>
           </div>
-          <Lock size={16} className="text-gray-600 flex-shrink-0" />
+          <Lock size={16} className="text-[var(--text-secondary)] flex-shrink-0" />
         </div>
       </div>
     );

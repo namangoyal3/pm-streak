@@ -89,11 +89,18 @@ model Lesson {
   sourceTranscript String? // Raw transcript excerpt from Lenny MCP
   isLocked     Boolean  @default(false)
   aiGenerated  Boolean  @default(false)
+  generatedForUserId String?
+  topicKey     String?
+  generationMode String?
+  sourceLessonId String?
   createdAt    DateTime @default(now())
 
   questions        Question[]
   completedLessons CompletedLesson[]
   dailyChallenges  DailyChallenge[]
+
+  @@index([aiGenerated, generatedForUserId, createdAt])
+  @@index([generatedForUserId, topicKey, generationMode])
 }
 
 model Question {

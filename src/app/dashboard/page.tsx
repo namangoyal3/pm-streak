@@ -34,6 +34,8 @@ interface Category {
     dayNumber: number;
     completed: boolean;
     isLocked: boolean;
+    lockedReason: string | null;
+    prerequisiteLessonTitle: string | null;
   }[];
 }
 
@@ -56,7 +58,7 @@ export default function DashboardPage() {
   const [earnBack, setEarnBack] = useState<any>(null);
   const [milestone, setMilestone] = useState<string | null>(null);
   const [pendingChallenges, setPendingChallenges] = useState<any[]>([]);
-  const [lessonsUnlockedCount, setLessonsUnlockedCount] = useState(0);
+  const [lessonUnlocked, setLessonUnlocked] = useState<{ title: string } | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -79,16 +81,13 @@ export default function DashboardPage() {
         setUser(userData.user);
         setStats(statsData);
         setCategories(lessonsData.categories);
-        if (lessonsData.unlockedBatch !== undefined) {
-          setUser((u: any) => ({ ...u, unlockedBatch: lessonsData.unlockedBatch }));
-        }
 
-        // Check if lessons were just unlocked (set by QuizView on completion)
+        // Check if a next lesson was just unlocked (set by QuizView on completion)
         try {
-          const unlocked = sessionStorage.getItem("lessonsUnlocked");
+          const unlocked = sessionStorage.getItem("lessonUnlocked");
           if (unlocked) {
-            setLessonsUnlockedCount(Number(unlocked));
-            sessionStorage.removeItem("lessonsUnlocked");
+            setLessonUnlocked(JSON.parse(unlocked));
+            sessionStorage.removeItem("lessonUnlocked");
           }
         } catch { /* ignore */ }
 
@@ -456,7 +455,7 @@ export default function DashboardPage() {
             />
           </div>
           <p className="text-xs text-[var(--text-secondary)] mt-1.5">
-            {totalCompleted} of {totalLessons} active lessons · {totalArchive}+ in archive
+            {totalCompleted} of {totalLessons} core lessons completed · {totalArchive}+ transcript episodes available for bonus practice
           </p>
         </div>
 
@@ -603,7 +602,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {categories.map((category) => {
                 const catCompleted = category.lessons.filter((l) => l.completed).length;
-                const catTotal = category.lessons.filter((l) => !l.isLocked).length;
+                const catTotal = category.lessons.length;
                 const catPct = catTotal > 0 ? Math.round((catCompleted / catTotal) * 100) : 0;
                 const catColor = category.color || "#58cc02";
                 return (
@@ -642,8 +641,11 @@ export default function DashboardPage() {
 
         {categories.map((category) => {
           const catCompleted = category.lessons.filter((l) => l.completed).length;
-          const catTotal = category.lessons.filter((l) => !l.isLocked).length;
+          const catTotal = category.lessons.length;
           const catPct = catTotal > 0 ? Math.round((catCompleted / catTotal) * 100) : 0;
+          const nextOpenLesson = category.lessons.find((lesson) => !lesson.completed && !lesson.isLocked);
+          const nextLockedLesson = category.lessons.find((lesson) => !lesson.completed && lesson.isLocked);
+          const categoryExploreHref = `/explore?topic=${encodeURIComponent(category.name)}`;
 
           return (
             <div key={category.id} className="-mt-2">
@@ -667,131 +669,61 @@ export default function DashboardPage() {
                   </div>
                   {/* 2B: Category Completion CTA */}
                   {catCompleted === catTotal && catTotal > 0 ? (
-                    <p className="text-xs font-black mt-1" style={{ color: "var(--gold-primary)" }}>
-                      ✓ Track complete!
-                    </p>
-                  ) : catCompleted > 0 && catCompleted < catTotal ? (
-                    <a
-                      href="#lessons"
-                      className="text-xs font-bold mt-1 inline-flex items-center gap-0.5 hover:underline"
-                      style={{ color: category.color || "var(--green-primary)" }}
+                    <Link
+                      href={categoryExploreHref}
+                      className="text-xs font-black mt-1 inline-flex items-center gap-1 hover:underline"
+                      style={{ color: "var(--gold-primary)" }}
                     >
-                      {catTotal - catCompleted} more lesson{catTotal - catCompleted !== 1 ? "s" : ""} to complete this track →
-                    </a>
+                      ✓ Track complete! Create a bonus lesson →
+                    </Link>
+                  ) : nextOpenLesson ? (
+                    <p className="text-xs font-bold mt-1" style={{ color: category.color || "var(--green-primary)" }}>
+                      Next up: {nextOpenLesson.title}
+                    </p>
+                  ) : nextLockedLesson ? (
+                    <p className="text-xs font-bold mt-1 text-[var(--text-secondary)]">
+                      {nextLockedLesson.lockedReason}
+                    </p>
                   ) : null}
                 </div>
               </div>
 
               <div className="space-y-2.5">
-                {category.lessons.map((lesson, i) => {
-                  const prevCompleted = i === 0 || category.lessons[i - 1].completed;
-                  const seqLocked = !prevCompleted && !lesson.completed;
-                  return (
-                    <LessonCard
-                      key={lesson.id}
-                      id={lesson.id}
-                      title={lesson.title}
-                      description={lesson.description}
-                      difficulty={lesson.difficulty}
-                      xpReward={lesson.xpReward}
-                      completed={lesson.completed}
-                      locked={lesson.isLocked || seqLocked}
-                      index={i}
-                    />
-                  );
-                })}
+                {category.lessons.map((lesson, i) => (
+                  <LessonCard
+                    key={lesson.id}
+                    id={lesson.id}
+                    title={lesson.title}
+                    description={lesson.description}
+                    difficulty={lesson.difficulty}
+                    xpReward={lesson.xpReward}
+                    completed={lesson.completed}
+                    locked={lesson.isLocked}
+                    lockedReason={lesson.lockedReason}
+                    index={i}
+                  />
+                ))}
               </div>
             </div>
           );
         })}
 
-        {/* ── Coming Soon Lessons (dynamic) ── */}
-        {(() => {
-          const previewLessons = categories.flatMap((c) => c.lessons.filter((l) => l.isLocked));
-          const allCompleted = categories
-            .flatMap((c) => c.lessons.filter((l) => !l.isLocked))
-            .every((l) => l.completed);
-          const hasMore = previewLessons.length > 0 || allCompleted;
-          if (!hasMore) return null;
-          return (
-            <div className="rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)]">
-              <div className="bg-gradient-to-r from-[#1a1a2e] to-[#16213e] px-5 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <BookOpen size={20} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-black text-white">
-                      {previewLessons.length > 0 ? "Coming Up Next" : "200+ Lessons Coming"}
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded-md bg-[var(--green-primary)]/20 text-[var(--green-primary)] text-[9px] font-black uppercase tracking-wide border border-[var(--green-primary)]/30">
-                      LENNY&apos;S ARCHIVE
-                    </span>
-                  </div>
-                  <p className="text-xs text-white/50 mt-0.5">
-                    {previewLessons.length > 0
-                      ? `${previewLessons.length} lessons queued · Complete all active lessons to unlock`
-                      : "289 podcast episodes · New lessons added weekly"}
-                  </p>
-                </div>
+        <Link href="/explore" className="block">
+          <div className="rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)]">
+            <div className="bg-gradient-to-r from-[#10271a] to-[#153726] px-5 py-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                <Sparkles size={20} className="text-white" />
               </div>
-
-              <div className="divide-y divide-[var(--border-color)]">
-                {previewLessons.length > 0 ? (
-                  previewLessons.map((lesson) => (
-                    <div key={lesson.id} className="flex items-center gap-3 px-5 py-3.5 opacity-60">
-                      <div className="w-9 h-9 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
-                        <Lock size={16} className="text-[var(--text-secondary)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-[var(--text-primary)] truncate">{lesson.title}</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] truncate">
-                          {lesson.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Lock size={13} className="text-[var(--text-secondary)]" />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  [{title: "Marc Andreessen on the AI Boom", desc: "Marc Andreessen (a16z)"},
-                   {title: "Ben Horowitz: Why Founders Fail", desc: "Ben Horowitz (a16z)"},
-                   {title: "Stewart Butterfield: Building Slack", desc: "Slack founder"},
-                   {title: "Dr. Fei-Fei Li on AI & Jobs", desc: "Stanford AI Lab"},
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 px-5 py-3.5 opacity-60">
-                      <div className="w-9 h-9 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
-                        <BookOpen size={16} className="text-[var(--text-secondary)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-[var(--text-primary)] truncate">{item.title}</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] truncate">{item.desc}</p>
-                      </div>
-                      <Lock size={13} className="text-[var(--text-secondary)]" />
-                    </div>
-                  ))
-                )}
-
-                <div className="px-5 py-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="flex -space-x-2">
-                      {[BookOpen, Zap, TrendingUp, Trophy, Sparkles].map((Icon, i) => (
-                        <div key={i} className="w-7 h-7 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center">
-                          <Icon size={12} className="text-[var(--text-secondary)]" />
-                        </div>
-                      ))}
-                    </div>
-                    <span className="text-xs text-[var(--text-secondary)] font-bold">+ 285 more episodes</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-[var(--green-primary)] font-black">
-                    <Sparkles size={12} /> Coming soon
-                  </div>
-                </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-black text-white">Need more depth on a concept?</div>
+                <p className="text-xs text-white/65 mt-0.5">
+                  Generate bonus lessons from the transcript archive without affecting which core lesson unlocks next.
+                </p>
               </div>
+              <ArrowRight size={16} className="text-white/70" />
             </div>
-          );
-        })()}
+          </div>
+        </Link>
 
         {/* ── Share CTA ── */}
         <button
@@ -814,9 +746,9 @@ export default function DashboardPage() {
 
       <ShareCard isOpen={showShare} onClose={() => setShowShare(false)} />
 
-      {/* New lessons unlocked overlay */}
-      {lessonsUnlockedCount > 0 && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center" onClick={() => setLessonsUnlockedCount(0)}>
+      {/* Next lesson unlocked overlay */}
+      {lessonUnlocked && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center" onClick={() => setLessonUnlocked(null)}>
           <div className="absolute inset-0 bg-black/70" />
           <div className="relative w-full max-w-xs mx-4">
             <div className="bg-gradient-to-br from-[#0d2a18] to-[#1a3a25] border border-[var(--green-primary)]/40 rounded-3xl p-6 text-center shadow-2xl">
@@ -840,19 +772,19 @@ export default function DashboardPage() {
                 );
               })}
               <div className="text-5xl mb-3">🎉</div>
-              <h2 className="text-2xl font-black text-white mb-2">New Lessons Unlocked!</h2>
+              <h2 className="text-2xl font-black text-white mb-2">Next Lesson Ready</h2>
               <p className="text-sm text-white/70 mb-1">
-                {lessonsUnlockedCount} fresh lessons just dropped into your curriculum.
+                {lessonUnlocked.title}
               </p>
-              <p className="text-xs text-[var(--green-primary)] font-bold mb-5">Keep the streak alive — new content awaits!</p>
+              <p className="text-xs text-[var(--green-primary)] font-bold mb-5">Your category progression just moved forward.</p>
               <button
                 onClick={() => {
-                  setLessonsUnlockedCount(0);
+                  setLessonUnlocked(null);
                   document.getElementById("lessons")?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm transition-colors flex items-center justify-center gap-2"
               >
-                <Sparkles size={16} /> See New Lessons
+                <Sparkles size={16} /> See My Curriculum
               </button>
             </div>
           </div>
