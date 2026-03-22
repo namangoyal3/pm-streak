@@ -182,6 +182,7 @@ export default function DashboardPage() {
   const totalArchive = stats?.totalArchive ?? 289;
   const episodesNotYetImported = stats?.episodesNotYetImported ?? 0;
   const coreLessonCount = stats?.coreLessonCount ?? 0;
+  const archiveImportDisplay = Math.min(coreLessonCount, totalArchive);
   const archiveUnlockProgress = stats?.archiveUnlockProgress as
     | {
         remainingToNextUnlock: number;
@@ -246,7 +247,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-2.5">
-          {category.lessons.map((lesson, i) => (
+          {category.lessons.map((lesson) => (
             <LessonCard
               key={lesson.id}
               id={lesson.id}
@@ -257,7 +258,7 @@ export default function DashboardPage() {
               completed={lesson.completed}
               locked={lesson.isLocked}
               lockedReason={lesson.lockedReason}
-              index={i}
+              isNext={nextOpenLesson?.id === lesson.id}
             />
           ))}
         </div>
@@ -289,8 +290,8 @@ export default function DashboardPage() {
             </div>
           </Link>
         )}
-        <div className="lg:grid lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-6 lg:items-start w-full min-w-0">
-        <div className="space-y-4 min-w-0">
+        <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-6 lg:items-start w-full min-w-0">
+        <div className="space-y-4 min-w-0 order-2 lg:order-1">
 
         {/* ── Earn-Back Banner ── */}
         {earnBack && (
@@ -561,9 +562,11 @@ export default function DashboardPage() {
           </p>
           <p className="text-[10px] text-[var(--text-secondary)] mt-2 leading-relaxed border-t border-[var(--border-color)] pt-2">
             <span className="font-bold text-[var(--text-primary)]">
-              {coreLessonCount} of {totalArchive}
+              {coreLessonCount > totalArchive
+                ? `${coreLessonCount} (${totalArchive} catalog reference)`
+                : `${archiveImportDisplay} of ${totalArchive}`}
             </span>{" "}
-            Lenny catalog episodes are in the database as core lessons
+            podcast-archive lesson rows in the database
             {episodesNotYetImported > 0 ? (
               <>
                 {" "}
@@ -753,56 +756,18 @@ export default function DashboardPage() {
         </div>
 
         </div>{/* end left sidebar */}
-        <div className="space-y-4 mt-4 lg:mt-0 min-w-0">
+        <div className="space-y-4 mt-0 lg:mt-0 min-w-0 order-1 lg:order-2">
 
-        {/* ── Activity Calendar ── */}
-        {stats?.calendar && <StreakCalendar calendar={stats.calendar} />}
-
-        {/* ── PM Knowledge Map ── */}
-        {categories.length > 0 && (
-          <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp size={16} className="text-[var(--green-primary)]" />
-              <h2 className="text-base font-black">PM Knowledge Map</h2>
-            </div>
-            <div className="space-y-3">
-              {categories.map((category) => {
-                const catCompleted = category.lessons.filter((l) => l.completed).length;
-                const catTotal = category.lessons.length;
-                const catPct = catTotal > 0 ? Math.round((catCompleted / catTotal) * 100) : 0;
-                const catColor = category.color || "#58cc02";
-                return (
-                  <div key={category.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-base flex-shrink-0">
-                      {category.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-bold truncate">{category.name}</span>
-                        <span className="text-xs font-bold ml-2 flex-shrink-0 tabular-nums" style={{ color: catPct > 0 ? catColor : "var(--text-secondary)" }}>
-                          {catCompleted}/{catTotal}
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${catPct}%`, background: catColor }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* ── Your Curriculum (core path always visible) ── */}
+        {/* ── Your Curriculum (first on the page so lessons are visible without scrolling) ── */}
         <div id="lessons" className="pt-2 scroll-mt-24">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-1">
             <Sparkles size={18} className="text-[var(--green-primary)]" />
             <h2 className="text-base font-black">Your Curriculum</h2>
           </div>
+          <p className="text-[10px] text-[var(--text-secondary)] font-bold mb-3 leading-relaxed">
+            <span className="text-[var(--green-primary)]">Next</span> ·{" "}
+            <span className="text-[#1cb0f6]">unlocked</span> · done · locked
+          </p>
         </div>
 
         {coreCategories.map((c) => renderCategoryTrack(c))}
@@ -934,6 +899,48 @@ export default function DashboardPage() {
               </div>
             )}
           </>
+        )}
+
+        {/* ── Activity Calendar (below curriculum so lessons stay above the fold) ── */}
+        {stats?.calendar && <StreakCalendar calendar={stats.calendar} />}
+
+        {/* ── PM Knowledge Map ── */}
+        {categories.length > 0 && (
+          <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp size={16} className="text-[var(--green-primary)]" />
+              <h2 className="text-base font-black">PM Knowledge Map</h2>
+            </div>
+            <div className="space-y-3">
+              {categories.map((category) => {
+                const catCompleted = category.lessons.filter((l) => l.completed).length;
+                const catTotal = category.lessons.length;
+                const catPct = catTotal > 0 ? Math.round((catCompleted / catTotal) * 100) : 0;
+                const catColor = category.color || "#58cc02";
+                return (
+                  <div key={category.id} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-base flex-shrink-0">
+                      {category.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold truncate">{category.name}</span>
+                        <span className="text-xs font-bold ml-2 flex-shrink-0 tabular-nums" style={{ color: catPct > 0 ? catColor : "var(--text-secondary)" }}>
+                          {catCompleted}/{catTotal}
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${catPct}%`, background: catColor }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         <Link href="/explore" className="block">

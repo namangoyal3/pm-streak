@@ -13,7 +13,8 @@ interface LessonCardProps {
   completed: boolean;
   locked: boolean;
   lockedReason?: string | null;
-  index: number;
+  /** First unlocked, incomplete lesson in this track — strong green CTA */
+  isNext?: boolean;
 }
 
 export default function LessonCard({
@@ -25,17 +26,10 @@ export default function LessonCard({
   completed,
   locked,
   lockedReason,
-  index,
+  isNext = false,
 }: LessonCardProps) {
-  const palette = [
-    { from: "#58cc02", to: "#46a302", shadow: "rgba(88,204,2,0.3)" },
-    { from: "#1cb0f6", to: "#1899d6", shadow: "rgba(28,176,246,0.3)" },
-    { from: "#ff9600", to: "#e08600", shadow: "rgba(255,150,0,0.3)" },
-    { from: "#ce82ff", to: "#b060e0", shadow: "rgba(206,130,255,0.3)" },
-    { from: "#ff4b4b", to: "#ea2b2b", shadow: "rgba(255,75,75,0.3)" },
-  ];
-
-  const color = palette[index % palette.length];
+  const green = "var(--green-primary)";
+  const blue = "#1cb0f6";
 
   if (locked) {
     return (
@@ -57,70 +51,138 @@ export default function LessonCard({
     );
   }
 
+  if (completed) {
+    return (
+      <Link href={`/lesson/${id}`} className="block">
+        <div
+          className="lesson-card rounded-2xl p-4 relative overflow-hidden border-2"
+          style={{
+            background: `linear-gradient(135deg, ${green}14, ${green}08)`,
+            borderColor: `${green}44`,
+            boxShadow: "none",
+          }}
+        >
+          <div className="absolute right-3 top-3">
+            <CheckCircle2 size={20} style={{ color: green }} />
+          </div>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ background: `${green}22` }}
+            >
+              <Star size={20} style={{ color: green }} fill={green} />
+            </div>
+            <div className="flex-1 min-w-0 pr-2">
+              <h3 className="font-bold text-sm leading-tight mb-0.5" style={{ color: green }}>
+                {title}
+              </h3>
+              <p className="text-xs truncate" style={{ color: `${green}99` }}>
+                {description}
+              </p>
+            </div>
+            <div
+              className="flex items-center gap-1 text-xs font-black px-2.5 py-1.5 rounded-xl flex-shrink-0"
+              style={{ background: `${green}18`, color: green }}
+            >
+              <Zap size={11} />
+              {xpReward}
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex gap-1 flex-1">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-1 flex-1 rounded-full"
+                  style={{
+                    background: i < difficulty ? `${green}66` : `${green}22`,
+                  }}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: green }}>
+              Done ✓
+            </span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  const isPrimaryNext = isNext;
+
   return (
     <Link href={`/lesson/${id}`} className="block">
       <div
-        className="lesson-card rounded-2xl p-4 relative overflow-hidden"
-        style={{
-          background: completed
-            ? `linear-gradient(135deg, ${color.from}22, ${color.to}11)`
-            : `linear-gradient(135deg, ${color.from}, ${color.to})`,
-          border: completed ? `2px solid ${color.from}44` : "none",
-          boxShadow: completed ? "none" : `0 4px 14px ${color.shadow}`,
-        }}
-      >
-        {/* Completed watermark */}
-        {completed && (
-          <div className="absolute right-3 top-3">
-            <CheckCircle2 size={20} style={{ color: color.from }} />
-          </div>
+        className={cn(
+          "lesson-card rounded-2xl p-4 relative overflow-hidden border-2 transition-all",
+          isPrimaryNext
+            ? "border-transparent"
+            : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]/30"
         )}
-
+        style={
+          isPrimaryNext
+            ? {
+                background: `linear-gradient(135deg, ${green}, #46a302)`,
+                boxShadow: "0 4px 14px rgba(88,204,2,0.35)",
+              }
+            : {
+                borderLeftWidth: 4,
+                borderLeftColor: blue,
+              }
+        }
+      >
         <div className="flex items-center gap-3">
-          {/* Icon circle */}
           <div
-            className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{
-              background: completed ? `${color.from}22` : "rgba(255,255,255,0.2)",
-            }}
-          >
-            {completed ? (
-              <Star size={20} style={{ color: color.from }} fill={color.from} />
-            ) : (
-              <PlayCircle size={22} className="text-white" />
+            className={cn(
+              "w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0",
+              isPrimaryNext ? "bg-white/20" : "bg-[var(--bg-secondary)]"
             )}
+          >
+            <PlayCircle
+              size={22}
+              className={isPrimaryNext ? "text-white" : ""}
+              style={!isPrimaryNext ? { color: blue } : undefined}
+            />
           </div>
-
-          {/* Text */}
           <div className="flex-1 min-w-0 pr-2">
             <h3
-              className={cn("font-bold text-sm leading-tight mb-0.5", completed ? "text-white/60" : "text-white")}
-              style={completed ? { color: color.from } : {}}
+              className={cn(
+                "font-bold text-sm leading-tight mb-0.5",
+                isPrimaryNext ? "text-white" : "text-[var(--text-primary)]"
+              )}
             >
               {title}
             </h3>
             <p
-              className="text-xs truncate"
-              style={{ color: completed ? `${color.from}99` : "rgba(255,255,255,0.75)" }}
+              className={cn(
+                "text-xs truncate",
+                isPrimaryNext ? "text-white/80" : "text-[var(--text-secondary)]"
+              )}
             >
               {description}
             </p>
+            {!isPrimaryNext && (
+              <p className="text-[10px] font-bold mt-1 uppercase tracking-wide" style={{ color: blue }}>
+                Unlocked — tap to start
+              </p>
+            )}
+            {isPrimaryNext && (
+              <p className="text-[10px] font-black mt-1 uppercase tracking-wide text-white/90">
+                Next up
+              </p>
+            )}
           </div>
-
-          {/* XP badge */}
           <div
-            className="flex items-center gap-1 text-xs font-black px-2.5 py-1.5 rounded-xl flex-shrink-0"
-            style={{
-              background: completed ? `${color.from}22` : "rgba(255,255,255,0.2)",
-              color: completed ? color.from : "white",
-            }}
+            className={cn(
+              "flex items-center gap-1 text-xs font-black px-2.5 py-1.5 rounded-xl flex-shrink-0",
+              isPrimaryNext ? "bg-white/20 text-white" : "bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+            )}
           >
             <Zap size={11} />
             {xpReward}
           </div>
         </div>
-
-        {/* Difficulty + status bar */}
         <div className="mt-3 flex items-center gap-2">
           <div className="flex gap-1 flex-1">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -128,26 +190,25 @@ export default function LessonCard({
                 key={i}
                 className="h-1 flex-1 rounded-full"
                 style={{
-                  background: i < difficulty
-                    ? (completed ? `${color.from}66` : "rgba(255,255,255,0.7)")
-                    : (completed ? `${color.from}22` : "rgba(255,255,255,0.2)"),
+                  background: isPrimaryNext
+                    ? i < difficulty
+                      ? "rgba(255,255,255,0.75)"
+                      : "rgba(255,255,255,0.2)"
+                    : i < difficulty
+                      ? `${blue}80`
+                      : "var(--bg-secondary)",
                 }}
               />
             ))}
           </div>
-          {completed && (
-            <span
-              className="text-[10px] font-bold uppercase tracking-wide"
-              style={{ color: color.from }}
-            >
-              Done ✓
-            </span>
-          )}
-          {!completed && (
-            <span className="text-[10px] font-bold uppercase tracking-wide text-white/60">
-              {difficulty === 1 ? "Beginner" : difficulty === 2 ? "Intermediate" : "Advanced"}
-            </span>
-          )}
+          <span
+            className={cn(
+              "text-[10px] font-bold uppercase tracking-wide",
+              isPrimaryNext ? "text-white/80" : "text-[var(--text-secondary)]"
+            )}
+          >
+            {difficulty === 1 ? "Beginner" : difficulty === 2 ? "Intermediate" : "Advanced"}
+          </span>
         </div>
       </div>
     </Link>

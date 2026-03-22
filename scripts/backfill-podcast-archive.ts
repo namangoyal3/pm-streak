@@ -1,6 +1,11 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { PrismaClient } from "@prisma/client";
+import {
+  buildArchiveInsightQuestions,
+  extractSentences,
+  truncateOption,
+} from "../src/lib/podcast-quiz-helpers";
 
 const envPath = resolve(process.cwd(), ".env");
 if (existsSync(envPath)) {
@@ -273,67 +278,6 @@ function deriveTopic(title: string) {
   return beforePipe.replace(/^Episode:\s*/i, "").trim();
 }
 
-function insertCorrectAnswer<T>(options: T[], correctValue: T, seed: string) {
-  const insertIndex =
-    seed.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) %
-    (options.length + 1);
-  const result = [...options];
-  result.splice(insertIndex, 0, correctValue);
-  return {
-    options: result,
-    correctIndex: insertIndex,
-  };
-}
-
-function buildQuestions(guest: string, title: string, topic: string) {
-  const guestChoices = insertCorrectAnswer(
-    [
-      "Julie Zhuo",
-      "Brian Chesky",
-      "Madhavan Ramanujam",
-    ].filter((candidate) => candidate !== guest),
-    guest,
-    guest
-  );
-
-  const titleChoices = insertCorrectAnswer(
-    [
-      "A tactical teardown of weekly sprint ceremonies",
-      "A debate about whether PMs should avoid customer research",
-      "A guide to managing only by vanity metrics",
-    ],
-    title,
-    title
-  );
-
-  return [
-    {
-      questionText: "Which guest is featured in this podcast lesson?",
-      options: guestChoices.options,
-      correctIndex: guestChoices.correctIndex,
-      explanation: `${guest} is the featured guest for this Lenny's Podcast episode.`,
-    },
-    {
-      questionText: "Which episode title matches this lesson?",
-      options: titleChoices.options,
-      correctIndex: titleChoices.correctIndex,
-      explanation: `This lesson is based on "${title}".`,
-    },
-    {
-      questionText: `What is the best next step after finishing this lesson on ${topic}?`,
-      options: [
-        `Apply one insight from ${topic} to a real product decision this week.`,
-        "Treat the lesson as inspiration and avoid turning it into action.",
-        "Wait for someone else to summarize it before discussing it with your team.",
-        "Turn the entire transcript into a slide deck before using it.",
-      ],
-      correctIndex: 0,
-      explanation:
-        "The fastest way to retain an episode insight is to turn it into a concrete experiment, question, or product decision right away.",
-    },
-  ];
-}
-
 function buildEpisodeRecord(
   guest: string,
   rawText: string
@@ -356,6 +300,13 @@ function buildEpisodeRecord(
 
   const summary = getFirstSentence(highlights[0]);
   const description = truncate(topic, 110);
+  const pmTakeaways = highlights
+    .slice(0, 3)
+    .map((h, idx) => {
+      const line = extractSentences(h, 48, 1)[0] ?? truncate(h, 130);
+      return `${idx + 1}. ${truncateOption(line, 160)}`;
+    })
+    .join("\n");
   const sourceTranscript = [
     `Episode: ${title}`,
     `Guest: ${guest}`,
@@ -363,7 +314,7 @@ function buildEpisodeRecord(
     ...highlights.map((highlight, index) => `${index + 1}. ${highlight}`),
   ].join("\n");
   const content = [
-    "This lesson is built from a full episode in Lenny's Podcast archive.",
+    "This lesson is built from a full Lenny's Podcast episode. Focus on the ideas below — quizzes reward recalling the guest's insights and frameworks, not trivia.",
     "",
     "EPISODE",
     title,
@@ -371,6 +322,9 @@ function buildEpisodeRecord(
     "",
     "FOUNDATIONAL IDEA",
     summary,
+    "",
+    "KEY PM TAKEAWAYS (from transcripts)",
+    pmTakeaways,
     "",
     "TRANSCRIPT HIGHLIGHTS",
     ...highlights.flatMap((highlight, index) => [
@@ -392,7 +346,13 @@ function buildEpisodeRecord(
     description: `Archive episode: ${description}`,
     content,
     sourceTranscript,
-    questions: buildQuestions(guest, title, topic),
+    questions: buildArchiveInsightQuestions({
+      guest,
+      title,
+      topic,
+      highlights,
+      summary,
+    }),
   };
 }
 

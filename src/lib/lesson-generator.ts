@@ -1,4 +1,9 @@
 import { prisma } from "./prisma";
+import {
+  buildExploreInsightQuestions,
+  extractSentences,
+  truncateOption,
+} from "./podcast-quiz-helpers";
 
 type GenerationMode = "explore" | "deep_dive";
 
@@ -270,9 +275,22 @@ function buildLessonContent(
       : `This custom lesson is built from transcript highlights across Lenny's Podcast for "${topic}".`;
 
   const summary = extractLeadSentence(lead.snippet, topic);
+  const leadClean = cleanSnippet(lead.snippet, 620);
+  const takeawayLines = [
+    extractSentences(leadClean, 45, 2)[0],
+    ...results.slice(1, 3).flatMap((r) => extractSentences(cleanSnippet(r.snippet, 620), 45, 1)),
+    extractSentences(leadClean, 40, 3)[1],
+  ]
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((line, i) => `${i + 1}. ${truncateOption(line!, 165)}`);
+
   const highlightLines = [
     `FOUNDATIONAL IDEA`,
     summary,
+    "",
+    `KEY PM TAKEAWAYS (from Lenny transcript excerpts)`,
+    takeawayLines.join("\n"),
     "",
     `WHY THIS TOPIC MATTERS`,
     `${topic} keeps surfacing in strong PM conversations because it changes how teams prioritize, where they look for evidence, and how quickly users reach value.`,
@@ -293,56 +311,14 @@ function buildLessonContent(
 }
 
 function buildQuestions(topic: string, results: SearchResult[]) {
-  const lead = results[0];
-  const guestOptions = Array.from(
-    new Set([
-      lead.guest,
-      ...results.slice(1).map((result) => result.guest),
-      "Lenny Rachitsky",
-      "Shreyas Doshi",
-      "Julie Zhuo",
-    ])
-  ).slice(0, 4);
-
-  const q1Options = guestOptions.includes(lead.guest)
-    ? guestOptions
-    : [lead.guest, ...guestOptions.slice(0, 3)];
-
-  const q2Correct = extractLeadSentence(lead.snippet, topic);
-  const q2Options = [
-    q2Correct,
-    `Treat ${topic} as a one-time setup task and move on.`,
-    `Ignore user friction until acquisition improves.`,
-    `Prioritize output volume over user outcomes.`,
-  ];
-
-  const q3Correct = `Apply one insight from ${topic} to a real product decision this week.`;
-
-  return [
-    {
-      questionText: `Which expert is featured most prominently in this lesson on ${topic}?`,
-      options: q1Options,
-      correctIndex: q1Options.indexOf(lead.guest),
-      explanation: `${lead.guest} is the primary source for the leading transcript highlight in this lesson.`,
-    },
-    {
-      questionText: `Which takeaway best matches the transcript evidence in this lesson?`,
-      options: q2Options,
-      correctIndex: 0,
-      explanation: `The lesson centers on this pattern from the transcript excerpts: ${q2Correct}`,
-    },
-    {
-      questionText: `What is the best next step after finishing a lesson on ${topic}?`,
-      options: [
-        q3Correct,
-        "Wait until you have more data before changing anything.",
-        "Turn the lesson into a slide deck before applying it.",
-        "Treat the topic as theory and keep it separate from daily work.",
-      ],
-      correctIndex: 0,
-      explanation: "Retention is higher when you turn a takeaway into a concrete decision, experiment, or product review right away.",
-    },
-  ];
+  return buildExploreInsightQuestions(
+    topic,
+    results.map((r) => ({
+      guest: r.guest,
+      episodeTitle: r.episodeTitle,
+      snippet: r.snippet,
+    }))
+  );
 }
 
 async function ensureAiCategory() {
