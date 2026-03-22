@@ -30,6 +30,20 @@ model User {
   lostStreakVal Int      @default(0)    // the streak value that was lost
   xpBoostActive Boolean  @default(false) // next lesson gives 2× XP
   unlockedBatch Int      @default(0)     // how many batches of locked lessons have been unlocked
+
+  // Billing / PM Streak Pro (Paddle)
+  plan               String    @default("free") // free | pro
+  billingStatus      String?   // active | trialing | past_due | canceled | none
+  billingProvider    String?   // paddle
+  country            String?   // ISO 3166-1 alpha-2 (from geo or checkout)
+  currency           String?   // ISO 4217
+  priceBand          String?   // A | B | C
+  trialEndsAt        DateTime?
+  proPreviewConsumed Boolean   @default(false)
+  paddleCustomerId   String?
+  renewsAt           DateTime?
+  cancelsAt          DateTime?
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -44,6 +58,59 @@ model User {
   receivedChallenges FriendChallenge[] @relation("challengee")
   notifications      Notification[]    @relation("notifRecipient")
   sentNotifications  Notification[]    @relation("notifSender")
+  subscriptions      Subscription[]
+  billingEvents      BillingEvent[]
+  entitlements       Entitlement[]
+}
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paddleSubscriptionId String?   @unique
+  paddlePriceId        String?
+  status               String    @default("active") // active | canceled | past_due | paused | trialing
+  billingInterval      String?   // month | quarter | year
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model BillingEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  provider   String   @default("paddle")
+  eventType  String
+  payload    String   // raw JSON
+  externalId String?  @unique
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+}
+
+model Entitlement {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key       String    // unlimited_ai_lessons | deep_dives | interview_sprint | role_roadmaps | saved_notes | premium_recaps
+  grantedAt DateTime  @default(now())
+  expiresAt DateTime?
+  source    String    @default("subscription") // subscription | trial | admin | promo
+
+  @@unique([userId, key])
+  @@index([userId])
+}
+
+model CountryPriceOverride {
+  id          String   @id @default(cuid())
+  countryCode String   @unique // ISO 3166-1 alpha-2
+  priceBand   String   // A | B | C
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Notification {

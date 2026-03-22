@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap, Crown } from "lucide-react";
 
 interface NavbarProps {
   streakCount: number;
@@ -42,6 +42,7 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
     { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
     { href: "/daily-challenge", label: "Daily", icon: Calendar, locked: false },
     { href: "/explore", label: "Explore", icon: Sparkles, locked: false },
+    { href: "/pricing", label: "Pro", icon: Crown, locked: false },
     { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: !unlocked },
     { href: "/social", label: "Social", icon: Users, locked: !unlocked },
   ];

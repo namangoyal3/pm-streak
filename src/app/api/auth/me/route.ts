@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { maybeGrantProTrial } from "@/lib/billing/trial";
 
 export async function GET() {
   const userId = await getCurrentUserId();
   if (!userId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  await maybeGrantProTrial(userId);
 
   const [user, unreadNotifications] = await Promise.all([
     prisma.user.findUnique({
@@ -29,6 +32,12 @@ export async function GET() {
         onboarded: true,
         lastActiveAt: true,
         createdAt: true,
+        plan: true,
+        billingStatus: true,
+        trialEndsAt: true,
+        proPreviewConsumed: true,
+        country: true,
+        priceBand: true,
       },
     }),
     prisma.notification.count({ where: { userId, readAt: null } }),

@@ -28,12 +28,20 @@ export default async function Home() {
             <span className="text-[var(--green-primary)]">PM</span>
             <span className="text-white">Streak</span>
           </div>
-          <BrowserLink
-            href="/login"
-            className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
-          >
-            Start Free
-          </BrowserLink>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/pricing"
+              className="px-3 py-2 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-white text-sm font-bold transition-colors"
+            >
+              Pro
+            </Link>
+            <BrowserLink
+              href="/login"
+              className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
+            >
+              Start Free
+            </BrowserLink>
+          </div>
         </div>
       </nav>
 
@@ -49,8 +57,11 @@ export default async function Home() {
               The fastest way<br />to get sharper<br />
               <span className="text-[var(--green-primary)]">as a PM.</span>
             </h1>
-            <p className="text-lg text-[var(--text-secondary)] mb-8 leading-relaxed max-w-md">
+            <p className="text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
               One lesson a day. Streak tracking. XP and leaderboards. The best PM frameworks from Lenny&apos;s podcast — turned into 2-minute lessons that actually stick.
+            </p>
+            <p className="text-sm text-[var(--green-primary)] font-bold mb-8 max-w-md">
+              Free core curriculum — upgrade for deeper learning with PM Streak Pro.
             </p>
 
             <BrowserLink
@@ -102,7 +113,7 @@ export default async function Home() {
             { value: "300+", label: "Podcast episodes" },
             { value: "2 min", label: "Per lesson" },
             { value: "10+", label: "PM frameworks" },
-            { value: "Free", label: "Forever" },
+            { value: "Free", label: "core" },
           ].map(({ value, label }) => (
             <div key={label} className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-white tabular-nums">{value}</span>

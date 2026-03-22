@@ -55,6 +55,7 @@ function ExplorePageContent() {
   const [generating, setGenerating] = useState(false);
   const [generatedLessons, setGeneratedLessons] = useState<GeneratedLesson[]>([]);
   const [error, setError] = useState("");
+  const [paywallHard, setPaywallHard] = useState(false);
 
   const sourceLessonId = searchParams.get("sourceLessonId");
   const generationMode =
@@ -97,6 +98,7 @@ function ExplorePageContent() {
 
     setGenerating(true);
     setError("");
+    setPaywallHard(false);
 
     try {
       const res = await fetch("/api/generate-lesson", {
@@ -111,10 +113,12 @@ function ExplorePageContent() {
 
       const data = await res.json();
       if (!res.ok) {
+        setPaywallHard(res.status === 402);
         setError(data.error || "Failed to generate");
         return;
       }
 
+      setPaywallHard(false);
       setGeneratedLessons((prev) => mergeLessons([data.lesson, ...prev]));
       setTopic("");
     } catch {
@@ -190,7 +194,25 @@ function ExplorePageContent() {
         </div>
 
         {error && (
-          <p className="text-[var(--red-primary)] text-sm text-center">{error}</p>
+          <div className="text-center space-y-2">
+            <p
+              className={
+                paywallHard
+                  ? "text-sm text-[var(--gold-primary)] font-bold"
+                  : "text-[var(--red-primary)] text-sm"
+              }
+            >
+              {error}
+            </p>
+            {paywallHard && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-1 text-sm font-black text-[var(--green-primary)]"
+              >
+                View PM Streak Pro <ArrowRight size={14} />
+              </Link>
+            )}
+          </div>
         )}
 
         <div>

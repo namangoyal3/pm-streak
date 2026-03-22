@@ -6,6 +6,7 @@ import {
   getCoreLessonAccess,
   syncArchiveUnlocksForUser,
 } from "@/lib/lesson-access";
+import { maybeGrantProTrial } from "@/lib/billing/trial";
 
 export async function POST(
   req: NextRequest,
@@ -113,6 +114,10 @@ export async function POST(
 
   const streakResult = await recordLessonCompletion(userId, totalXP);
   const totalGemsEarned = gemsEarned + (streakResult.milestoneGems ?? 0);
+
+  if (!lesson.aiGenerated) {
+    await maybeGrantProTrial(userId);
+  }
 
   let archiveUnlock = null;
 
