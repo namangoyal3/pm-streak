@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { ds } from "@/lib/ds";
 import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap, Crown } from "lucide-react";
 
 interface NavbarProps {
@@ -50,7 +51,7 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
   return (
     <>
       {/* Top header bar */}
-      <header className="sticky top-0 z-50 bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
+      <header className={ds.headerShell}>
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-1.5 font-black text-xl tracking-tight">
@@ -102,7 +103,7 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
       </header>
 
       {/* Bottom navigation - fixed, Duolingo-style */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--bg-secondary)] border-t border-[var(--border-color)] safe-area-pb">
+      <nav className={ds.bottomNav}>
         <div className="max-w-5xl mx-auto px-2 flex h-16">
           {navItems.map((item) => {
             const Icon = item.icon;

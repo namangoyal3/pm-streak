@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { ds } from "@/lib/ds";
 import { CheckCircle2, Lock, Zap, PlayCircle, Star } from "lucide-react";
 
 interface LessonCardProps {
@@ -29,13 +30,18 @@ export default function LessonCard({
   isNext = false,
 }: LessonCardProps) {
   const green = "var(--green-primary)";
-  const blue = "#1cb0f6";
+  const accent = "var(--lesson-accent)";
 
   if (locked) {
     return (
-      <div className="lesson-card bg-[var(--bg-card)] rounded-2xl p-4 cursor-not-allowed border border-[var(--border-color)]">
+      <div className="lesson-card cursor-not-allowed border-2 border-[var(--border-color)] bg-[var(--surface-2)] p-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0">
+          <div
+            className={cn(
+              "w-11 h-11 flex items-center justify-center flex-shrink-0",
+              ds.iconBox
+            )}
+          >
             <Lock size={18} className="text-[var(--text-secondary)]" />
           </div>
           <div className="flex-1 min-w-0">
@@ -55,34 +61,32 @@ export default function LessonCard({
     return (
       <Link href={`/lesson/${id}`} className="block">
         <div
-          className="lesson-card rounded-2xl p-4 relative overflow-hidden border-2"
+          className="lesson-card p-4 relative overflow-hidden border-2"
           style={{
-            background: `linear-gradient(135deg, ${green}14, ${green}08)`,
-            borderColor: `${green}44`,
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--green-primary) 14%, transparent), color-mix(in srgb, var(--green-primary) 6%, transparent))",
+            borderColor: "color-mix(in srgb, var(--green-primary) 28%, transparent)",
             boxShadow: "none",
           }}
         >
           <div className="absolute right-3 top-3">
-            <CheckCircle2 size={20} style={{ color: green }} />
+            <CheckCircle2 size={20} className="text-[var(--green-primary)]" />
           </div>
           <div className="flex items-center gap-3">
             <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
-              style={{ background: `${green}22` }}
+              className="w-11 h-11 rounded-[var(--ds-radius-md)] flex items-center justify-center flex-shrink-0"
+              style={{
+                background: "color-mix(in srgb, var(--green-primary) 16%, transparent)",
+              }}
             >
-              <Star size={20} style={{ color: green }} fill={green} />
+              <Star size={20} className="text-[var(--green-primary)]" fill="currentColor" />
             </div>
             <div className="flex-1 min-w-0 pr-2">
-              <h3 className="font-bold text-sm leading-tight mb-0.5" style={{ color: green }}>
-                {title}
-              </h3>
-              <p className="text-xs truncate" style={{ color: `${green}99` }}>
-                {description}
-              </p>
+              <h3 className="font-bold text-sm leading-tight mb-0.5 text-[var(--green-primary)]">{title}</h3>
+              <p className="text-xs truncate text-[var(--green-primary)]/70">{description}</p>
             </div>
             <div
-              className="flex items-center gap-1 text-xs font-black px-2.5 py-1.5 rounded-xl flex-shrink-0"
-              style={{ background: `${green}18`, color: green }}
+              className="flex items-center gap-1 text-xs font-black px-2.5 py-1.5 rounded-[var(--ds-radius-md)] flex-shrink-0 bg-[color-mix(in_srgb,var(--green-primary)_10%,transparent)] text-[var(--green-primary)]"
             >
               <Zap size={11} />
               {xpReward}
@@ -95,12 +99,15 @@ export default function LessonCard({
                   key={i}
                   className="h-1 flex-1 rounded-full"
                   style={{
-                    background: i < difficulty ? `${green}66` : `${green}22`,
+                    background:
+                      i < difficulty
+                        ? "color-mix(in srgb, var(--green-primary) 45%, transparent)"
+                        : "color-mix(in srgb, var(--green-primary) 12%, transparent)",
                   }}
                 />
               ))}
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: green }}>
+            <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--green-primary)]">
               Done ✓
             </span>
           </div>
@@ -115,34 +122,34 @@ export default function LessonCard({
     <Link href={`/lesson/${id}`} className="block">
       <div
         className={cn(
-          "lesson-card rounded-2xl p-4 relative overflow-hidden border-2 transition-all",
+          "lesson-card p-4 relative overflow-hidden border-2 transition-all",
           isPrimaryNext
             ? "border-transparent"
-            : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]/30"
+            : "border-[var(--border-color)] bg-[var(--surface-2)] hover:border-[var(--text-secondary)]/30"
         )}
         style={
           isPrimaryNext
             ? {
-                background: `linear-gradient(135deg, ${green}, #46a302)`,
-                boxShadow: "0 4px 14px rgba(88,204,2,0.35)",
+                background: `linear-gradient(135deg, ${green}, var(--green-dark))`,
+                boxShadow: "var(--shadow-ds-float)",
               }
             : {
                 borderLeftWidth: 4,
-                borderLeftColor: blue,
+                borderLeftColor: accent,
               }
         }
       >
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0",
-              isPrimaryNext ? "bg-white/20" : "bg-[var(--bg-secondary)]"
+              "w-11 h-11 rounded-[var(--ds-radius-md)] flex items-center justify-center flex-shrink-0",
+              isPrimaryNext ? "bg-white/20" : "bg-[var(--surface-1)]"
             )}
           >
             <PlayCircle
               size={22}
               className={isPrimaryNext ? "text-white" : ""}
-              style={!isPrimaryNext ? { color: blue } : undefined}
+              style={!isPrimaryNext ? { color: accent } : undefined}
             />
           </div>
           <div className="flex-1 min-w-0 pr-2">
@@ -163,7 +170,7 @@ export default function LessonCard({
               {description}
             </p>
             {!isPrimaryNext && (
-              <p className="text-[10px] font-bold mt-1 uppercase tracking-wide" style={{ color: blue }}>
+              <p className="text-[10px] font-bold mt-1 uppercase tracking-wide" style={{ color: accent }}>
                 Unlocked — tap to start
               </p>
             )}
@@ -195,8 +202,8 @@ export default function LessonCard({
                       ? "rgba(255,255,255,0.75)"
                       : "rgba(255,255,255,0.2)"
                     : i < difficulty
-                      ? `${blue}80`
-                      : "var(--bg-secondary)",
+                      ? "color-mix(in srgb, var(--blue-primary) 55%, transparent)"
+                      : "var(--surface-1)",
                 }}
               />
             ))}

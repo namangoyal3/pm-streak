@@ -1,6 +1,7 @@
 "use client";
 
 import { getXPProgress, getLevelFromXP } from "@/lib/utils";
+import { ds } from "@/lib/ds";
 import { Zap } from "lucide-react";
 
 export default function XPProgress({ xp }: { xp: number }) {
@@ -23,7 +24,7 @@ export default function XPProgress({ xp }: { xp: number }) {
   const title = levelTitles[level] ?? "Legend";
 
   return (
-    <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
+    <div className={ds.panelFlat}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--gold-primary)] to-[#e6a800] flex items-center justify-center font-black text-black text-base shadow-lg shadow-[var(--gold-primary)]/20">
@@ -41,7 +42,7 @@ export default function XPProgress({ xp }: { xp: number }) {
           <div className="text-[10px] text-[var(--text-secondary)]">to level {level + 1}</div>
         </div>
       </div>
-      <div className="relative h-3 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+      <div className="relative h-3 bg-[var(--surface-1)] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full progress-fill relative"
           style={{

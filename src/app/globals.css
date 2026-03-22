@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/*
+ * PM Streak design system — Duolingo-inspired structure
+ * Surfaces: 0 = app bg, 1 = raised strip, 2 = cards
+ */
 :root {
   --green-primary: #58cc02;
   --green-dark: #46a302;
@@ -17,13 +21,58 @@
   --text-primary: #ffffff;
   --text-secondary: #afafaf;
   --border-color: #37464f;
+
+  --surface-0: var(--bg-primary);
+  --surface-1: var(--bg-secondary);
+  --surface-2: var(--bg-card);
+  --text-muted: var(--text-secondary);
+
+  /* Spacing scale (4px base) */
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.25rem;
+  --ds-space-6: 1.5rem;
+
+  /* Radii — consistent squircles */
+  --ds-radius-sm: 0.75rem;
+  --ds-radius-md: 1rem;
+  --ds-radius-lg: 1.25rem;
+  --ds-radius-xl: 1.5rem;
+
+  /* Elevation — subtle “lifted tile” like Duolingo */
+  --shadow-ds-card: 0 2px 0 0 rgba(0, 0, 0, 0.35);
+  --shadow-ds-card-hover: 0 4px 0 0 rgba(0, 0, 0, 0.28);
+  --shadow-ds-float: 0 4px 14px rgba(0, 0, 0, 0.3);
+
+  /* Lesson tile semantics */
+  --lesson-next-shadow: 0 4px 0 0 var(--green-dark);
+  --lesson-accent: var(--blue-primary);
 }
 
 body {
-  background: var(--bg-primary);
+  background: var(--surface-0);
   color: var(--text-primary);
   font-family: "DIN Round Pro", "Nunito", system-ui, -apple-system, sans-serif;
   font-size: 15px;
+}
+
+/* Structural primitives — prefer these over one-off rounded/border combos */
+.ds-panel {
+  border-radius: var(--ds-radius-lg);
+  border: 2px solid var(--border-color);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-ds-card);
+}
+
+.ds-panel--flat {
+  box-shadow: none;
+}
+
+.ds-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue-primary) 45%, transparent);
 }
 
 .streak-flame {
@@ -67,12 +116,13 @@ body {
 }
 
 .lesson-card {
+  border-radius: var(--ds-radius-lg);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .lesson-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-ds-float);
 }
 
 /* Shimmer animation for XP bar */
