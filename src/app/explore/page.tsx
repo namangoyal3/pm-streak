@@ -12,6 +12,8 @@ import {
   Compass,
 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { ds } from "@/lib/ds";
 
 const SUGGESTED_TOPICS = [
   "Product-market fit",
@@ -130,7 +132,7 @@ function ExplorePageContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className={cn(ds.pageShell, "flex items-center justify-center")}>
         <div className="animate-pulse text-[var(--green-primary)] text-lg font-bold">
           Loading...
         </div>
@@ -139,20 +141,25 @@ function ExplorePageContent() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={ds.pageShell}>
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
 
       <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 py-6 pb-28 space-y-6">
         <div className="text-center">
           <Sparkles size={40} className="mx-auto text-[var(--green-primary)] mb-2" />
-          <h1 className="text-xl font-bold">Explore & Generate</h1>
+          <h1 className={cn(ds.sectionTitle, "text-xl")}>Explore & Generate</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
             Bonus lessons for deeper learning, separate from your core curriculum unlocks
           </p>
         </div>
 
         {generationMode === "deep_dive" && (
-          <div className="bg-[var(--blue-primary)]/10 border border-[var(--blue-primary)]/30 rounded-2xl p-4">
+          <div
+            className={cn(
+              ds.panelFlat,
+              "border-[var(--blue-primary)]/30 bg-[var(--blue-primary)]/10"
+            )}
+          >
             <div className="text-sm font-black text-[var(--blue-primary)]">
               Deep-dive mode
             </div>
@@ -174,12 +181,18 @@ function ExplorePageContent() {
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
             disabled={generating}
-            className="w-full pl-10 pr-24 py-3 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none text-sm"
+            className={cn(
+              ds.inputSearch,
+              "w-full pl-10 pr-24 py-3"
+            )}
           />
           <button
             onClick={() => handleGenerate()}
             disabled={generating || topic.length < 2}
-            className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 rounded-xl bg-[var(--green-primary)] text-white text-xs font-bold disabled:opacity-50 flex items-center gap-1"
+            className={cn(
+              ds.btnPrimary,
+              "absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 text-xs disabled:opacity-50 flex items-center gap-1"
+            )}
           >
             {generating ? (
               <>
@@ -228,7 +241,7 @@ function ExplorePageContent() {
                   handleGenerate(suggestedTopic);
                 }}
                 disabled={generating}
-                className="px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border-color)] text-xs text-[var(--text-secondary)] hover:text-white hover:border-[var(--green-primary)] transition-colors disabled:opacity-50"
+                className={ds.topicChip}
               >
                 {suggestedTopic}
               </button>
@@ -244,7 +257,12 @@ function ExplorePageContent() {
             <div className="space-y-3">
               {generatedLessons.map((lesson) => (
                 <Link key={lesson.id} href={`/lesson/${lesson.id}`}>
-                  <div className="bg-gradient-to-br from-[var(--green-primary)]/20 to-[var(--blue-primary)]/20 border border-[var(--green-primary)]/30 rounded-2xl p-4 lesson-card">
+                  <div
+                    className={cn(
+                      ds.panelFlat,
+                      "lesson-card bg-gradient-to-br from-[var(--green-primary)]/20 to-[var(--blue-primary)]/20 border-[var(--green-primary)]/30"
+                    )}
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-[var(--green-primary)]/20 flex items-center justify-center">
                         <Sparkles size={18} className="text-[var(--green-primary)]" />
@@ -276,8 +294,8 @@ function ExplorePageContent() {
           </div>
         )}
 
-        <div className="bg-[var(--bg-card)] rounded-2xl p-4">
-          <h3 className="text-sm font-bold mb-2">How it works</h3>
+        <div className={ds.panel}>
+          <h3 className={cn(ds.sectionTitle, "mb-2")}>How it works</h3>
           <div className="space-y-2 text-xs text-[var(--text-secondary)]">
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">1.</span>
@@ -298,10 +316,10 @@ function ExplorePageContent() {
           </div>
         </div>
 
-        <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
+        <div className={ds.panel}>
           <div className="flex items-center gap-2 mb-2">
             <Compass size={16} className="text-[var(--blue-primary)]" />
-            <h3 className="text-sm font-bold">What this is best for</h3>
+            <h3 className={ds.sectionTitle}>What this is best for</h3>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Use Explore when a lesson summary feels too short, when the video made the idea click and you want more depth, or when you finish a category and want extra practice on that theme.
@@ -316,7 +334,7 @@ export default function ExplorePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
+        <div className={cn(ds.pageShell, "flex items-center justify-center")}>
           <div className="animate-pulse text-[var(--green-primary)] text-lg font-bold">
             Loading...
           </div>

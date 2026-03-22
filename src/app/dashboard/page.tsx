@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { ds } from "@/lib/ds";
 import ShareCard from "@/components/ShareCard";
 import StreakCelebration from "@/components/StreakCelebration";
 
@@ -210,7 +211,7 @@ export default function DashboardPage() {
     return (
       <div key={category.id} className="-mt-2">
         <div className="flex items-center gap-2.5 mb-3">
-          <div className="w-9 h-9 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] flex items-center justify-center text-lg">
+          <div className={cn(ds.iconBox, "h-9 w-9 text-lg")}>
             {category.icon}
           </div>
           <div className="flex-1 min-w-0">
@@ -220,7 +221,7 @@ export default function DashboardPage() {
                 {catCompleted}/{catTotal}
               </span>
             </div>
-            <div className="h-1 bg-[var(--bg-secondary)] rounded-full mt-1 overflow-hidden">
+            <div className="mt-1 h-1 overflow-hidden rounded-full bg-[var(--surface-1)]">
               <div
                 className="h-full bg-[var(--green-primary)] rounded-full progress-fill"
                 style={{ width: `${catPct}%` }}
@@ -267,14 +268,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
+    <div className={ds.pageShell}>
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} avatarUrl={user.avatarUrl} name={user.name} unreadNotifications={user.unreadNotifications} />
 
       <main className="w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-28">
         {/* ── Pending challenge alert ── */}
         {pendingChallenges.length > 0 && (
           <Link href="/social" className="block mb-4">
-            <div className="flex items-center gap-3 bg-[var(--orange-primary)]/10 border border-[var(--orange-primary)]/30 rounded-2xl px-4 py-3 hover:bg-[var(--orange-primary)]/15 transition-colors">
+            <div className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-[var(--orange-primary)]/30 bg-[var(--orange-primary)]/10 px-4 py-3 hover:bg-[var(--orange-primary)]/15 transition-colors">
               <div className="w-8 h-8 rounded-full bg-[var(--orange-primary)]/20 flex items-center justify-center flex-shrink-0">
                 <Swords size={16} className="text-[var(--orange-primary)]" />
               </div>
@@ -295,7 +296,7 @@ export default function DashboardPage() {
 
         {/* ── Earn-Back Banner ── */}
         {earnBack && (
-          <div className="bg-gradient-to-r from-[var(--orange-primary)]/20 to-[var(--red-primary)]/20 border border-[var(--orange-primary)]/40 rounded-2xl p-4 flex items-start gap-3">
+          <div className="flex items-start gap-3 rounded-[var(--ds-radius-lg)] border-2 border-[var(--orange-primary)]/40 bg-gradient-to-r from-[var(--orange-primary)]/20 to-[var(--red-primary)]/20 p-4">
             <div className="w-10 h-10 rounded-2xl bg-[var(--orange-primary)]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
               <RotateCcw size={18} className="text-[var(--orange-primary)]" />
             </div>
@@ -315,7 +316,7 @@ export default function DashboardPage() {
                     document.getElementById("lessons")?.scrollIntoView({ behavior: "smooth", block: "start" })
                   );
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--orange-primary)] hover:bg-[var(--orange-primary)]/80 text-white text-xs font-black transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-[var(--ds-radius-md)] bg-[var(--orange-primary)] px-3.5 py-2 text-xs font-black text-white transition-colors hover:bg-[var(--orange-primary)]/80"
               >
                 <Flame size={13} /> Start a Lesson Now
               </a>
@@ -325,7 +326,7 @@ export default function DashboardPage() {
 
         {/* ── Streak Broken Banner ── */}
         {stats?.streak?.streakBroken && !earnBack && (
-          <div className="bg-[var(--red-primary)]/10 border border-[var(--red-primary)]/30 rounded-2xl p-4 text-center">
+          <div className="rounded-[var(--ds-radius-lg)] border-2 border-[var(--red-primary)]/30 bg-[var(--red-primary)]/10 p-4 text-center">
             <p className="text-[var(--red-primary)] font-black">Your streak was broken!</p>
             <p className="text-xs text-[var(--text-secondary)] mt-1">Start fresh today — every legend restarts.</p>
           </div>
@@ -333,7 +334,7 @@ export default function DashboardPage() {
 
         {/* ── HERO: Streak Card ── */}
         <div className={cn(
-          "rounded-3xl p-5 relative overflow-hidden",
+          "relative overflow-hidden rounded-[var(--ds-radius-xl)] p-5",
           isPerfect
             ? "bg-gradient-to-br from-[#1a1200] to-[#2a1f00] border border-[var(--gold-primary)]/30"
             : user.streakCount > 0
@@ -390,7 +391,7 @@ export default function DashboardPage() {
 
             {/* Today's goal progress */}
             <div className={cn(
-              "rounded-2xl p-3.5 border",
+              "rounded-[var(--ds-radius-lg)] border-2 p-3.5",
               completedToday
                 ? "bg-[var(--green-primary)]/10 border-[var(--green-primary)]/25"
                 : user.streakCount > 0
@@ -448,10 +449,9 @@ export default function DashboardPage() {
 
         {/* ── 2A: Streak Threshold Motivator ── */}
         {user.streakCount >= 1 && user.streakCount <= 6 && (
-          <div className="rounded-2xl p-4 overflow-hidden relative" style={{
-            background: "linear-gradient(135deg, rgba(255,150,0,0.15) 0%, rgba(255,75,0,0.1) 100%)",
-            border: "1px solid rgba(255,150,0,0.35)",
-          }}>
+          <div
+            className="relative overflow-hidden rounded-[var(--ds-radius-lg)] border-2 border-[var(--orange-primary)]/35 bg-gradient-to-br from-[var(--orange-primary)]/15 to-[var(--red-primary)]/10 p-4"
+          >
             <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-10" style={{ background: "var(--orange-primary)" }} />
             <div className="relative flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(255,150,0,0.2)" }}>
@@ -492,7 +492,7 @@ export default function DashboardPage() {
             { icon: <Trophy size={16} className="text-[var(--orange-primary)]" />, value: user.longestStreak, label: "Best Streak", color: "text-[var(--orange-primary)]", bg: "bg-[var(--orange-primary)]/8 border-[var(--orange-primary)]/15" },
             { icon: <BookOpen size={16} className="text-[var(--blue-primary)]" />, value: totalCompleted, label: "Lessons", color: "text-[var(--blue-primary)]", bg: "bg-[var(--blue-primary)]/8 border-[var(--blue-primary)]/15" },
           ].map(({ icon, value, label, color, bg }) => (
-            <div key={label} className={cn("rounded-2xl p-3.5 text-center border", bg)}>
+            <div key={label} className={cn("rounded-[var(--ds-radius-lg)] border-2 p-3.5 text-center", bg)}>
               <div className="flex items-center justify-center mb-1.5">{icon}</div>
               <div className={cn("text-2xl font-black tabular-nums", color)}>{value}</div>
               <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wide mt-0.5">{label}</div>
@@ -502,7 +502,7 @@ export default function DashboardPage() {
 
         {/* ── Daily Challenge CTA ── */}
         <Link href="/daily-challenge">
-          <div className="relative bg-gradient-to-r from-[#ff6b00] via-[var(--orange-primary)] to-[#ff4b4b] rounded-2xl p-4 lesson-card overflow-hidden">
+          <div className="relative overflow-hidden rounded-[var(--ds-radius-lg)] bg-gradient-to-r from-[#ff6b00] via-[var(--orange-primary)] to-[#ff4b4b] p-4 lesson-card">
             {/* Background pattern */}
             <div className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center opacity-10">
               <Calendar size={80} />
@@ -535,15 +535,15 @@ export default function DashboardPage() {
         <XPProgress xp={user.xp} />
 
         {/* ── Overall Progress ── */}
-        <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
+        <div className={ds.panel}>
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2">
               <TrendingUp size={16} className="text-[var(--green-primary)]" />
-              <span className="text-sm font-black">Course Progress</span>
+              <span className={ds.sectionTitle}>Course Progress</span>
             </div>
             <span className="text-sm font-black text-[var(--green-primary)]">{progressPct}%</span>
           </div>
-          <div className="h-2.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+          <div className="h-2.5 overflow-hidden rounded-full bg-[var(--surface-1)]">
             <div
               className="h-full rounded-full progress-fill bg-[var(--green-primary)]"
               style={{ width: `${progressPct}%` }}
@@ -584,10 +584,10 @@ export default function DashboardPage() {
 
         {/* ── Podcast archive unlock (core curriculum) ── */}
         {stats?.archiveUnlockProgress?.hasLockedArchiveRemaining && (
-          <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
+          <div className={ds.panel}>
             <div className="flex items-center gap-2 mb-2">
               <BookOpen size={16} className="text-[var(--blue-primary)]" />
-              <span className="text-sm font-black">Podcast lesson unlocks</span>
+              <span className={ds.sectionTitle}>Podcast lesson unlocks</span>
             </div>
             <p className="text-xs text-[var(--text-secondary)] mb-2">
               <span className="text-[var(--text-primary)] font-bold">
@@ -601,7 +601,7 @@ export default function DashboardPage() {
               unlock. Bonus lessons from Explore don&apos;t count toward this
               gate.
             </p>
-            <div className="h-2 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+            <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-1)]">
               <div
                 className="h-full rounded-full bg-[var(--blue-primary)]/80"
                 style={{
@@ -629,9 +629,9 @@ export default function DashboardPage() {
         )}
 
         {/* ── Gem Shop ── */}
-        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden">
+        <div className={cn(ds.panel, "overflow-hidden !p-0")}>
           {/* Header */}
-          <div className="px-4 py-3 border-b border-[var(--border-color)] flex items-center justify-between">
+          <div className="flex items-center justify-between border-b-2 border-[var(--border-color)] px-4 py-3">
             <div className="flex items-center gap-2">
               <Gem size={16} className="text-[var(--blue-primary)]" />
               <span className="text-sm font-black">Gem Shop</span>
@@ -644,7 +644,7 @@ export default function DashboardPage() {
 
           {/* Toast message */}
           {shopMsg && (
-            <div className="mx-4 mt-3 px-3 py-2 rounded-xl bg-[var(--green-primary)]/15 border border-[var(--green-primary)]/30 text-xs font-bold text-[var(--green-primary)] text-center">
+            <div className="mx-4 mt-3 rounded-[var(--ds-radius-md)] border-2 border-[var(--green-primary)]/30 bg-[var(--green-primary)]/15 px-3 py-2 text-center text-xs font-bold text-[var(--green-primary)]">
               {shopMsg}
             </div>
           )}
@@ -652,8 +652,8 @@ export default function DashboardPage() {
           <div className="p-4 space-y-3">
 
             {/* Streak Freeze */}
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
-              <div className="w-10 h-10 rounded-xl bg-[var(--blue-primary)]/15 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-[var(--border-color)] bg-[var(--surface-1)] p-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[var(--ds-radius-md)] bg-[var(--blue-primary)]/15">
                 <Snowflake size={20} className="text-[var(--blue-primary)]" />
               </div>
               <div className="flex-1 min-w-0">
@@ -673,15 +673,15 @@ export default function DashboardPage() {
               <button
                 onClick={() => handleShopBuy("streak_freeze")}
                 disabled={user.gems < 50 || user.streakFreezes >= 5}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                className="flex flex-shrink-0 items-center gap-1 rounded-[var(--ds-radius-md)] bg-[var(--blue-primary)] px-3 py-2 text-xs font-black text-white transition-colors hover:bg-[var(--blue-dark)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Gem size={11} /> 50
               </button>
             </div>
 
             {/* XP Boost */}
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
-              <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", user.xpBoostActive ? "bg-[var(--gold-primary)]/30" : "bg-[var(--gold-primary)]/15")}>
+            <div className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-[var(--border-color)] bg-[var(--surface-1)] p-3">
+              <div className={cn("flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[var(--ds-radius-md)]", user.xpBoostActive ? "bg-[var(--gold-primary)]/30" : "bg-[var(--gold-primary)]/15")}>
                 <Zap size={20} className="text-[var(--gold-primary)]" />
               </div>
               <div className="flex-1 min-w-0">
@@ -700,7 +700,7 @@ export default function DashboardPage() {
               <button
                 onClick={() => handleShopBuy("xp_boost")}
                 disabled={user.gems < 75 || user.xpBoostActive}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[var(--gold-primary)] hover:opacity-90 text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                className="flex flex-shrink-0 items-center gap-1 rounded-[var(--ds-radius-md)] bg-[var(--gold-primary)] px-3 py-2 text-xs font-black text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Gem size={11} /> 75
               </button>
@@ -708,8 +708,8 @@ export default function DashboardPage() {
 
             {/* Streak Repair — only show if broken within 48h */}
             {user.lostStreakVal > 0 && user.streakLostAt && (
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--orange-primary)]/10 border border-[var(--orange-primary)]/30">
-                <div className="w-10 h-10 rounded-xl bg-[var(--orange-primary)]/20 flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-[var(--orange-primary)]/30 bg-[var(--orange-primary)]/10 p-3">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[var(--ds-radius-md)] bg-[var(--orange-primary)]/20">
                   <RotateCcw size={20} className="text-[var(--orange-primary)]" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -721,7 +721,7 @@ export default function DashboardPage() {
                 <button
                   onClick={() => handleShopBuy("streak_repair")}
                   disabled={user.gems < 150}
-                  className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[var(--orange-primary)] hover:opacity-90 text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  className="flex flex-shrink-0 items-center gap-1 rounded-[var(--ds-radius-md)] bg-[var(--orange-primary)] px-3 py-2 text-xs font-black text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Gem size={11} /> 150
                 </button>
@@ -744,7 +744,7 @@ export default function DashboardPage() {
                 { label: "30-day streak", gems: "+50" },
                 { label: "100-day streak", gems: "+100" },
               ].map(({ label, gems }) => (
-                <div key={label} className="flex items-center justify-between bg-[var(--bg-primary)] rounded-xl px-2.5 py-1.5">
+                <div key={label} className="flex items-center justify-between rounded-[var(--ds-radius-md)] bg-[var(--surface-0)] px-2.5 py-1.5">
                   <span className="text-[10px] text-[var(--text-secondary)]">{label}</span>
                   <span className="text-[10px] font-black text-[var(--gold-primary)] flex items-center gap-0.5">
                     <Gem size={9} /> {gems}
@@ -759,10 +759,10 @@ export default function DashboardPage() {
         <div className="space-y-4 mt-0 lg:mt-0 min-w-0 order-1 lg:order-2">
 
         {/* ── Your Curriculum (first on the page so lessons are visible without scrolling) ── */}
-        <div id="lessons" className="pt-2 scroll-mt-24">
-          <div className="flex items-center gap-2 mb-1">
+        <div id="lessons" className="scroll-mt-24 pt-2">
+          <div className="mb-1 flex items-center gap-2">
             <Sparkles size={18} className="text-[var(--green-primary)]" />
-            <h2 className="text-base font-black">Your Curriculum</h2>
+            <h2 className={ds.sectionTitle}>Your Curriculum</h2>
           </div>
           <p className="text-[10px] text-[var(--text-secondary)] font-bold mb-3 leading-relaxed">
             <span className="text-[var(--green-primary)]">Next</span> ·{" "}
@@ -778,14 +778,17 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setGradualArchiveOpen((o) => !o)}
-                className="w-full flex items-center justify-between gap-3 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] px-4 py-3 text-left hover:bg-[var(--bg-secondary)]/80 transition-colors"
+                className={cn(
+                  ds.panelFlat,
+                  "flex w-full items-center justify-between gap-3 !p-0 px-4 py-3 text-left transition-colors hover:bg-[var(--surface-1)]/90"
+                )}
                 aria-expanded={gradualArchiveOpen}
                 aria-controls="gradual-archive-panel"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <BookOpen size={18} className="text-[var(--blue-primary)] flex-shrink-0" />
                   <div className="min-w-0">
-                    <h2 className="text-base font-black">Podcast archive & gradual unlocks</h2>
+                    <h2 className={ds.sectionTitle}>Podcast archive & gradual unlocks</h2>
                     <p className="text-[11px] text-[var(--text-secondary)] font-bold truncate">
                       {archiveCategory ? `${archiveCategory.lessons.length} archive lessons` : "Lenny archive"}
                       {lockedPreviewCount > 0 ? ` · ${lockedPreviewCount} in preview queue` : ""}
@@ -817,7 +820,7 @@ export default function DashboardPage() {
           }
 
           return (
-            <div className="rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)] max-h-[min(70vh,520px)] overflow-y-auto">
+            <div className="max-h-[min(70vh,520px)] overflow-y-auto rounded-[var(--ds-radius-xl)] border-2 border-[var(--border-color)] bg-[var(--surface-2)]">
               <div className="bg-gradient-to-r from-[#1a1a2e] to-[#16213e] px-5 py-4 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
                   <BookOpen size={20} className="text-white" />
@@ -845,7 +848,7 @@ export default function DashboardPage() {
                     key={lesson.id}
                     className="flex items-center gap-3 px-5 py-3.5 opacity-60"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center flex-shrink-0">
+                    <div className={cn(ds.iconBox, "h-9 w-9")}>
                       <Lock
                         size={16}
                         className="text-[var(--text-secondary)]"
@@ -906,10 +909,10 @@ export default function DashboardPage() {
 
         {/* ── PM Knowledge Map ── */}
         {categories.length > 0 && (
-          <div className="bg-[var(--bg-card)] rounded-2xl p-4 border border-[var(--border-color)]">
-            <div className="flex items-center gap-2 mb-4">
+          <div className={ds.panel}>
+            <div className="mb-4 flex items-center gap-2">
               <TrendingUp size={16} className="text-[var(--green-primary)]" />
-              <h2 className="text-base font-black">PM Knowledge Map</h2>
+              <h2 className={ds.sectionTitle}>PM Knowledge Map</h2>
             </div>
             <div className="space-y-3">
               {categories.map((category) => {
@@ -919,7 +922,7 @@ export default function DashboardPage() {
                 const catColor = category.color || "#58cc02";
                 return (
                   <div key={category.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-base flex-shrink-0">
+                    <div className={cn(ds.iconBox, "h-8 w-8 text-base")}>
                       {category.icon}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -929,7 +932,7 @@ export default function DashboardPage() {
                           {catCompleted}/{catTotal}
                         </span>
                       </div>
-                      <div className="h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-[var(--surface-1)]">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{ width: `${catPct}%`, background: catColor }}
@@ -944,7 +947,7 @@ export default function DashboardPage() {
         )}
 
         <Link href="/explore" className="block">
-          <div className="rounded-3xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)]">
+          <div className="overflow-hidden rounded-[var(--ds-radius-xl)] border-2 border-[var(--border-color)] bg-[var(--surface-2)] shadow-[var(--shadow-ds-card)]">
             <div className="bg-gradient-to-r from-[#10271a] to-[#153726] px-5 py-4 flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
                 <Sparkles size={20} className="text-white" />
@@ -963,7 +966,10 @@ export default function DashboardPage() {
         {/* ── Share CTA ── */}
         <button
           onClick={() => setShowShare(true)}
-          className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-[var(--green-primary)]/20"
+          className={cn(
+            ds.btnPrimary,
+            "flex w-full items-center justify-center gap-2 py-3.5 text-sm shadow-lg shadow-[var(--green-primary)]/20"
+          )}
         >
           <Share2 size={16} /> Invite Friends & Share Streak
         </button>
@@ -971,7 +977,7 @@ export default function DashboardPage() {
         {/* ── Logout ── */}
         <button
           onClick={handleLogout}
-          className="w-full py-3 rounded-2xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--red-primary)] hover:border-[var(--red-primary)]/50 transition-colors text-sm font-bold flex items-center justify-center gap-2"
+          className="flex w-full items-center justify-center gap-2 rounded-[var(--ds-radius-lg)] border-2 border-[var(--border-color)] py-3 text-sm font-bold text-[var(--text-secondary)] transition-colors hover:border-[var(--red-primary)]/50 hover:text-[var(--red-primary)]"
         >
           <LogOut size={15} /> Sign Out
         </button>
@@ -991,7 +997,7 @@ export default function DashboardPage() {
               });
             });
           }}
-          className="fixed bottom-24 right-4 z-40 flex items-center gap-2 rounded-2xl border border-[var(--green-primary)]/40 bg-[var(--bg-card)]/95 px-4 py-3 text-sm font-black text-[var(--green-primary)] shadow-lg backdrop-blur-sm hover:bg-[var(--bg-secondary)] transition-colors"
+          className="fixed bottom-24 right-4 z-40 flex items-center gap-2 rounded-[var(--ds-radius-lg)] border-2 border-[var(--green-primary)]/40 bg-[var(--surface-2)]/95 px-4 py-3 text-sm font-black text-[var(--green-primary)] shadow-lg backdrop-blur-sm transition-colors hover:bg-[var(--surface-1)]"
         >
           <Anchor size={18} className="opacity-90" />
           <span>Archive</span>
@@ -1006,7 +1012,7 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center" onClick={() => setArchiveUnlock(null)}>
           <div className="absolute inset-0 bg-black/70" />
           <div className="relative w-full max-w-xs mx-4">
-            <div className="bg-gradient-to-br from-[#0d2a18] to-[#1a3a25] border border-[var(--green-primary)]/40 rounded-3xl p-6 text-center shadow-2xl">
+            <div className="rounded-[var(--ds-radius-xl)] border-2 border-[var(--green-primary)]/40 bg-gradient-to-br from-[#0d2a18] to-[#1a3a25] p-6 text-center shadow-2xl">
               {/* Confetti particles */}
               {[...Array(16)].map((_, i) => {
                 const emojis = ["🎉", "⭐", "🏆", "✨", "🔥", "💡", "📚", "🎯"];
@@ -1045,7 +1051,10 @@ export default function DashboardPage() {
                     document.getElementById("gradual-archive")?.scrollIntoView({ behavior: "smooth", block: "start" })
                   );
                 }}
-                className="w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-black text-sm transition-colors flex items-center justify-center gap-2"
+                className={cn(
+                  ds.btnPrimary,
+                  "flex w-full items-center justify-center gap-2 py-3 text-sm"
+                )}
               >
                 <Sparkles size={16} /> See New Lessons
               </button>
