@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
-  const redirectUri = `${appUrl}/api/auth/google/callback`;
+  // Use current origin as default to handle localhost vs production automatically
+  const origin = req.nextUrl.origin;
+  const redirectUri = `${origin}/api/auth/google/callback`;
+
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.error("Missing GOOGLE_CLIENT_ID environment variable");
+    return NextResponse.redirect(new URL(`/login?error=google_failed`, origin));
+  }
 
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-  url.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID!);
+  url.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", "email profile");

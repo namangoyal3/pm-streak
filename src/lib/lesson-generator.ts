@@ -12,6 +12,12 @@ interface GenerateLessonInput {
 }
 
 export class TranscriptEvidenceError extends Error {}
+export class DailyLimitError extends Error {
+  constructor(message = "You've reached your daily limit for AI lessons.") {
+    super(message);
+    this.name = "DailyLimitError";
+  }
+}
 
 const LENNY_MCP_URL = "https://lenny-mcp.onrender.com/mcp";
 const MCP_HEADERS = {
@@ -234,6 +240,29 @@ export async function generateLesson({
 
   if (existingLesson) {
     return existingLesson;
+  }
+
+  // Monetization: Check daily limit for free users
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { plan: true },
+  });
+
+  if (user?.plan !== "pro") {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const dailyAiLessonsCount = await prisma.lesson.count({
+      where: {
+        generatedForUserId: userId,
+        aiGenerated: true,
+        createdAt: { gte: twentyFourHoursAgo },
+      },
+    });
+
+    if (dailyAiLessonsCount >= 1) {
+      throw new DailyLimitError(
+        "You've reached your daily limit for AI lessons. Upgrade to Pro for unlimited Deep Dives."
+      );
+    }
   }
 
   const [searchResults, sourceLesson, maxDay] = await Promise.all([

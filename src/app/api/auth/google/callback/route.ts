@@ -5,32 +5,43 @@ import { cookies } from "next/headers";
 import { sendWelcomeEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
+  const origin = req.nextUrl.origin;
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");
 
   if (error || !code) {
-    return NextResponse.redirect(new URL("/login?error=google_cancelled", appUrl));
+    return NextResponse.redirect(new URL("/login?error=google_cancelled", origin));
   }
 
   try {
-    const redirectUri = `${appUrl}/api/auth/google/callback`;
+    const redirectUri = `${origin}/api/auth/google/callback`;
 
     // Exchange code for access token
+    const tokenParams = new URLSearchParams({
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      redirect_uri: redirectUri,
+      grant_type: "authorization_code",
+    });
+
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        code,
-        client_id: process.env.GOOGLE_CLIENT_ID!,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-        redirect_uri: redirectUri,
-        grant_type: "authorization_code",
-      }),
+      body: tokenParams,
     });
 
     if (!tokenRes.ok) {
-      return NextResponse.redirect(new URL("/login?error=google_failed", appUrl));
+      const errorText = await tokenRes.text();
+      console.error("Google token exchange failed:", {
+        status: tokenRes.status,
+        error: errorText,
+        params: {
+          client_id: process.env.GOOGLE_CLIENT_ID?.slice(0, 10) + "...",
+          redirect_uri: redirectUri,
+        }
+      });
+      return NextResponse.redirect(new URL("/login?error=google_failed", origin));
     }
 
     const { access_token } = await tokenRes.json();
@@ -41,7 +52,12 @@ export async function GET(req: NextRequest) {
     });
 
     if (!userInfoRes.ok) {
-      return NextResponse.redirect(new URL("/login?error=google_failed", appUrl));
+      const errorText = await userInfoRes.text();
+      console.error("Google user info fetch failed:", {
+        status: userInfoRes.status,
+        error: errorText,
+      });
+      return NextResponse.redirect(new URL("/login?error=google_failed", origin));
     }
 
     const { id: googleId, email, name, picture } = await userInfoRes.json();
@@ -89,9 +105,9 @@ export async function GET(req: NextRequest) {
     });
 
     const redirectTo = user.onboarded ? "/dashboard" : "/onboarding";
-    return NextResponse.redirect(new URL(redirectTo, appUrl));
+    return NextResponse.redirect(new URL(redirectTo, origin));
   } catch (err) {
     console.error("Google OAuth error:", err);
-    return NextResponse.redirect(new URL("/login?error=google_failed", appUrl));
+    return NextResponse.redirect(new URL("/login?error=google_failed", origin));
   }
 }

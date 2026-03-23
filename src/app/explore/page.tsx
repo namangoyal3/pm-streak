@@ -46,7 +46,6 @@ function ExplorePageContent() {
   const [readyTopics, setReadyTopics] = useState<Array<{ topic: string; lessonId: string }>>([]);
   const [preparingTopics, setPreparingTopics] = useState(false);
   const [error, setError] = useState("");
-  const [paywallHard, setPaywallHard] = useState(false);
 
   const sourceLessonId = searchParams.get("sourceLessonId");
   const generationMode =
@@ -100,7 +99,6 @@ function ExplorePageContent() {
 
     setGenerating(true);
     setError("");
-    setPaywallHard(false);
 
     try {
       const res = await fetch("/api/generate-lesson", {
@@ -115,12 +113,10 @@ function ExplorePageContent() {
 
       const data = await res.json();
       if (!res.ok) {
-        setPaywallHard(res.status === 402);
         setError(data.error || "Failed to generate");
         return;
       }
 
-      setPaywallHard(false);
       setGeneratedLessons((prev) => mergeLessons([data.lesson, ...prev]));
       setTopic("");
     } catch {
@@ -207,24 +203,8 @@ function ExplorePageContent() {
         </div>
 
         {error && (
-          <div className="text-center space-y-2">
-            <p
-              className={
-                paywallHard
-                  ? "text-sm text-[var(--gold-primary)] font-bold"
-                  : "text-[var(--red-primary)] text-sm"
-              }
-            >
-              {error}
-            </p>
-            {paywallHard && (
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-1 text-sm font-black text-[var(--green-primary)]"
-              >
-                View PM Streak Pro <ArrowRight size={14} />
-              </Link>
-            )}
+          <div className="text-center">
+            <p className="text-[var(--red-primary)] text-sm">{error}</p>
           </div>
         )}
 
@@ -330,7 +310,7 @@ function ExplorePageContent() {
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">4.</span>
-              <span>Custom lessons keep your streak alive, but the main podcast curriculum still unlocks gradually in batches as you finish what&apos;s open</span>
+              <span>Custom lessons keep your streak alive</span>
             </div>
           </div>
         </div>

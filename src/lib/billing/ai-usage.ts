@@ -1,73 +1,85 @@
 import { prisma } from "@/lib/prisma";
 
-const FREE_AI_LESSONS_PER_MONTH = 5;
-const SOFT_THRESHOLD = 3;
-const HARD_THRESHOLD = 5;
+const FREE_DAILY_LIMIT = 1;
+const FREE_MONTHLY_LIMIT = 5;
 
 export type AiLessonGate =
-  | { allowed: true; softPaywall: boolean; usedThisMonth: number; limit: number }
+  | { allowed: true; usedToday: number; limit: number }
   | {
       allowed: false;
-      softPaywall: boolean;
-      hardPaywall: boolean;
-      usedThisMonth: number;
+      usedToday: number;
       limit: number;
       reason: string;
+      type: "daily" | "monthly";
     };
 
-function startOfUtcMonth(d: Date): Date {
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1, 0, 0, 0, 0));
-}
-
-export async function countAiLessonsThisMonth(userId: string): Promise<number> {
-  const from = startOfUtcMonth(new Date());
+export async function countAiLessonsToday(userId: string): Promise<number> {
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   return prisma.lesson.count({
     where: {
       aiGenerated: true,
       generatedForUserId: userId,
-      createdAt: { gte: from },
+      createdAt: { gte: twentyFourHoursAgo },
+    },
+  });
+}
+
+export async function countAiLessonsThisMonth(userId: string): Promise<number> {
+  const startOfMonth = new Date();
+  startOfMonth.setUTCDate(1);
+  startOfMonth.setUTCHours(0, 0, 0, 0);
+  
+  return prisma.lesson.count({
+    where: {
+      aiGenerated: true,
+      generatedForUserId: userId,
+      createdAt: { gte: startOfMonth },
     },
   });
 }
 
 /**
- * Free tier: 5 AI lessons / month. Soft messaging after 3; hard block after 5.
- * Pro / active trial: unlimited.
+ * Free tier strategy: 1 AI lesson / day.
+ * Pro strategy: Unlimited.
  */
 export async function evaluateAiLessonGate(
   userId: string,
   isPro: boolean
 ): Promise<AiLessonGate> {
   if (isPro) {
-    const used = await countAiLessonsThisMonth(userId);
+    const used = await countAiLessonsToday(userId);
     return {
       allowed: true,
-      softPaywall: false,
-      usedThisMonth: used,
+      usedToday: used,
       limit: Infinity,
     };
   }
 
-  const used = await countAiLessonsThisMonth(userId);
-  if (used >= HARD_THRESHOLD) {
+  const usedToday = await countAiLessonsToday(userId);
+  if (usedToday >= FREE_DAILY_LIMIT) {
     return {
       allowed: false,
-      softPaywall: true,
-      hardPaywall: true,
-      usedThisMonth: used,
-      limit: FREE_AI_LESSONS_PER_MONTH,
-      reason:
-        "You've used this month's free AI lessons. Upgrade to PM Streak Pro for unlimited Explore & Go Deeper.",
+      usedToday,
+      limit: FREE_DAILY_LIMIT,
+      type: "daily",
+      reason: "You've reached your free daily limit for AI lessons. Deep Dives require a deep focus—and Pro access.",
     };
   }
 
-  const softPaywall = used >= SOFT_THRESHOLD;
+  const usedThisMonth = await countAiLessonsThisMonth(userId);
+  if (usedThisMonth >= FREE_MONTHLY_LIMIT) {
+     return {
+      allowed: false,
+      usedToday: usedThisMonth,
+      limit: FREE_MONTHLY_LIMIT,
+      type: "monthly",
+      reason: "You've used all 5 free AI lessons for this month. Upgrade to Pro for unlimited deeper insights.",
+    };
+  }
+
   return {
     allowed: true,
-    softPaywall,
-    usedThisMonth: used,
-    limit: FREE_AI_LESSONS_PER_MONTH,
+    usedToday,
+    limit: FREE_DAILY_LIMIT,
   };
 }
-
-export { FREE_AI_LESSONS_PER_MONTH, SOFT_THRESHOLD, HARD_THRESHOLD };
