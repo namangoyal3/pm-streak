@@ -202,10 +202,7 @@ function LoginForm() {
           </form>
 
           <p className="text-center mt-4 text-xs text-[var(--text-secondary)]">
-            New here?{" "}
-            <a href="/signup" className="text-[var(--green-primary)] font-bold hover:underline">
-              Create an account
-            </a>
+            New registrations are currently disabled.
           </p>
 
           <p className="text-center mt-8 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed">
