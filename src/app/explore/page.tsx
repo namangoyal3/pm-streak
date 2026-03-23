@@ -14,14 +14,27 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { EXPLORE_SEED_TOPICS } from "@/lib/explore-topics";
+
+const SUGGESTED_TOPICS = [
+  "Product-market fit",
+  "User onboarding",
+  "A/B testing",
+  "Hiring PMs",
+  "AI product strategy",
+  "Building culture",
+  "Roadmap planning",
+  "OKRs and metrics",
+  "B2B vs B2C",
+  "Remote team management",
+  "Feature prioritization",
+  "Customer interviews",
+];
 
 type GeneratedLesson = {
   id: string;
   title: string;
   description: string;
   xpReward: number;
-  topicKey?: string | null;
   guestName?: string | null;
   generationMode?: string | null;
   category?: { name: string; icon: string } | null;
@@ -43,9 +56,8 @@ function ExplorePageContent() {
   const [topic, setTopic] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedLessons, setGeneratedLessons] = useState<GeneratedLesson[]>([]);
-  const [readyTopics, setReadyTopics] = useState<Array<{ topic: string; lessonId: string }>>([]);
-  const [preparingTopics, setPreparingTopics] = useState(false);
   const [error, setError] = useState("");
+  const [paywallHard, setPaywallHard] = useState(false);
 
   const sourceLessonId = searchParams.get("sourceLessonId");
   const generationMode =
@@ -70,17 +82,6 @@ function ExplorePageContent() {
         const generatedData = await generatedRes.json();
         setGeneratedLessons(generatedData.lessons ?? []);
       }
-
-      setPreparingTopics(true);
-      try {
-        const readyRes = await fetch("/api/explore/ready-topics", { method: "POST" });
-        if (readyRes.ok) {
-          const data = await readyRes.json();
-          setReadyTopics(data.readyTopics ?? []);
-        }
-      } finally {
-        setPreparingTopics(false);
-      }
     }
 
     load();
@@ -99,6 +100,7 @@ function ExplorePageContent() {
 
     setGenerating(true);
     setError("");
+    setPaywallHard(false);
 
     try {
       const res = await fetch("/api/generate-lesson", {
@@ -113,10 +115,12 @@ function ExplorePageContent() {
 
       const data = await res.json();
       if (!res.ok) {
+        setPaywallHard(res.status === 402);
         setError(data.error || "Failed to generate");
         return;
       }
 
+      setPaywallHard(false);
       setGeneratedLessons((prev) => mergeLessons([data.lesson, ...prev]));
       setTopic("");
     } catch {
@@ -203,49 +207,46 @@ function ExplorePageContent() {
         </div>
 
         {error && (
-          <div className="text-center">
-            <p className="text-[var(--red-primary)] text-sm">{error}</p>
+          <div className="text-center space-y-2">
+            <p
+              className={
+                paywallHard
+                  ? "text-sm text-[var(--gold-primary)] font-bold"
+                  : "text-[var(--red-primary)] text-sm"
+              }
+            >
+              {error}
+            </p>
+            {paywallHard && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-1 text-sm font-black text-[var(--green-primary)]"
+              >
+                View PM Streak Pro <ArrowRight size={14} />
+              </Link>
+            )}
           </div>
         )}
 
         <div>
           <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
-            Ready-to-play PM insights
+            Suggested Topics
           </h3>
           <div className="flex flex-wrap gap-2">
-            {readyTopics.map((ready) => (
+            {SUGGESTED_TOPICS.map((suggestedTopic) => (
               <button
-                key={ready.topic}
-                onClick={() => router.push(`/lesson/${ready.lessonId}`)}
+                key={suggestedTopic}
+                onClick={() => {
+                  setTopic(suggestedTopic);
+                  handleGenerate(suggestedTopic);
+                }}
+                disabled={generating}
                 className={ds.topicChip}
               >
-                {ready.topic}
+                {suggestedTopic}
               </button>
             ))}
-            {readyTopics.length === 0 && !preparingTopics &&
-              EXPLORE_SEED_TOPICS.slice(0, 6).map((suggestedTopic) => (
-                <button
-                  key={suggestedTopic}
-                  onClick={() => {
-                    setTopic(suggestedTopic);
-                    handleGenerate(suggestedTopic);
-                  }}
-                  disabled={generating}
-                  className={ds.topicChip}
-                >
-                  {suggestedTopic}
-                </button>
-              ))}
-            {preparingTopics && (
-              <div className="inline-flex items-center gap-2 rounded-[var(--ds-radius-md)] border-2 border-[var(--border-color)] px-3 py-1.5 text-xs text-[var(--text-secondary)]">
-                <Loader2 size={12} className="animate-spin" />
-                Preparing strong podcast-based quizzes...
-              </div>
-            )}
           </div>
-          <p className="mt-2 text-[11px] font-bold text-[var(--text-secondary)]">
-            Only topics with strong transcript evidence are shown here.
-          </p>
         </div>
 
         {generatedLessons.length > 0 && (
@@ -310,7 +311,7 @@ function ExplorePageContent() {
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">4.</span>
-              <span>Custom lessons keep your streak alive</span>
+              <span>Custom lessons keep your streak alive, but the main podcast curriculum still unlocks gradually in batches as you finish what&apos;s open</span>
             </div>
           </div>
         </div>
