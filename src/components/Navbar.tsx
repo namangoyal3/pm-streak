@@ -20,7 +20,6 @@ interface NavbarProps {
 
 export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadNotifications: propUnread }: NavbarProps) {
   const pathname = usePathname();
-  const unlocked = streakCount >= 7;
   const [unreadNotifications, setUnreadNotifications] = useState(propUnread ?? 0);
 
   // Keep in sync with prop (dashboard passes it directly)
@@ -45,8 +44,8 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
     { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
     { href: "/daily-challenge", label: "Daily", icon: Calendar, locked: false },
     { href: "/explore", label: "Explore", icon: Sparkles, locked: false },
-    { href: "/social", label: "Social", icon: Users, locked: !unlocked },
-    { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: !unlocked },
+    { href: "/social", label: "Social", icon: Users, locked: false },
+    { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: false },
   ];
 
   return (
