@@ -29,12 +29,6 @@ export default async function Home() {
             <span className="text-white">Streak</span>
           </div>
           <div className="flex items-center gap-2">
-            <Link
-              href="/pricing"
-              className="px-3 py-2 rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-white text-sm font-bold transition-colors"
-            >
-              Pro
-            </Link>
             <BrowserLink
               href="/login"
               className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
@@ -60,9 +54,11 @@ export default async function Home() {
             <p className="text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
               One lesson a day. Streak tracking. XP and leaderboards. The best PM frameworks from Lenny&apos;s podcast — turned into 2-minute lessons that actually stick.
             </p>
-            <p className="text-sm text-[var(--green-primary)] font-bold mb-8 max-w-md">
-              Free core curriculum — upgrade for deeper learning with PM Streak Pro.
-            </p>
+            <div className="mb-8 p-4 rounded-2xl bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/20 max-w-md">
+              <p className="text-sm text-[var(--green-primary)] font-bold">
+                Join 5,000+ PMs building their product intuition daily.
+              </p>
+            </div>
 
             <BrowserLink
               href="/login"
@@ -113,7 +109,7 @@ export default async function Home() {
             { value: "300+", label: "Podcast episodes" },
             { value: "2 min", label: "Per lesson" },
             { value: "10+", label: "PM frameworks" },
-            { value: "Free", label: "core" },
+            { value: "Free", label: "Forever" },
           ].map(({ value, label }) => (
             <div key={label} className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-white tabular-nums">{value}</span>
@@ -234,55 +230,6 @@ export default async function Home() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SAMPLE LESSON PREVIEW ── */}
-      <section className="max-w-5xl mx-auto px-5 py-20">
-        <div className="mb-10">
-          <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-2">See for yourself</p>
-          <h2 className="text-3xl font-black mb-2">A real lesson.</h2>
-          <p className="text-[var(--text-secondary)] text-sm">Real frameworks. Real questions. Actually useful.</p>
-        </div>
-
-        <div className="max-w-lg mx-auto bg-[var(--bg-card)] rounded-3xl border border-[var(--border-color)] overflow-hidden">
-          {/* Lesson header */}
-          <div className="bg-gradient-to-r from-[var(--green-primary)]/20 to-[var(--blue-primary)]/10 px-6 py-5 border-b border-[var(--border-color)]">
-            <div className="text-xs text-[var(--green-primary)] font-black uppercase tracking-wide mb-1">📈 Product Strategy</div>
-            <div className="font-black text-lg leading-snug">The Shreyas Doshi Prioritisation Stack</div>
-            <div className="text-xs text-[var(--text-secondary)] mt-1">Stripe PM Leader · 3 min read · +20 XP</div>
-          </div>
-
-          {/* Content preview */}
-          <div className="px-6 py-5">
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-              Shreyas Doshi&apos;s &ldquo;Outcome vs. Output&rdquo; framework helps PMs stop building features for the sake of building. The key insight: most roadmaps are output-focused (we&apos;ll ship X, Y, Z) when they should be outcome-focused (we&apos;ll achieve metric M)...
-            </p>
-            <div className="h-px bg-[var(--border-color)] mb-4" />
-            {/* Fake quiz question */}
-            <div className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wide mb-3">Quiz · Question 1 of 3</div>
-            <div className="text-sm font-bold mb-3">What&apos;s the core difference between outcome and output thinking?</div>
-            <div className="space-y-2">
-              {[
-                "Outcomes focus on metrics; outputs focus on features shipped",
-                "Outputs are more important than outcomes",
-                "They mean the same thing",
-              ].map((opt, i) => (
-                <div key={i} className={`px-4 py-3 rounded-xl border text-xs font-medium ${i === 0 ? "border-[var(--green-primary)] bg-[var(--green-primary)]/10 text-white" : "border-[var(--border-color)] text-[var(--text-secondary)]"}`}>
-                  {opt}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Blurred CTA overlay */}
-          <div className="relative">
-            <div className="px-6 pb-6">
-              <div className="w-full py-3 rounded-2xl bg-[var(--green-primary)] text-white text-sm font-black text-center">
-                Test My Knowledge →
-              </div>
-            </div>
           </div>
         </div>
       </section>

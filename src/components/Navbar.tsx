@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap, Crown } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap } from "lucide-react";
 
 interface NavbarProps {
   streakCount: number;
@@ -14,6 +14,7 @@ interface NavbarProps {
   gems: number;
   avatarUrl?: string | null;
   name?: string;
+  plan?: string;
   unreadNotifications?: number;
 }
 
@@ -44,9 +45,8 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
     { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
     { href: "/daily-challenge", label: "Daily", icon: Calendar, locked: false },
     { href: "/explore", label: "Explore", icon: Sparkles, locked: false },
-    { href: "/pricing", label: "Pro", icon: Crown, locked: false },
-    { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: !unlocked },
     { href: "/social", label: "Social", icon: Users, locked: !unlocked },
+    { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: !unlocked },
   ];
 
   return (
@@ -61,23 +61,32 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
             <span className="text-white">Streak</span>
           </Link>
 
-          {/* Stats row */}
-          <div className="flex items-center gap-2">
-            {/* Avatar */}
-            {avatarUrl ? (
-              <Image
-                src={avatarUrl}
-                alt={name ?? "User"}
-                width={28}
-                height={28}
-                unoptimized
-                className="h-7 w-7 flex-shrink-0 rounded-full border border-[var(--border-color)] object-cover"
-              />
-            ) : name ? (
-              <div className="w-7 h-7 rounded-full bg-[var(--green-primary)] flex items-center justify-center text-xs font-black text-white flex-shrink-0">
-                {name.charAt(0).toUpperCase()}
+          {/* User Profile */}
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="flex items-center gap-2 group">
+              <div className="relative">
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={name ?? "User"}
+                    width={28}
+                    height={28}
+                    unoptimized
+                    className="h-7 w-7 rounded-full object-cover transition-all border border-[var(--border-color)]"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white bg-[var(--green-primary)]">
+                    {name?.charAt(0).toUpperCase() || "P"}
+                  </div>
+                )}
               </div>
-            ) : null}
+              <div className="hidden sm:block">
+                <span className="text-xs font-black text-white group-hover:text-[var(--green-primary)] transition-colors">
+                  {name?.split(" ")[0] || "Learner"}
+                </span>
+              </div>
+            </Link>
+
             {/* Streak */}
             <div className="flex items-center gap-0.5 flex-shrink-0">
               <Flame
@@ -110,7 +119,7 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
         </div>
       </header>
 
-      {/* Bottom navigation - fixed, Duolingo-style */}
+      {/* Bottom navigation - fixed */}
       <nav className={ds.bottomNav}>
         <div className="max-w-5xl mx-auto px-2 flex h-16">
           {navItems.map((item) => {
@@ -166,8 +175,6 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
           })}
         </div>
       </nav>
-
-      {/* Spacer below sticky header so content doesn't start under it */}
     </>
   );
 }
