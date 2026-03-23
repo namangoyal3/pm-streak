@@ -1,5 +1,5 @@
 import { prisma } from "./prisma";
-import { buildSourceTranscript } from "./podcast-quiz-helpers";
+import { buildExploreInsightQuestions, buildSourceTranscript } from "./podcast-quiz-helpers";
 import { generateActionablePMLesson, SearchResult } from "./llm-lessons";
 
 type GenerationMode = "explore" | "deep_dive";
@@ -286,10 +286,17 @@ export async function generateLesson({
       ? `A deeper follow-up lesson on ${normalizedTopic}`
       : `Custom lesson on ${normalizedTopic} from Lenny's Podcast insights`;
 
-  // Use Groq for smarter content and questions
+  // Use Groq for richer narrative content, but keep quiz generation strictly transcript-grounded.
   const llmResult = await generateActionablePMLesson(normalizedTopic, searchResults);
   const content = llmResult.content;
-  const questions = llmResult.questions;
+  const questions = buildExploreInsightQuestions(
+    normalizedTopic,
+    searchResults.map((r) => ({
+      guest: r.guest,
+      episodeTitle: r.episodeTitle,
+      snippet: r.snippet,
+    }))
+  );
   const sourceTranscript = buildSourceTranscript(normalizedTopic, searchResults);
 
   const leadResult = searchResults[0];

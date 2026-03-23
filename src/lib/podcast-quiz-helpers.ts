@@ -7,6 +7,17 @@ export function normalizeSpace(s: string) {
   return s.replace(/\s+/g, " ").trim();
 }
 
+const LOW_SIGNAL_SENTENCE = /(no one out there|shares more wisdom|featured most|most prominently|legendary|greatest|best in the world|live\b)/i;
+const PM_SIGNAL_SENTENCE = /(user|customer|metric|experiment|roadmap|priorit|trade[\s-]?off|outcome|decision|funnel|retention|activation|pricing|onboarding|hypothesis|execution|strategy|ship|learn|evidence|workflow)/i;
+
+function isInsightSentence(s: string): boolean {
+  const t = normalizeSpace(s);
+  if (t.length < 35) return false;
+  if (LOW_SIGNAL_SENTENCE.test(t)) return false;
+  if (PM_SIGNAL_SENTENCE.test(t)) return true;
+  return /\b(should|must|when|if|because|therefore|instead|avoid|focus)\b/i.test(t);
+}
+
 /** Split prose into candidate sentences for MCQ options (min length drops fragments). */
 export function extractSentences(
   text: string,
@@ -22,6 +33,7 @@ export function extractSentences(
   const seen = new Set<string>();
   const out: string[] = [];
   for (const p of parts) {
+    if (!isInsightSentence(p)) continue;
     const key = p.slice(0, 80).toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
