@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { isGenericLessonContent, isWeakQuestionSet } from "./lesson-quality";
 
 const CORE_LESSON_WHERE = { aiGenerated: false } as const;
 const ARCHIVE_UNLOCK_BATCH_SIZE = 5;
@@ -483,7 +484,7 @@ export async function unlockNextArchiveBatchIfReady(
 }
 
 export async function getGeneratedLessonsForUser(userId: string) {
-  return prisma.lesson.findMany({
+  const lessons = await prisma.lesson.findMany({
     where: {
       aiGenerated: true,
       generatedForUserId: userId,
@@ -499,6 +500,14 @@ export async function getGeneratedLessonsForUser(userId: string) {
       createdAt: true,
       generationMode: true,
       topicKey: true,
+      content: true,
+      questions: {
+        orderBy: { sortOrder: "asc" },
+        select: {
+          questionText: true,
+          options: true,
+        },
+      },
       category: {
         select: {
           name: true,
@@ -507,6 +516,21 @@ export async function getGeneratedLessonsForUser(userId: string) {
       },
     },
   });
+
+  return lessons
+    .filter((lesson) => {
+      try {
+        if (isGenericLessonContent(lesson.content)) return false;
+        const questionSet = lesson.questions.map((q) => ({
+          questionText: q.questionText,
+          options: JSON.parse(q.options) as string[],
+        }));
+        return !isWeakQuestionSet(questionSet);
+      } catch {
+        return false;
+      }
+    })
+    .map(({ questions: _questions, content: _content, ...lesson }) => lesson);
 }
 
 export { ARCHIVE_UNLOCK_BATCH_SIZE, ARCHIVE_LOCKED_REASON, CORE_LESSON_WHERE };

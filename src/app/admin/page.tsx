@@ -67,6 +67,13 @@ interface EmailStats {
   complained: number;
 }
 
+interface CleanupPreview {
+  scannedLessons: number;
+  weakLessonsFound: number;
+  affectedUsers: number;
+  sampleTitles: string[];
+}
+
 function isAdminEmail(email: string): boolean {
   return email === "namangoyal21197@gmail.com";
 }
@@ -124,6 +131,10 @@ export default function AdminPage() {
   const [emailHasMore, setEmailHasMore] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupPreview, setCleanupPreview] = useState<CleanupPreview | null>(null);
+  const [cleanupMsg, setCleanupMsg] = useState("");
+  const [cleanupRegenN, setCleanupRegenN] = useState(20);
 
   const fetchStats = useCallback(async () => {
     setRefreshing(true);
@@ -175,6 +186,77 @@ export default function AdminPage() {
       setEmailLoading(false);
     }
   }, []);
+
+  const runCleanupPreview = useCallback(async () => {
+    setCleanupLoading(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-weak-ai-lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: false }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCleanupMsg(data.error || "Could not run cleanup preview.");
+        return;
+      }
+      setCleanupPreview(data.preview);
+      setCleanupMsg("Preview ready.");
+    } finally {
+      setCleanupLoading(false);
+    }
+  }, []);
+
+  const runCleanupApply = useCallback(async () => {
+    setCleanupLoading(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-weak-ai-lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: true, regenerateTopN: 0 }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCleanupMsg(data.error || "Could not apply cleanup.");
+        return;
+      }
+      setCleanupPreview(data.preview);
+      const deletedLessons = data?.deleted?.deletedLessons ?? 0;
+      setCleanupMsg(`Cleanup applied. Deleted ${deletedLessons} weak AI lessons.`);
+      await fetchStats();
+    } finally {
+      setCleanupLoading(false);
+    }
+  }, [fetchStats]);
+
+  const runCleanupApplyWithRegen = useCallback(async () => {
+    setCleanupLoading(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-weak-ai-lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: true, regenerateTopN: cleanupRegenN }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCleanupMsg(data.error || "Could not apply cleanup + regenerate.");
+        return;
+      }
+      setCleanupPreview(data.preview);
+      const deletedLessons = data?.deleted?.deletedLessons ?? 0;
+      const regenerated = data?.regeneration?.regenerated ?? 0;
+      const failed = data?.regeneration?.failed ?? 0;
+      setCleanupMsg(
+        `Cleanup applied. Deleted ${deletedLessons} weak lessons. Regenerated ${regenerated} topic replacements (${failed} failed).`
+      );
+      await fetchStats();
+    } finally {
+      setCleanupLoading(false);
+    }
+  }, [cleanupRegenN, fetchStats]);
 
   useEffect(() => {
     async function init() {
@@ -276,7 +358,7 @@ export default function AdminPage() {
               <StatCard icon={<Lock size={20} style={{ color: "#58cc02" }} />} label="7+ Day Streaks" value={stats.usersWithStreakOver7} color="#58cc02" sub="Loss aversion locked in 🔒" />
             </div>
 
-            <Section title="Lenny catalog vs database (live)">
+            <Section title="Archive Coverage">
               <div
                 className="rounded-2xl p-4 space-y-2 text-sm"
                 style={{
@@ -288,8 +370,7 @@ export default function AdminPage() {
                   <span className="font-black" style={{ color: "var(--text-primary)" }}>
                     {stats.coreLessonCount} / {stats.catalogEpisodes}
                   </span>{" "}
-                  core lesson rows in Postgres (Lenny catalog reference ={" "}
-                  {stats.catalogEpisodes} episodes).
+                  archive lessons are currently available in the app.
                 </p>
                 <p style={{ color: "var(--text-secondary)" }}>
                   Breakdown:{" "}
@@ -307,12 +388,83 @@ export default function AdminPage() {
                   AI / Explore lessons.
                 </p>
                 <p style={{ color: "var(--text-secondary)" }}>
-                  Catalog not yet in DB:{" "}
+                  Remaining lessons being prepared:{" "}
                   <span className="font-black" style={{ color: stats.episodesNotYetImported > 0 ? "#ff9600" : "var(--green-primary)" }}>
                     {stats.episodesNotYetImported}
-                  </span>{" "}
-                  episodes (run archive backfill to approach full catalog).
+                  </span>
+                  .
                 </p>
+              </div>
+            </Section>
+
+            <Section title="AI Lesson Quality Cleanup">
+              <div className="rounded-2xl p-4 space-y-3 text-sm" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
+                <p style={{ color: "var(--text-secondary)" }}>
+                  Remove previously generated weak/generic AI lessons permanently.
+                </p>
+                <p style={{ color: "var(--text-secondary)" }}>
+                  Deleted lessons are not rewritten in place. Users get improved replacements when they generate fresh custom lessons.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={runCleanupPreview}
+                    disabled={cleanupLoading}
+                    className="px-3 py-2 rounded-xl text-xs font-black disabled:opacity-50"
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
+                  >
+                    {cleanupLoading ? "Running..." : "Preview Cleanup"}
+                  </button>
+                  <button
+                    onClick={runCleanupApply}
+                    disabled={cleanupLoading}
+                    className="px-3 py-2 rounded-xl text-xs font-black text-white disabled:opacity-50"
+                    style={{ background: "#ff4b4b", border: "1px solid #ff4b4b" }}
+                  >
+                    {cleanupLoading ? "Running..." : "Apply Cleanup"}
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>
+                    Auto-regenerate top
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={cleanupRegenN}
+                    onChange={(e) => setCleanupRegenN(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+                    className="w-20 px-2 py-1 rounded-lg text-xs"
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+                  />
+                  <label className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>
+                    topics
+                  </label>
+                  <button
+                    onClick={runCleanupApplyWithRegen}
+                    disabled={cleanupLoading}
+                    className="px-3 py-2 rounded-xl text-xs font-black text-white disabled:opacity-50"
+                    style={{ background: "#58cc02", border: "1px solid #58cc02" }}
+                  >
+                    {cleanupLoading ? "Running..." : "Apply + Regenerate"}
+                  </button>
+                </div>
+                {cleanupPreview && (
+                  <div className="text-xs space-y-1" style={{ color: "var(--text-secondary)" }}>
+                    <p>
+                      Scanned: <span className="font-black text-[var(--text-primary)]">{cleanupPreview.scannedLessons}</span> · Weak found:{" "}
+                      <span className="font-black text-[#ff9600]">{cleanupPreview.weakLessonsFound}</span> · Affected users:{" "}
+                      <span className="font-black text-[var(--text-primary)]">{cleanupPreview.affectedUsers}</span>
+                    </p>
+                    {cleanupPreview.sampleTitles.length > 0 && (
+                      <p className="truncate">Examples: {cleanupPreview.sampleTitles.slice(0, 3).join(" | ")}</p>
+                    )}
+                  </div>
+                )}
+                {cleanupMsg && (
+                  <p className="text-xs font-bold" style={{ color: cleanupMsg.includes("Deleted") ? "#58cc02" : "#ff9600" }}>
+                    {cleanupMsg}
+                  </p>
+                )}
               </div>
             </Section>
 

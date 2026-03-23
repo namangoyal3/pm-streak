@@ -9,6 +9,7 @@ interface GenerateLessonInput {
   userId: string;
   generationMode?: GenerationMode;
   sourceLessonId?: string | null;
+  bypassDailyLimit?: boolean;
 }
 
 export class TranscriptEvidenceError extends Error {}
@@ -24,6 +25,7 @@ const MCP_HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json, text/event-stream",
 } as const;
+const AI_LESSON_GENERATION_VERSION = "qv4";
 
 function normalizeTopicKey(topic: string) {
   return topic
@@ -223,9 +225,10 @@ export async function generateLesson({
   userId,
   generationMode = "explore",
   sourceLessonId = null,
+  bypassDailyLimit = false,
 }: GenerateLessonInput) {
   const normalizedTopic = topic.trim();
-  const topicKey = normalizeTopicKey(normalizedTopic);
+  const topicKey = `${normalizeTopicKey(normalizedTopic)}:${AI_LESSON_GENERATION_VERSION}`;
 
   const existingLesson = await prisma.lesson.findFirst({
     where: {
@@ -248,7 +251,7 @@ export async function generateLesson({
     select: { plan: true },
   });
 
-  if (user?.plan !== "pro") {
+  if (!bypassDailyLimit && user?.plan !== "pro") {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const dailyAiLessonsCount = await prisma.lesson.count({
       where: {

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Zap } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap } from "lucide-react";
 
 interface NavbarProps {
   streakCount: number;
@@ -41,11 +41,11 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
   }, [pathname, propUnread]);
 
   const navItems = [
-    { href: "/dashboard", label: "Learn", icon: BookOpen },
-    { href: "/daily-challenge", label: "Daily", icon: Calendar },
-    { href: "/explore", label: "Explore", icon: Sparkles },
-    { href: "/social", label: "Social", icon: Users },
-    { href: "/leaderboard", label: "Ranks", icon: Trophy },
+    { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
+    { href: "/daily-challenge", label: "Daily", icon: Calendar, locked: false },
+    { href: "/explore", label: "Explore", icon: Sparkles, locked: false },
+    { href: "/social", label: "Social", icon: Users, locked: false },
+    { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: false },
   ];
 
   return (
@@ -124,6 +124,22 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href;
+            if (item.locked) {
+              return (
+                <div
+                  key={item.href}
+                  className="flex-1 flex flex-col items-center justify-center gap-0.5 text-[var(--border-color)] cursor-not-allowed relative"
+                >
+                  <div className="relative w-10 h-8 flex items-center justify-center rounded-xl">
+                    <Icon size={22} strokeWidth={2} />
+                    <div className="absolute top-0 right-0.5 bg-[var(--bg-secondary)] rounded-full p-0.5">
+                      <Lock size={8} className="text-[var(--border-color)]" />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold">{item.label}</span>
+                </div>
+              );
+            }
             const showBadge = item.href === "/social" && unreadNotifications > 0;
             return (
               <Link

@@ -3,19 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { sendWelcomeEmail } from "@/lib/email";
-
-function safeReason(input: string | undefined) {
-  if (!input) return "unknown";
-  return input.toLowerCase().replace(/[^a-z0-9_ -]/g, "").slice(0, 120);
-}
+import { getCanonicalOrigin } from "@/lib/app-origin";
 
 export async function GET(req: NextRequest) {
-  const origin = req.nextUrl.origin;
-  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-    return NextResponse.redirect(
-      new URL("/login?error=google_not_configured", origin)
-    );
-  }
+  const origin = getCanonicalOrigin(req.nextUrl.origin);
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");
 
@@ -43,18 +34,6 @@ export async function GET(req: NextRequest) {
 
     if (!tokenRes.ok) {
       const errorText = await tokenRes.text();
-      let reason = "token_exchange_failed";
-      try {
-        const parsed = JSON.parse(errorText) as {
-          error?: string;
-          error_description?: string;
-        };
-        reason = safeReason(
-          parsed.error_description || parsed.error || reason
-        );
-      } catch {
-        reason = safeReason(errorText || reason);
-      }
       console.error("Google token exchange failed:", {
         status: tokenRes.status,
         error: errorText,
@@ -63,9 +42,7 @@ export async function GET(req: NextRequest) {
           redirect_uri: redirectUri,
         }
       });
-      return NextResponse.redirect(
-        new URL(`/login?error=google_failed&reason=${encodeURIComponent(reason)}`, origin)
-      );
+      return NextResponse.redirect(new URL("/login?error=google_failed", origin));
     }
 
     const { access_token } = await tokenRes.json();
@@ -77,22 +54,14 @@ export async function GET(req: NextRequest) {
 
     if (!userInfoRes.ok) {
       const errorText = await userInfoRes.text();
-      const reason = safeReason(errorText || "userinfo_failed");
       console.error("Google user info fetch failed:", {
         status: userInfoRes.status,
         error: errorText,
       });
-      return NextResponse.redirect(
-        new URL(`/login?error=google_failed&reason=${encodeURIComponent(reason)}`, origin)
-      );
+      return NextResponse.redirect(new URL("/login?error=google_failed", origin));
     }
 
     const { id: googleId, email, name, picture } = await userInfoRes.json();
-    if (!email) {
-      return NextResponse.redirect(
-        new URL("/login?error=google_failed&reason=missing_email_scope", origin)
-      );
-    }
 
     // Find existing user by googleId or email
     let user = await prisma.user.findFirst({
@@ -140,11 +109,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL(redirectTo, origin));
   } catch (err) {
     console.error("Google OAuth error:", err);
-    const reason = safeReason(
-      err instanceof Error ? err.message : "oauth_exception"
-    );
-    return NextResponse.redirect(
-      new URL(`/login?error=google_failed&reason=${encodeURIComponent(reason)}`, origin)
-    );
+    return NextResponse.redirect(new URL("/login?error=google_failed", origin));
   }
 }
