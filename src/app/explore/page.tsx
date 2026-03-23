@@ -14,27 +14,14 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-
-const SUGGESTED_TOPICS = [
-  "Product-market fit",
-  "User onboarding",
-  "A/B testing",
-  "Hiring PMs",
-  "AI product strategy",
-  "Building culture",
-  "Roadmap planning",
-  "OKRs and metrics",
-  "B2B vs B2C",
-  "Remote team management",
-  "Feature prioritization",
-  "Customer interviews",
-];
+import { EXPLORE_SEED_TOPICS } from "@/lib/explore-topics";
 
 type GeneratedLesson = {
   id: string;
   title: string;
   description: string;
   xpReward: number;
+  topicKey?: string | null;
   guestName?: string | null;
   generationMode?: string | null;
   category?: { name: string; icon: string } | null;
@@ -56,6 +43,8 @@ function ExplorePageContent() {
   const [topic, setTopic] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedLessons, setGeneratedLessons] = useState<GeneratedLesson[]>([]);
+  const [readyTopics, setReadyTopics] = useState<Array<{ topic: string; lessonId: string }>>([]);
+  const [preparingTopics, setPreparingTopics] = useState(false);
   const [error, setError] = useState("");
   const [paywallHard, setPaywallHard] = useState(false);
 
@@ -81,6 +70,17 @@ function ExplorePageContent() {
       if (generatedRes.ok) {
         const generatedData = await generatedRes.json();
         setGeneratedLessons(generatedData.lessons ?? []);
+      }
+
+      setPreparingTopics(true);
+      try {
+        const readyRes = await fetch("/api/explore/ready-topics", { method: "POST" });
+        if (readyRes.ok) {
+          const data = await readyRes.json();
+          setReadyTopics(data.readyTopics ?? []);
+        }
+      } finally {
+        setPreparingTopics(false);
       }
     }
 
@@ -230,23 +230,42 @@ function ExplorePageContent() {
 
         <div>
           <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
-            Suggested Topics
+            Ready-to-play PM insights
           </h3>
           <div className="flex flex-wrap gap-2">
-            {SUGGESTED_TOPICS.map((suggestedTopic) => (
+            {readyTopics.map((ready) => (
               <button
-                key={suggestedTopic}
-                onClick={() => {
-                  setTopic(suggestedTopic);
-                  handleGenerate(suggestedTopic);
-                }}
-                disabled={generating}
+                key={ready.topic}
+                onClick={() => router.push(`/lesson/${ready.lessonId}`)}
                 className={ds.topicChip}
               >
-                {suggestedTopic}
+                {ready.topic}
               </button>
             ))}
+            {readyTopics.length === 0 && !preparingTopics &&
+              EXPLORE_SEED_TOPICS.slice(0, 6).map((suggestedTopic) => (
+                <button
+                  key={suggestedTopic}
+                  onClick={() => {
+                    setTopic(suggestedTopic);
+                    handleGenerate(suggestedTopic);
+                  }}
+                  disabled={generating}
+                  className={ds.topicChip}
+                >
+                  {suggestedTopic}
+                </button>
+              ))}
+            {preparingTopics && (
+              <div className="inline-flex items-center gap-2 rounded-[var(--ds-radius-md)] border-2 border-[var(--border-color)] px-3 py-1.5 text-xs text-[var(--text-secondary)]">
+                <Loader2 size={12} className="animate-spin" />
+                Preparing strong podcast-based quizzes...
+              </div>
+            )}
           </div>
+          <p className="mt-2 text-[11px] font-bold text-[var(--text-secondary)]">
+            Only topics with strong transcript evidence are shown here.
+          </p>
         </div>
 
         {generatedLessons.length > 0 && (

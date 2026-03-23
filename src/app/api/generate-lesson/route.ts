@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
-import { generateLesson } from "@/lib/lesson-generator";
+import { generateLesson, TranscriptEvidenceError } from "@/lib/lesson-generator";
 import {
   evaluateAiLessonGate,
   FREE_AI_LESSONS_PER_MONTH,
@@ -51,6 +51,9 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
+    if (err instanceof TranscriptEvidenceError) {
+      return NextResponse.json({ error: err.message }, { status: 422 });
+    }
     return NextResponse.json(
       { error: `Failed to generate lesson: ${err instanceof Error ? err.message : "Unknown error"}` },
       { status: 500 }

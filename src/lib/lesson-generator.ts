@@ -20,6 +20,8 @@ interface GenerateLessonInput {
   sourceLessonId?: string | null;
 }
 
+export class TranscriptEvidenceError extends Error {}
+
 const LENNY_MCP_URL = "https://lenny-mcp.onrender.com/mcp";
 const MCP_HEADERS = {
   "Content-Type": "application/json",
@@ -145,71 +147,9 @@ function parseSearchResults(rawText: string): SearchResult[] {
     .slice(0, 4);
 }
 
-function getFallbackContent(topic: string): SearchResult[] {
-  const topicContent: Record<string, SearchResult[]> = {
-    onboarding: [
-      {
-        guest: "Adam Fishman",
-        episodeTitle: "How to build a high-performing growth team",
-        snippet:
-          "Onboarding is the one part of your product that nearly every user touches. The strongest onboarding flows shorten time-to-value, reduce cognitive load, and get the user to their first meaningful outcome quickly.",
-      },
-    ],
-    hiring: [
-      {
-        guest: "Nikhyl Singhal",
-        episodeTitle: "Hiring world-class product managers",
-        snippet:
-          "Great hiring loops test how candidates think, not just what they know. The best PM interviews surface judgment, synthesis, and the ability to reason through ambiguous product trade-offs.",
-      },
-    ],
-    ai: [
-      {
-        guest: "Ravi Mehta",
-        episodeTitle: "The AI prototype method",
-        snippet:
-          "AI product work moves faster when teams prototype with the model early, stay close to real user workflows, and treat non-determinism as a design constraint rather than an edge case.",
-      },
-    ],
-    strategy: [
-      {
-        guest: "Gibson Biddle",
-        episodeTitle: "The DHM strategy framework",
-        snippet:
-          "A durable strategy is useful only when it delights customers, is hard to copy, and improves the economics of the business. Strategy should make trade-offs visible, not hide them.",
-      },
-    ],
-    roadmap: [
-      {
-        guest: "Sachin Rekhi",
-        episodeTitle: "Outcome-driven roadmaps",
-        snippet:
-          "A roadmap is strongest when it tells a story about outcomes, customer problems, and how the team will measure progress. Feature lists alone do not create alignment.",
-      },
-    ],
-    pricing: [
-      {
-        guest: "Madhavan Ramanujam",
-        episodeTitle: "The art and science of pricing",
-        snippet:
-          "Pricing becomes a product advantage when it reflects willingness to pay, customer value, and packaging clarity. Teams usually underinvest in testing the story behind the price.",
-      },
-    ],
-  };
-
-  const key = Object.keys(topicContent).find((candidate) =>
-    topic.toLowerCase().includes(candidate)
-  );
-
-  return (
-    topicContent[key ?? ""] ?? [
-      {
-        guest: "Lenny's Podcast Archive",
-        episodeTitle: "Curated PM insights",
-        snippet: `Across the archive, ${topic} shows up as a mix of user empathy, decision quality, and execution discipline. The consistent pattern is to define the outcome clearly, study real user behavior, and turn the insight into a practical next step.`,
-      },
-    ]
-  );
+function hasStrongEvidence(result: SearchResult) {
+  const snippet = result.snippet.trim();
+  return Boolean(result.guest) && snippet.length >= 180;
 }
 
 async function searchLennyTranscripts(query: string): Promise<SearchResult[]> {
@@ -224,10 +164,20 @@ async function searchLennyTranscripts(query: string): Promise<SearchResult[]> {
       .map((item) => item.text ?? "")
       .join("\n\n");
 
-    const parsed = parseSearchResults(text);
-    return parsed.length > 0 ? parsed : getFallbackContent(query);
-  } catch {
-    return getFallbackContent(query);
+    const parsed = parseSearchResults(text).filter(hasStrongEvidence);
+    if (parsed.length < 2) {
+      throw new TranscriptEvidenceError(
+        "Not enough strong podcast transcript evidence for this topic yet. Try another topic."
+      );
+    }
+    return parsed;
+  } catch (error) {
+    if (error instanceof TranscriptEvidenceError) {
+      throw error;
+    }
+    throw new TranscriptEvidenceError(
+      "Podcast transcript evidence is unavailable right now. Try another topic."
+    );
   }
 }
 

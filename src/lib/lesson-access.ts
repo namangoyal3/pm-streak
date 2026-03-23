@@ -2,6 +2,7 @@ import { prisma } from "./prisma";
 
 const CORE_LESSON_WHERE = { aiGenerated: false } as const;
 const ARCHIVE_UNLOCK_BATCH_SIZE = 5;
+const MIN_OPEN_ARCHIVE_WINDOW = 10;
 const ARCHIVE_LOCKED_REASON =
   "Complete all currently available lessons to unlock the next podcast batch.";
 
@@ -102,7 +103,11 @@ function getArchiveVisibility(
   const lockedLessons = lessons
     .filter((lesson) => lesson.isLocked)
     .sort(sortLessonsByDayNumber);
-  const unlockedCount = unlockedBatch * ARCHIVE_UNLOCK_BATCH_SIZE;
+  // Keep a steady "few lessons open" feel even when a user is early in progression.
+  const unlockedCount = Math.max(
+    unlockedBatch * ARCHIVE_UNLOCK_BATCH_SIZE,
+    MIN_OPEN_ARCHIVE_WINDOW
+  );
 
   return {
     lockedLessons,
