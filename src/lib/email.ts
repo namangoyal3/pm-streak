@@ -102,6 +102,39 @@ export async function sendWelcomeEmail({ toEmail, toName }: { toEmail: string; t
   });
 }
 
+export async function sendPasswordResetEmail({
+  toEmail,
+  toName,
+  resetUrl,
+}: {
+  toEmail: string;
+  toName: string;
+  resetUrl: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const first = toName.split(" ")[0] || "there";
+  const body = `
+    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px">Reset your password</h1>
+    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6">
+      Hi ${first}, we received a request to reset your PM Streak password.
+      This link expires in 30 minutes.
+    </p>
+
+    ${btn("Reset password →", resetUrl, "#58cc02")}
+
+    <p style="margin:18px 0 0;font-size:12px;color:#9ca3af;line-height:1.6">
+      If you did not request this, you can safely ignore this email.
+    </p>
+  `;
+  await getResend().emails.send({
+    from: FROM,
+    replyTo: REPLY_TO,
+    to: toEmail,
+    subject: "Reset your PM Streak password",
+    html: wrap("Reset your password link (expires in 30 minutes).", body),
+  });
+}
+
 // ── Day-2 nudge ────────────────────────────────────────────────────────────
 export async function sendDay2NudgeEmail({ toEmail, toName }: { toEmail: string; toName: string }) {
   if (!process.env.RESEND_API_KEY) return;

@@ -21,6 +21,32 @@ export async function verifyToken(token: string): Promise<{ userId: string } | n
   }
 }
 
+type ResetTokenPayload = {
+  userId: string;
+  type: "password_reset";
+};
+
+export async function signPasswordResetToken(userId: string): Promise<string> {
+  return new SignJWT({ userId, type: "password_reset" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("30m")
+    .sign(JWT_SECRET);
+}
+
+export async function verifyPasswordResetToken(
+  token: string
+): Promise<ResetTokenPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    if (payload.type !== "password_reset" || typeof payload.userId !== "string") {
+      return null;
+    }
+    return payload as unknown as ResetTokenPayload;
+  } catch {
+    return null;
+  }
+}
+
 export async function getCurrentUserId(): Promise<string | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;

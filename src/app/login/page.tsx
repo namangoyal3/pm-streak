@@ -1,19 +1,76 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
 
 function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
 
   useEffect(() => {
     const err = searchParams.get("error");
     if (err === "google_failed") setError("Google sign-in failed. Please check your .env.local configuration.");
     if (err === "google_cancelled") setError("Sign-in was cancelled.");
+    if (err === "google_not_configured") {
+      setError("Google sign-in is temporarily unavailable. Use email login below.");
+    }
   }, [searchParams]);
+
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Login failed");
+        return;
+      }
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/password-reset/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to send reset email.");
+        return;
+      }
+      setResetDone(true);
+    } catch {
+      setError("Failed to send reset email.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex text-white font-sans bg-[var(--bg-main)]">
@@ -79,7 +136,72 @@ function LoginForm() {
             </BrowserLink>
           </div>
 
-          <p className="text-center mt-12 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed font-bold uppercase tracking-tight">
+          <div className="my-4 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[var(--border-color)]" />
+            <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wide">or</span>
+            <div className="h-px flex-1 bg-[var(--border-color)]" />
+          </div>
+
+          <form onSubmit={handlePasswordLogin} className="space-y-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+              className="w-full rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-3 text-sm text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-3 text-sm text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-[var(--green-primary)] px-3 py-3 text-sm font-black text-white transition-colors hover:bg-[var(--green-dark)] disabled:opacity-60"
+            >
+              {loading ? "Signing in..." : "Sign in with Email"}
+            </button>
+          </form>
+
+          <form onSubmit={handleReset} className="mt-3 space-y-2">
+            <label className="text-xs text-[var(--text-secondary)]">Forgot password?</label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="Enter email"
+                required
+                className="flex-1 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2 text-xs text-white placeholder:text-[var(--text-secondary)] focus:border-[var(--green-primary)] focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={resetLoading}
+                className="rounded-xl border border-[var(--border-color)] px-3 py-2 text-xs font-bold text-white hover:bg-white/5 disabled:opacity-60"
+              >
+                {resetLoading ? "Sending..." : "Send link"}
+              </button>
+            </div>
+            {resetDone && (
+              <p className="text-[10px] text-[var(--green-primary)]">
+                If this email exists, a reset link was sent.
+              </p>
+            )}
+          </form>
+
+          <p className="text-center mt-4 text-xs text-[var(--text-secondary)]">
+            New here?{" "}
+            <a href="/signup" className="text-[var(--green-primary)] font-bold hover:underline">
+              Create an account
+            </a>
+          </p>
+
+          <p className="text-center mt-8 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed">
             By signing in you agree to our{" "}
             <a href="/terms" className="underline hover:text-white">Terms</a>
             {" & "}

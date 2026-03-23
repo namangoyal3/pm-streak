@@ -6,6 +6,11 @@ import { sendWelcomeEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return NextResponse.redirect(
+      new URL("/login?error=google_not_configured", origin)
+    );
+  }
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");
 
