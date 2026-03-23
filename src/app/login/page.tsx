@@ -18,7 +18,14 @@ function LoginForm() {
 
   useEffect(() => {
     const err = searchParams.get("error");
-    if (err === "google_failed") setError("Google sign-in failed. Please check your .env.local configuration.");
+    const reason = searchParams.get("reason");
+    if (err === "google_failed") {
+      setError(
+        reason
+          ? `Google sign-in failed: ${reason}`
+          : "Google sign-in failed. Please try again."
+      );
+    }
     if (err === "google_cancelled") setError("Sign-in was cancelled.");
     if (err === "google_not_configured") {
       setError("Google sign-in is temporarily unavailable. Use email login below.");
