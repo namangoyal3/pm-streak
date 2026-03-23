@@ -758,6 +758,9 @@ export default function DashboardPage() {
         </div>{/* end left sidebar */}
         <div className="space-y-4 mt-0 lg:mt-0 min-w-0 order-1 lg:order-2">
 
+        {/* ── Activity Calendar (moved to top of main content) ── */}
+        {stats?.calendar && <StreakCalendar calendar={stats.calendar} />}
+
         {/* ── Your Curriculum (first on the page so lessons are visible without scrolling) ── */}
         <div id="lessons" className="scroll-mt-24 pt-2">
           <div className="mb-1 flex items-center gap-2">
@@ -903,9 +906,6 @@ export default function DashboardPage() {
             )}
           </>
         )}
-
-        {/* ── Activity Calendar (below curriculum so lessons stay above the fold) ── */}
-        {stats?.calendar && <StreakCalendar calendar={stats.calendar} />}
 
         {/* ── PM Knowledge Map ── */}
         {categories.length > 0 && (
