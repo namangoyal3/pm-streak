@@ -19,7 +19,6 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@next/third-parties": "^16.2.1",
     "@prisma/client": "^6.0.0",
     "@revenuecat/purchases-js": "^1.29.0",
     "bcryptjs": "^2.4.3",

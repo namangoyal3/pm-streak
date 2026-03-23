@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import GoogleAnalyticsInit from "@/components/GoogleAnalyticsInit";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import GoogleAnalyticsTracker from "@/components/GoogleAnalyticsTracker";
 import { Suspense } from "react";
@@ -26,6 +26,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID?.trim();
+  const gaDebug = process.env.NEXT_PUBLIC_GA_DEBUG === "true";
 
   return (
     <html lang="en">
@@ -35,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </PostHogProvider>
         {gaId && (
           <>
-            <GoogleAnalytics gaId={gaId} />
+            <GoogleAnalyticsInit gaId={gaId} debugMode={gaDebug} />
             <Suspense fallback={null}>
               <GoogleAnalyticsTracker gaId={gaId} />
             </Suspense>
