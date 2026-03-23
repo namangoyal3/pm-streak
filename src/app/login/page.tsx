@@ -202,7 +202,10 @@ function LoginForm() {
           </form>
 
           <p className="text-center mt-4 text-xs text-[var(--text-secondary)]">
-            New registrations are currently disabled.
+            New here?{" "}
+            <a href="/signup" className="text-[var(--green-primary)] font-bold hover:underline">
+              Continue with Google
+            </a>
           </p>
 
           <p className="text-center mt-8 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed">
