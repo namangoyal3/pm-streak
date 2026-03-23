@@ -40,6 +40,11 @@ REQUIREMENTS:
    - They MUST be situational or conceptual (e.g., "In a scenario where X happens, which approach from the lesson would you apply and why?").
    - Provide a clear, insightful explanation for the correct answer.
 
+CRITICAL QUALITY GUARDRAILS:
+- Do not write praise/fanboy statements (e.g. "X is the best", "no one shares more wisdom").
+- Do not create identity-recall questions (guest name, show title, "who said this", "featured most prominently").
+- Every claim must be traceable to the transcript excerpts above.
+
 OUTPUT FORMAT: Return a valid JSON object only.
 {
   "content": "Markdown content string here...",
