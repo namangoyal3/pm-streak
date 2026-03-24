@@ -362,11 +362,9 @@ export async function getArchiveUnlockProgressForUser(
   ]);
 
   const visibility = getArchiveVisibility(lessons, unlockedBatch);
+  // Only count the currently-unlocked archive window — not the whole core curriculum.
   const availableLessonIds = lessons
-    .filter(
-      (lesson) =>
-        !lesson.isLocked || visibility.unlockedLockedIds.has(lesson.id)
-    )
+    .filter((lesson) => visibility.unlockedLockedIds.has(lesson.id))
     .map((lesson) => lesson.id);
 
   const completedAvailable =
@@ -437,11 +435,9 @@ export async function unlockNextArchiveBatchIfReady(
   ]);
 
   const visibility = getArchiveVisibility(lessons, unlockedBatch);
+  // Only require completion of the currently-unlocked archive batch — not the whole core curriculum.
   const availableLessonIds = lessons
-    .filter(
-      (lesson) =>
-        !lesson.isLocked || visibility.unlockedLockedIds.has(lesson.id)
-    )
+    .filter((lesson) => visibility.unlockedLockedIds.has(lesson.id))
     .map((lesson) => lesson.id);
 
   if (availableLessonIds.length === 0) {

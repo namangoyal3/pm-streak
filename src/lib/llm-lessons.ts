@@ -1,4 +1,4 @@
-import { groq } from "./groq";
+import { groqCreate } from "./groq";
 import { isGenericLessonContent, isWeakQuestionSet } from "./lesson-quality";
 
 export interface SearchResult {
@@ -66,9 +66,9 @@ OUTPUT FORMAT: Return a valid JSON object only.
 }
 `;
 
-  const completion = await groq.chat.completions.create({
+  const completion = await groqCreate({
     messages: [{ role: "user", content: prompt }],
-    model: "llama3-70b-8192", // High quality for PM reasoning
+    model: "llama-3.3-70b-versatile", // High quality for PM reasoning
     response_format: { type: "json_object" },
     temperature: 0.2,
   });
@@ -76,6 +76,12 @@ OUTPUT FORMAT: Return a valid JSON object only.
   const rawResult = completion.choices[0]?.message?.content;
   if (!rawResult) throw new Error("No response from Groq");
   const parsed = JSON.parse(rawResult) as GeneratedLessonContent;
+  // Normalize content to string in case the model wraps it in an object
+  if (typeof parsed.content !== "string") {
+    parsed.content = typeof parsed.content === "object"
+      ? JSON.stringify(parsed.content)
+      : String(parsed.content ?? "");
+  }
   if (!isGenericLessonContent(parsed.content) && !isWeakQuestionSet(parsed.questions)) return parsed;
 
   // One strict rewrite pass when content/questions are generic.
@@ -100,9 +106,9 @@ Rules:
 - Keep output as JSON object with keys: content, questions.
 `;
 
-  const retry = await groq.chat.completions.create({
+  const retry = await groqCreate({
     messages: [{ role: "user", content: rewritePrompt }],
-    model: "llama3-70b-8192",
+    model: "llama-3.3-70b-versatile",
     response_format: { type: "json_object" },
     temperature: 0.2,
   });
@@ -112,6 +118,11 @@ Rules:
     throw new Error("Could not generate high-quality PM lesson content.");
   }
   const retryParsed = JSON.parse(retryRaw) as GeneratedLessonContent;
+  if (typeof retryParsed.content !== "string") {
+    retryParsed.content = typeof retryParsed.content === "object"
+      ? JSON.stringify(retryParsed.content)
+      : String(retryParsed.content ?? "");
+  }
   if (isGenericLessonContent(retryParsed.content) || isWeakQuestionSet(retryParsed.questions)) {
     throw new Error("Could not generate high-quality PM lesson content.");
   }

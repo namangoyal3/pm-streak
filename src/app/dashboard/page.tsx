@@ -63,7 +63,6 @@ export default function DashboardPage() {
     count: number;
     lessons: { id: string; title: string }[];
   } | null>(null);
-  const [gradualArchiveOpen, setGradualArchiveOpen] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   useEffect(() => {
@@ -199,11 +198,7 @@ export default function DashboardPage() {
   const archiveUnlockProgress = stats?.archiveUnlockProgress;
   const progressPct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
 
-  const coreCategories = categories.filter((c) => c.slug !== "podcast-archive");
-  const archiveCategory = categories.find((c) => c.slug === "podcast-archive");
   const lockedPreviewCount = categories.flatMap((c) => c.lessons).filter((l) => l.isLocked).length;
-  const showGradualSection =
-    Boolean(archiveCategory && archiveCategory.lessons.length > 0) || lockedPreviewCount > 0;
 
   function renderCategoryTrack(category: Category) {
     const isExpanded = expandedCategories.includes(category.id);
@@ -504,35 +499,16 @@ export default function DashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {coreCategories.map((c) => renderCategoryTrack(c))}
+                {categories.map((c) => renderCategoryTrack(c))}
               </div>
+              {lockedPreviewCount > 0 && (
+                <div className="mt-4 bg-[var(--surface-1)] p-4 rounded-xl border-2 border-dashed border-[var(--border-color)]">
+                  <p className="text-[10px] text-[var(--text-secondary)] font-bold">
+                    Complete the open lessons above to unlock the next batch of podcast episodes.
+                  </p>
+                </div>
+              )}
             </div>
-
-            {showGradualSection && (
-              <div className="border-t border-[var(--border-color)] pt-6">
-                <button
-                  onClick={() => setGradualArchiveOpen(!gradualArchiveOpen)}
-                  className="flex w-full items-center justify-between py-3 px-4 rounded-xl bg-[var(--surface-1)] hover:bg-[var(--surface-2)] transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <BookOpen size={18} className="text-[var(--blue-primary)]" />
-                    <span className="text-sm font-black">Lenny&apos;s Podcast Archive</span>
-                  </div>
-                  <ChevronDown className={cn("transition-transform", gradualArchiveOpen && "rotate-180")} size={20} />
-                </button>
-                {gradualArchiveOpen && (
-                  <div className="mt-4 animate-in fade-in slide-in-from-top-2">
-                    {archiveCategory && renderCategoryTrack(archiveCategory)}
-                    {lockedPreviewCount > 0 && (
-                      <div className="bg-[var(--surface-2)] p-4 rounded-xl border-2 border-dashed border-[var(--border-color)] mt-4">
-                        <div className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-wider mb-2">Locked Batch</div>
-                        <p className="text-[10px] text-[var(--text-secondary)]">Complete the open lessons above to unlock the next batch.</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
 
             <button
               onClick={() => setShowShare(true)}

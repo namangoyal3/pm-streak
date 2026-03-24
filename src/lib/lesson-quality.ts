@@ -104,8 +104,8 @@ function hasTradeoffSignal(text: string): boolean {
   return TRADEOFF_HINTS.some((hint) => t.includes(hint));
 }
 
-export function isGenericLessonContent(content: string): boolean {
-  const text = (content || "").toLowerCase();
+export function isGenericLessonContent(content: unknown): boolean {
+  const text = (typeof content === "string" ? content : JSON.stringify(content ?? "")).toLowerCase();
   if (text.length < 500) return true;
   if (!text.includes("tactical application")) return true;
   const genericHits = GENERIC_CONTENT_PATTERNS.filter((p) => text.includes(p)).length;
