@@ -12,13 +12,14 @@ interface NavbarProps {
   streakCount: number;
   xp: number;
   gems: number;
+  credits?: number;
   avatarUrl?: string | null;
   name?: string;
   plan?: string;
   unreadNotifications?: number;
 }
 
-export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadNotifications: propUnread }: NavbarProps) {
+export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name, unreadNotifications: propUnread }: NavbarProps) {
   const pathname = usePathname();
   const [unreadNotifications, setUnreadNotifications] = useState(propUnread ?? 0);
 
@@ -108,6 +109,14 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
               <Gem size={16} className="text-[var(--blue-primary)]" />
               <span className="font-black text-sm tabular-nums text-[var(--blue-primary)]">{gems}</span>
             </div>
+
+            {/* Credits */}
+            {credits !== undefined && (
+              <Link href="/pricing" className="flex items-center gap-0.5 bg-purple-500/10 px-2 py-1 rounded-full flex-shrink-0 hover:bg-purple-500/20 transition-colors">
+                <Zap size={13} className="text-purple-400" />
+                <span className="font-black text-xs tabular-nums text-purple-400">{credits}</span>
+              </Link>
+            )}
 
             {/* XP */}
             <div className="flex items-center gap-1 bg-[var(--gold-primary)]/10 px-2 py-1 rounded-full flex-shrink-0">

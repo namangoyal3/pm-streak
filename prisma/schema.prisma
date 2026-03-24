@@ -30,6 +30,8 @@ model User {
   lostStreakVal Int      @default(0)    // the streak value that was lost
   xpBoostActive Boolean  @default(false) // next lesson gives 2× XP
   unlockedBatch Int      @default(0)     // how many batches of locked lessons have been unlocked
+  credits            Int      @default(10)    // spendable credits (free=10/mo, pro=50/mo)
+  creditsRefreshedAt DateTime?               // when credits were last reset
 
   // Billing / PM Streak Pro (Paddle)
   plan               String    @default("free") // free | pro
@@ -61,6 +63,7 @@ model User {
   subscriptions      Subscription[]
   billingEvents      BillingEvent[]
   entitlements       Entitlement[]
+  creditTransactions CreditTransaction[]
 }
 
 model Subscription {
@@ -287,4 +290,32 @@ model FriendChallenge {
 
   challenger User @relation("challenger", fields: [challengerId], references: [id])
   challengee User @relation("challengee", fields: [challengeeId], references: [id])
+}
+
+model CreditTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int      // positive = earned, negative = spent
+  reason    String   // monthly_refresh | lesson_unlock | ai_lesson | interview_prep
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  location    String?
+  remote      Boolean  @default(false)
+  applyUrl    String
+  description String?
+  tags        String[]
+  source      String   // wellfound | linkedin | himalayas
+  postedAt    DateTime?
+  scrapedAt   DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  @@index([isActive])
 }

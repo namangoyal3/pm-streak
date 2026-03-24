@@ -128,3 +128,67 @@ Rules:
   }
   return retryParsed;
 }
+
+/**
+ * Generates a PM lesson from a leader article — same format but accepts the first
+ * Groq output directly without the strict quality gate. Used for leader ingestion
+ * where the source text is already high-quality (real articles by PM thought leaders).
+ */
+export async function generateLeaderLesson(
+  topic: string,
+  results: SearchResult[]
+): Promise<GeneratedLessonContent> {
+  const context = results
+    .map((r, i) => `[Article ${i + 1}] Author: ${r.guest}\nTitle: ${r.episodeTitle ?? "N/A"}\nContent: ${r.snippet}`)
+    .join("\n\n");
+
+  const prompt = `Act as an elite Product Management coach. Generate a practical PM lesson based on this article by a PM thought leader.
+
+TOPIC: ${topic}
+ARTICLE EXCERPTS:
+${context}
+
+OUTPUT: Return valid JSON only.
+{
+  "content": "Markdown lesson with bolding, a ## Tactical Application section with 3 specific actions",
+  "questions": [
+    {
+      "questionText": "Scenario-based PM question referencing the article concepts",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctIndex": 0,
+      "explanation": "Why this is correct and why the alternatives are weaker"
+    }
+  ]
+}
+
+Requirements:
+- Extract 2-3 non-obvious, immediately applicable PM insights from the article
+- Include ## Tactical Application with 3 concrete actions a PM can do this week
+- Generate exactly 3 multiple-choice questions with 4 options each
+- Questions must test PM judgment (tradeoffs, metrics, execution), not recall
+- No identity questions (who wrote this, who is the author, etc.)`;
+
+  const completion = await groqCreate({
+    messages: [{ role: "user", content: prompt }],
+    model: "llama-3.3-70b-versatile",
+    response_format: { type: "json_object" },
+    temperature: 0.3,
+  });
+
+  const raw = completion.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from Groq for leader lesson");
+
+  const parsed = JSON.parse(raw) as GeneratedLessonContent;
+  if (typeof parsed.content !== "string") {
+    parsed.content = typeof parsed.content === "object"
+      ? JSON.stringify(parsed.content)
+      : String(parsed.content ?? "");
+  }
+  if (!parsed.content || parsed.content.length < 200) {
+    throw new Error("Leader lesson content too short");
+  }
+  if (!Array.isArray(parsed.questions) || parsed.questions.length < 3) {
+    throw new Error("Leader lesson questions missing");
+  }
+  return parsed;
+}

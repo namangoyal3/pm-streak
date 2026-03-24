@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import StreakCalendar from "@/components/StreakCalendar";
@@ -63,7 +63,9 @@ export default function DashboardPage() {
     count: number;
     lessons: { id: string; title: string }[];
   } | null>(null);
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const categoryRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
     async function load() {
@@ -97,7 +99,8 @@ export default function DashboardPage() {
             c.lessons.some((l: any) => !l.completed && !l.isLocked)
           )?.id;
           if (activeCatId) {
-            setExpandedCategories([activeCatId]);
+            setExpandedCategory(activeCatId);
+            setActiveCategoryId(activeCatId);
           }
         }
 
@@ -132,6 +135,35 @@ export default function DashboardPage() {
 
     load();
   }, [router]);
+
+  useEffect(() => {
+    if (categories.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const intersecting = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (intersecting.length > 0) {
+          const id = intersecting[0].target.getAttribute("data-category-id");
+          if (id) setActiveCategoryId(id);
+        }
+      },
+      { threshold: 0.15, rootMargin: "-56px 0px -40% 0px" }
+    );
+
+    const refs = categoryRefs.current;
+    refs.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [categories]);
+
+  const scrollToCategory = useCallback((categoryId: string) => {
+    setExpandedCategory(categoryId);
+    setTimeout(() => {
+      const el = categoryRefs.current.get(categoryId);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  }, []);
 
   const handleLogout = async () => {
     await fetch("/api/auth/me", { method: "DELETE" });
@@ -201,7 +233,7 @@ export default function DashboardPage() {
   const lockedPreviewCount = categories.flatMap((c) => c.lessons).filter((l) => l.isLocked).length;
 
   function renderCategoryTrack(category: Category) {
-    const isExpanded = expandedCategories.includes(category.id);
+    const isExpanded = expandedCategory === category.id;
     const catCompleted = category.lessons.filter((l) => l.completed).length;
     const catTotal = category.lessons.length;
     const catPct = catTotal > 0 ? Math.round((catCompleted / catTotal) * 100) : 0;
@@ -210,11 +242,7 @@ export default function DashboardPage() {
     const categoryExploreHref = `/explore?topic=${encodeURIComponent(category.name)}`;
 
     const toggleExpand = () => {
-      setExpandedCategories((prev) =>
-        prev.includes(category.id)
-          ? prev.filter((id) => id !== category.id)
-          : [...prev, category.id]
-      );
+      setExpandedCategory((prev) => (prev === category.id ? null : category.id));
     };
 
     const visibleLessons = (() => {
@@ -235,7 +263,15 @@ export default function DashboardPage() {
     })();
 
     return (
-      <div key={category.id} className="-mt-2 border-b border-[var(--border-color)] pb-4 last:border-0">
+      <div
+        key={category.id}
+        ref={(el) => {
+          if (el) categoryRefs.current.set(category.id, el);
+          else categoryRefs.current.delete(category.id);
+        }}
+        data-category-id={category.id}
+        className="-mt-2 border-b border-[var(--border-color)] pb-4 last:border-0"
+      >
         <button
           onClick={toggleExpand}
           className="flex w-full items-center gap-2.5 mb-3 text-left transition-opacity hover:opacity-80"
@@ -313,14 +349,36 @@ export default function DashboardPage() {
 
   return (
     <div className={ds.pageShell}>
-      <Navbar 
-        streakCount={user.streakCount} 
-        xp={user.xp} 
-        gems={user.gems} 
-        avatarUrl={user.avatarUrl} 
-        name={user.name} 
-        unreadNotifications={user.unreadNotifications} 
+      <Navbar
+        streakCount={user.streakCount}
+        xp={user.xp}
+        gems={user.gems}
+        credits={user.credits}
+        avatarUrl={user.avatarUrl}
+        name={user.name}
+        unreadNotifications={user.unreadNotifications}
       />
+
+      {/* Mobile sticky category bar */}
+      {categories.length > 0 && (
+        <div className="lg:hidden sticky top-14 z-40 bg-[var(--bg-primary)] border-b-2 border-[var(--border-color)] px-4 py-2 flex gap-2 overflow-x-auto scrollbar-none">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => scrollToCategory(cat.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors flex-shrink-0",
+                activeCategoryId === cat.id
+                  ? "bg-[var(--green-primary)] text-white"
+                  : "bg-[var(--surface-2)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+              )}
+            >
+              <span>{cat.icon}</span>
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <main className="w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-28">
         {/* ── Pending challenge alert ── */}
@@ -465,6 +523,58 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Credits & Upgrade */}
+            {user.plan !== "pro" ? (
+              <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Zap size={16} className="text-purple-400" />
+                    <span className="text-sm font-black text-white">Credits</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-purple-500/20 px-2.5 py-1 rounded-full">
+                    <Zap size={12} className="text-purple-400" />
+                    <span className="text-xs font-black text-purple-400">{user.credits ?? 10}</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-white/60 mb-3">Use credits to unlock lesson batches, generate AI lessons, and access interview prep.</p>
+                <Link
+                  href="/pricing"
+                  className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-purple-500 text-white text-xs font-black uppercase tracking-wider hover:bg-purple-400 transition-colors"
+                >
+                  <Star size={12} /> Upgrade to Pro ₹499/mo
+                </Link>
+              </div>
+            ) : (
+              <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Star size={14} className="text-purple-400" />
+                  <span className="text-xs font-black text-purple-300">Pro</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Zap size={12} className="text-purple-400" />
+                  <span className="text-xs font-black text-purple-400">{user.credits ?? 50} credits</span>
+                </div>
+              </div>
+            )}
+
+            {/* Quick links */}
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/jobs" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--green-primary)]/40 transition-colors">
+                <Target size={14} className="text-[var(--green-primary)]" />
+                <div>
+                  <div className="text-[10px] font-black">PM Jobs</div>
+                  <div className="text-[9px] text-[var(--text-secondary)]">Find roles</div>
+                </div>
+              </Link>
+              <Link href="/interview-prep" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--blue-primary)]/40 transition-colors">
+                <Brain size={14} className="text-[var(--blue-primary)]" />
+                <div>
+                  <div className="text-[10px] font-black">Interview</div>
+                  <div className="text-[9px] text-[var(--text-secondary)]">5⚡ / session</div>
+                </div>
+              </Link>
+            </div>
+
             <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[var(--border-color)] py-3 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--red-primary)] transition-colors">
               <LogOut size={14} /> Sign Out
             </button>
@@ -498,16 +608,49 @@ export default function DashboardPage() {
                   <Sparkles size={12} /> Explore More
                 </Link>
               </div>
-              <div className="space-y-4">
-                {categories.map((c) => renderCategoryTrack(c))}
-              </div>
-              {lockedPreviewCount > 0 && (
-                <div className="mt-4 bg-[var(--surface-1)] p-4 rounded-xl border-2 border-dashed border-[var(--border-color)]">
-                  <p className="text-[10px] text-[var(--text-secondary)] font-bold">
-                    Complete the open lessons above to unlock the next batch of podcast episodes.
-                  </p>
+              <div className="flex gap-4 items-start">
+                {/* Desktop sticky category nav */}
+                {categories.length > 0 && (
+                  <nav className="hidden lg:flex flex-col gap-1 sticky top-20 w-36 xl:w-44 shrink-0">
+                    {categories.map((cat) => {
+                      const done = cat.lessons.filter((l) => l.completed).length;
+                      const total = cat.lessons.length;
+                      const isActive = activeCategoryId === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => scrollToCategory(cat.id)}
+                          className={cn(
+                            "w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-colors",
+                            isActive
+                              ? "bg-[var(--green-primary)]/15 text-[var(--green-primary)]"
+                              : "text-[var(--text-secondary)] hover:bg-[var(--surface-2)]"
+                          )}
+                        >
+                          <span className="text-base leading-none">{cat.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className={cn("truncate text-xs leading-tight", isActive ? "font-black" : "font-bold")}>
+                              {cat.name}
+                            </div>
+                            <div className="text-[9px] opacity-60 mt-0.5">{done}/{total}</div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </nav>
+                )}
+                {/* Lesson tracks */}
+                <div className="flex-1 min-w-0 space-y-4">
+                  {categories.map((c) => renderCategoryTrack(c))}
+                  {lockedPreviewCount > 0 && (
+                    <div className="mt-4 bg-[var(--surface-1)] p-4 rounded-xl border-2 border-dashed border-[var(--border-color)]">
+                      <p className="text-[10px] text-[var(--text-secondary)] font-bold">
+                        Complete the open lessons above to unlock the next batch of podcast episodes.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
 
             <button

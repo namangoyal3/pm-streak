@@ -1,5 +1,7 @@
 import { prisma } from "./prisma";
 import { isGenericLessonContent, isWeakQuestionSet } from "./lesson-quality";
+import { spendCredits, CREDIT_COSTS } from "./credits";
+import { isUserPro } from "./entitlements";
 
 const CORE_LESSON_WHERE = { aiGenerated: false } as const;
 const ARCHIVE_UNLOCK_BATCH_SIZE = 5;
@@ -463,6 +465,13 @@ export async function unlockNextArchiveBatchIfReady(
 
   if (nextBatchLessons.length === 0) {
     return null;
+  }
+
+  // Credit gate: pro users get batches for free; free users spend 5 credits
+  const pro = await isUserPro(userId);
+  if (!pro) {
+    const ok = await spendCredits(userId, CREDIT_COSTS.lesson_unlock, "lesson_unlock");
+    if (!ok) return null; // insufficient credits — caller can detect by checking credits balance
   }
 
   await prisma.user.update({

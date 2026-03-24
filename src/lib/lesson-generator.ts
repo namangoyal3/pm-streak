@@ -1,6 +1,8 @@
 import { prisma } from "./prisma";
 import { buildSourceTranscript } from "./podcast-quiz-helpers";
 import { generateActionablePMLesson, SearchResult } from "./llm-lessons";
+import { spendCredits, CREDIT_COSTS } from "./credits";
+import { isUserPro } from "./entitlements";
 
 type GenerationMode = "explore" | "deep_dive";
 
@@ -245,25 +247,13 @@ export async function generateLesson({
     return existingLesson;
   }
 
-  // Monetization: Check daily limit for free users
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { plan: true },
-  });
-
-  if (!bypassDailyLimit && user?.plan !== "pro") {
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const dailyAiLessonsCount = await prisma.lesson.count({
-      where: {
-        generatedForUserId: userId,
-        aiGenerated: true,
-        createdAt: { gte: twentyFourHoursAgo },
-      },
-    });
-
-    if (dailyAiLessonsCount >= 1) {
+  // Monetization: credit gate for free users (2 credits per AI lesson)
+  const pro = await isUserPro(userId);
+  if (!bypassDailyLimit && !pro) {
+    const ok = await spendCredits(userId, CREDIT_COSTS.ai_lesson, "ai_lesson");
+    if (!ok) {
       throw new DailyLimitError(
-        "You've reached your daily limit for AI lessons. Upgrade to Pro for unlimited Deep Dives."
+        "Not enough credits to generate an AI lesson. Upgrade to Pro for unlimited lessons or wait for your monthly refresh."
       );
     }
   }

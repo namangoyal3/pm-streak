@@ -38,6 +38,8 @@ export async function GET() {
         proPreviewConsumed: true,
         country: true,
         priceBand: true,
+        credits: true,
+        creditsRefreshedAt: true,
       },
     }),
     prisma.notification.count({ where: { userId, readAt: null } }),
