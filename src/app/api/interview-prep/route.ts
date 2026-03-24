@@ -33,13 +33,22 @@ Rules:
 - commonMistakes: 2-3 things weak candidates do wrong
 - Vary question types: product sense, metrics, execution, strategy, behavioral`;
 
+const ALLOWED_TOPICS = new Set([
+  "Product Sense", "Metrics & Analytics", "Execution",
+  "Strategy", "Behavioral", "Estimation", "General PM",
+]);
+const ALLOWED_LEVELS = new Set(["APM", "PM", "Senior PM", "Group PM / Director"]);
+
 export async function POST(req: Request) {
   const userId = await getCurrentUserId();
   if (!userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
-  const topic = (body.topic as string) || "General PM";
-  const level = (body.level as string) || "PM";
+  // Validate against allowlists to prevent prompt injection
+  const rawTopic = (body.topic as string) || "General PM";
+  const rawLevel = (body.level as string) || "PM";
+  const topic = ALLOWED_TOPICS.has(rawTopic) ? rawTopic : "General PM";
+  const level = ALLOWED_LEVELS.has(rawLevel) ? rawLevel : "PM";
 
   // Credit gate: pro users skip; free users spend 5 credits
   const pro = await isUserPro(userId);

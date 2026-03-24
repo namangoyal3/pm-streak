@@ -84,11 +84,29 @@ function extractTags(job: HimalayasJob): string[] {
   return Array.from(tags).slice(0, 5);
 }
 
+/**
+ * Returns true only if the job title looks like a genuine PM role.
+ * Filters out false positives from broad keyword searches.
+ */
+function isPMJob(title: string): boolean {
+  const t = title.toLowerCase();
+  const PM_TITLE_PATTERNS = [
+    "product manager", "product management", "product lead",
+    "head of product", "vp of product", "vp, product",
+    "director of product", "director, product",
+    "principal pm", "group pm", "staff pm",
+    "associate product", "senior pm", "sr. pm",
+    "product operations", "product strategy",
+  ];
+  return PM_TITLE_PATTERNS.some((p) => t.includes(p));
+}
+
 async function main() {
   console.log(`\n[scrape-pm-jobs] Starting${dryRun ? " (dry-run)" : ""}…\n`);
 
-  const jobs = await fetchHimalayasJobs();
-  console.log(`\nFetched ${jobs.length} unique jobs from Himalayas\n`);
+  const allJobs = await fetchHimalayasJobs();
+  const jobs = allJobs.filter((j) => isPMJob(j.title));
+  console.log(`\nFetched ${allJobs.length} raw jobs → ${jobs.length} valid PM jobs after title filter\n`);
 
   let created = 0;
   let skipped = 0;

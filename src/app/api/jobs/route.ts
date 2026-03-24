@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const remote = searchParams.get("remote");
-  const search = searchParams.get("q");
+  const rawSearch = searchParams.get("q");
+  // Clamp search length to prevent excessive DB work
+  const search = rawSearch ? rawSearch.slice(0, 100) : null;
 
   const jobs = await prisma.job.findMany({
     where: {

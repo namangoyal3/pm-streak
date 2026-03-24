@@ -147,7 +147,11 @@ export default function PricingPage() {
                 </button>
               </div>
               <p className="text-[10px] text-white/40 text-center">
-                After payment, message us on WhatsApp or email to activate your account.
+                After payment, email{" "}
+                <a href="mailto:support@pmstreak.app" className="text-purple-400 underline underline-offset-2">
+                  support@pmstreak.app
+                </a>{" "}
+                with your UPI reference to activate.
               </p>
             </div>
           </div>
@@ -198,7 +202,7 @@ export default function PricingPage() {
         <div className="space-y-3">
           <h2 className="text-base font-black mb-4">FAQ</h2>
           {[
-            { q: "When will my Pro access activate?", a: "Within a few hours of payment confirmation. Message us on WhatsApp or email with your UPI reference number." },
+            { q: "When will my Pro access activate?", a: "Within a few hours of payment confirmation. Email support@pmstreak.app with your UPI reference number and we'll activate your account." },
             { q: "Are credits cumulative?", a: "No — they reset on the 1st of each month. Unused credits don't roll over." },
             { q: "Can I cancel anytime?", a: "Yes. Monthly plans are not auto-renewed — you pay each month manually." },
             { q: "What's the yearly plan?", a: "₹1,899/year (vs ₹5,988 yearly at monthly rate) — pay once, stay Pro for 12 months." },

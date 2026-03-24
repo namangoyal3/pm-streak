@@ -1,17 +1,29 @@
 import Groq from "groq-sdk";
 import type { ChatCompletion } from "groq-sdk/resources/chat/completions";
 
+// SECURITY: All Groq API keys must be supplied via environment variables.
+// Keys previously hardcoded here were exposed in git history and should be
+// rotated at console.groq.com immediately.
+// Set GROQ_API_KEY (primary) and GROQ_API_KEY_2 through GROQ_API_KEY_5
+// (fallback rotation keys) in .env.local and Vercel environment settings.
 const GROQ_KEYS = [
-  process.env.GROQ_API_KEY ?? "***REMOVED***",
-  "***REMOVED***",
-  "***REMOVED***",
-  "***REMOVED***",
-  "***REMOVED***",
-];
+  process.env.GROQ_API_KEY,
+  process.env.GROQ_API_KEY_2,
+  process.env.GROQ_API_KEY_3,
+  process.env.GROQ_API_KEY_4,
+  process.env.GROQ_API_KEY_5,
+].filter((k): k is string => Boolean(k));
+
+if (GROQ_KEYS.length === 0) {
+  console.error("[groq] CRITICAL: No Groq API keys configured. Set GROQ_API_KEY in environment variables.");
+}
 
 let currentKeyIndex = 0;
 
 function getClient() {
+  if (GROQ_KEYS.length === 0) {
+    throw new Error("No Groq API keys configured. Set GROQ_API_KEY in environment variables.");
+  }
   return new Groq({ apiKey: GROQ_KEYS[currentKeyIndex]! });
 }
 
