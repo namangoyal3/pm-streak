@@ -343,9 +343,9 @@ export default function DashboardPage() {
           </Link>
         )}
 
-        <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-6 lg:items-start w-full min-w-0">
-          {/* LEFT SIDEBAR */}
-          <div className="space-y-4 min-w-0 order-2 lg:order-1">
+        <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,300px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:gap-6 lg:items-start w-full min-w-0">
+          {/* RIGHT SIDEBAR */}
+          <div className="space-y-4 min-w-0 order-2 lg:order-2">
             {/* ── Earn-Back Banner ── */}
             {earnBack && (
               <div className="flex items-start gap-3 rounded-[var(--ds-radius-lg)] border-2 border-[var(--orange-primary)]/40 bg-gradient-to-r from-[var(--orange-primary)]/20 to-[var(--red-primary)]/20 p-4">
@@ -470,8 +470,8 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* RIGHT CONTENT (CURRICULUM) */}
-          <div className="space-y-4 min-w-0 order-1 lg:order-2">
+          {/* LEFT CONTENT (CURRICULUM) */}
+          <div className="space-y-4 min-w-0 order-1 lg:order-1">
             <div className={cn(
               "relative overflow-hidden rounded-[var(--ds-radius-xl)] p-5",
               isPerfect ? "bg-gradient-to-br from-[#1a1200] to-[#2a1f00] border-2 border-[var(--gold-primary)]/30" : "bg-gradient-to-br from-[#10271a] to-[#153726] border-2 border-[var(--green-primary)]/30"
@@ -493,7 +493,7 @@ export default function DashboardPage() {
 
             <div id="lessons" className="scroll-mt-24 pt-2">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className={ds.sectionTitle}>Product Mastery Map</h2>
+                <h2 className={ds.sectionTitle}>PM Knowledge Map</h2>
                 <Link href="/explore" className="text-xs font-black text-[var(--green-primary)] hover:underline flex items-center gap-1">
                   <Sparkles size={12} /> Explore More
                 </Link>
