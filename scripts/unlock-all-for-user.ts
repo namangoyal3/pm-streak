@@ -1,7 +1,11 @@
 /**
- * Bumps unlockedBatch to a high value for a user so all archive lessons become accessible.
- * Usage: npx tsx scripts/unlock-all-for-user.ts [email]
- * Default: admin account (namangoyal21197@gmail.com)
+ * Unlocks all archive lessons for one user or all users.
+ *
+ * Usage:
+ *   npx tsx scripts/unlock-all-for-user.ts                  # admin only
+ *   npx tsx scripts/unlock-all-for-user.ts user@example.com # one user
+ *   npx tsx scripts/unlock-all-for-user.ts --all            # every user
+ *   npx tsx scripts/unlock-all-for-user.ts --all --dry-run  # preview
  */
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
@@ -23,25 +27,37 @@ for (const p of [".env.local", ".env", ".env.production"].map((f) => resolve(pro
 }
 
 const prisma = new PrismaClient();
+const args = process.argv.slice(2);
+const allUsers = args.includes("--all");
+const dryRun = args.includes("--dry-run");
+const emailArg = args.find((a) => !a.startsWith("--"));
 
 async function main() {
-  const email = process.argv[2] ?? "namangoyal21197@gmail.com";
-
-  const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, unlockedBatch: true } });
-  if (!user) {
-    console.error(`User not found: ${email}`);
-    process.exitCode = 1;
-    return;
-  }
-
   const archiveCount = await prisma.lesson.count({ where: { isLocked: true, aiGenerated: false } });
-  // Each batch = 5 lessons, so batches needed = ceil(archiveCount / 5)
   const BATCH_SIZE = 5;
   const batchesNeeded = Math.ceil(archiveCount / BATCH_SIZE);
 
-  await prisma.user.update({ where: { id: user.id }, data: { unlockedBatch: batchesNeeded } });
+  if (allUsers) {
+    const users = await prisma.user.findMany({
+      select: { id: true, email: true, unlockedBatch: true },
+      orderBy: { createdAt: "asc" },
+    });
+    console.log(`${dryRun ? "[dry-run] " : ""}Unlocking all ${archiveCount} archive lessons for ${users.length} users (batch → ${batchesNeeded}):\n`);
+    for (const user of users) {
+      if (!dryRun) {
+        await prisma.user.update({ where: { id: user.id }, data: { unlockedBatch: batchesNeeded } });
+      }
+      console.log(`  ✅ ${user.email} (was batch=${user.unlockedBatch})`);
+    }
+    console.log(`\n${dryRun ? "Would update" : "Updated"} ${users.length} users.`);
+    return;
+  }
 
-  console.log(`✅ ${email}: unlockedBatch ${user.unlockedBatch} → ${batchesNeeded} (unlocks all ${archiveCount} archive lessons)`);
+  const email = emailArg ?? "namangoyal21197@gmail.com";
+  const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true, unlockedBatch: true } });
+  if (!user) { console.error(`User not found: ${email}`); process.exitCode = 1; return; }
+  if (!dryRun) await prisma.user.update({ where: { id: user.id }, data: { unlockedBatch: batchesNeeded } });
+  console.log(`✅ ${email}: unlockedBatch ${user.unlockedBatch} → ${batchesNeeded} (unlocks all ${archiveCount} archive lessons)${dryRun ? " [dry-run]" : ""}`);
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect());

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Flame, Check, X, Zap, Star, BookOpen, Brain, Target,
-  Users, Sparkles, MessageSquare, ChevronRight,
+  Users, Sparkles, MessageSquare, ChevronRight, Camera, Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,8 +42,52 @@ const CREDIT_COSTS = [
   { icon: <Brain size={14} />, action: "Interview prep session (5 questions)", cost: 5 },
 ];
 
+interface PlanCard {
+  key: string;
+  title: string;
+  amount: string;
+  period: string;
+  badge?: string;
+  badgeColor?: string;
+  savings?: string;
+  qrPath: string;
+  highlight?: boolean;
+}
+
+const PLANS: PlanCard[] = [
+  {
+    key: "monthly",
+    title: "Monthly",
+    amount: "₹499",
+    period: "/ month",
+    qrPath: "/india-upi-monthly.png",
+  },
+  {
+    key: "quarterly",
+    title: "Quarterly",
+    amount: "₹1,699",
+    period: "/ 3 months",
+    badge: "Best Value",
+    badgeColor: "bg-purple-500",
+    savings: "Save ₹298 vs monthly",
+    qrPath: "/india-upi-quarterly.png",
+    highlight: true,
+  },
+  {
+    key: "yearly",
+    title: "Yearly",
+    amount: "₹1,899",
+    period: "/ year",
+    savings: "Save 68% vs monthly",
+    qrPath: "/india-upi-yearly.png",
+  },
+];
+
 export default function PricingPage() {
+  const [selectedPlan, setSelectedPlan] = useState("quarterly");
   const [upiCopied, setUpiCopied] = useState(false);
+
+  const activePlan = PLANS.find((p) => p.key === selectedPlan) ?? PLANS[1];
 
   const handleCopy = () => {
     navigator.clipboard.writeText("pmstreak@upi").catch(() => {});
@@ -109,18 +153,13 @@ export default function PricingPage() {
 
           {/* Pro */}
           <div className="rounded-2xl border-2 border-purple-500/50 p-6 bg-gradient-to-br from-purple-900/40 to-purple-800/20 relative overflow-hidden">
-            <div className="absolute top-3 right-3">
-              <span className="bg-purple-500 text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">
-                Best Value
-              </span>
-            </div>
             <div className="mb-4">
               <h2 className="text-lg font-black mb-1">Pro</h2>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-black">₹499</span>
                 <span className="text-white/50 text-sm">/ month</span>
               </div>
-              <p className="text-xs text-purple-300/70 mt-1">Or ₹1,899 / year (save 68%)</p>
+              <p className="text-xs text-purple-300/70 mt-1">Or ₹1,699 / 3 months · Or ₹1,899 / year (save 68%)</p>
             </div>
             <ul className="space-y-2.5 mb-6">
               {PRO_FEATURES.map((f) => (
@@ -131,30 +170,101 @@ export default function PricingPage() {
               ))}
             </ul>
 
+            {/* Plan Selector */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {PLANS.map((plan) => (
+                <button
+                  key={plan.key}
+                  onClick={() => setSelectedPlan(plan.key)}
+                  className={cn(
+                    "rounded-xl p-2.5 border-2 text-center transition-all relative",
+                    selectedPlan === plan.key
+                      ? "border-purple-500 bg-purple-500/20"
+                      : "border-white/10 bg-black/20 hover:border-white/30"
+                  )}
+                >
+                  {plan.badge && (
+                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-black px-1.5 py-0.5 rounded-full bg-purple-500 text-white whitespace-nowrap">
+                      {plan.badge}
+                    </span>
+                  )}
+                  <div className="text-sm font-black text-white">{plan.amount}</div>
+                  <div className="text-[10px] text-white/50">{plan.period}</div>
+                  {plan.savings && (
+                    <div className="text-[9px] text-green-400 font-bold mt-0.5">{plan.savings}</div>
+                  )}
+                </button>
+              ))}
+            </div>
+
             {/* UPI Payment */}
             <div className="bg-black/30 rounded-xl p-4 border border-purple-500/20">
-              <p className="text-xs font-black text-purple-300 mb-2 text-center">Pay via UPI / Scan QR</p>
+              <p className="text-xs font-black text-purple-300 mb-2 text-center">
+                Pay via UPI · {activePlan.amount}{activePlan.period}
+              </p>
               <div className="flex items-center justify-center mb-3">
-                {/* QR placeholder — replace with actual QR image */}
                 <div className="w-32 h-32 bg-white rounded-xl flex items-center justify-center text-[10px] text-black font-bold">
-                  <img src="/india-upi-monthly.png" alt="UPI QR" className="w-full h-full object-contain rounded-xl" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  <img
+                    src={activePlan.qrPath}
+                    alt="UPI QR"
+                    className="w-full h-full object-contain rounded-xl"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
                 </div>
               </div>
-              <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2 mb-2">
+              <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2 mb-3">
                 <span className="text-xs text-white/60 flex-1 font-mono">pmstreak@upi</span>
                 <button onClick={handleCopy} className="text-[10px] font-black text-purple-400 hover:text-purple-300 transition-colors">
                   {upiCopied ? "Copied!" : "Copy"}
                 </button>
               </div>
-              <p className="text-[10px] text-white/40 text-center">
-                After payment, email{" "}
-                <a href="mailto:support@pmstreak.app" className="text-purple-400 underline underline-offset-2">
-                  support@pmstreak.app
-                </a>{" "}
-                with your UPI reference to activate.
-              </p>
+
+              {/* Screenshot flow */}
+              <div className="rounded-lg bg-purple-900/20 border border-purple-500/20 p-3 space-y-2">
+                <p className="text-[10px] font-black text-purple-300 uppercase tracking-wider">After paying:</p>
+                <div className="flex items-start gap-2">
+                  <Camera size={12} className="text-purple-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-white/60">
+                    Take a screenshot of the payment confirmation
+                  </p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Mail size={12} className="text-purple-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-white/60">
+                    Send it to{" "}
+                    <a href="mailto:namangoyal21197@gmail.com?subject=PM Streak Pro Payment" className="text-purple-400 underline underline-offset-2 font-bold">
+                      namangoyal21197@gmail.com
+                    </a>
+                    {" "}with your registered email
+                  </p>
+                </div>
+                <p className="text-[10px] text-green-400 font-bold">
+                  ✓ Pro activated within a few hours
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* WhatsApp Community */}
+        <div className="rounded-2xl border-2 border-green-500/30 p-5 mb-12 bg-green-900/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+              <MessageSquare size={20} className="text-green-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-black text-green-400">WhatsApp PM Community</h3>
+              <p className="text-[11px] text-white/55 mt-0.5">
+                Private group with active PMs — job referrals, case study discussions, peer accountability. Pro members only.
+              </p>
+            </div>
+            <span className="text-[10px] font-black px-2 py-1 rounded-full bg-purple-500/20 text-purple-300 flex-shrink-0">
+              PRO
+            </span>
+          </div>
+          <p className="text-[10px] text-white/40 mt-3">
+            WhatsApp link shared after Pro activation via email.
+          </p>
         </div>
 
         {/* Credits Explainer */}
@@ -202,9 +312,10 @@ export default function PricingPage() {
         <div className="space-y-3">
           <h2 className="text-base font-black mb-4">FAQ</h2>
           {[
-            { q: "When will my Pro access activate?", a: "Within a few hours of payment confirmation. Email support@pmstreak.app with your UPI reference number and we'll activate your account." },
+            { q: "When will my Pro access activate?", a: "Within a few hours of payment confirmation. Send your payment screenshot to namangoyal21197@gmail.com with your registered email and we'll activate your account." },
             { q: "Are credits cumulative?", a: "No — they reset on the 1st of each month. Unused credits don't roll over." },
-            { q: "Can I cancel anytime?", a: "Yes. Monthly plans are not auto-renewed — you pay each month manually." },
+            { q: "Can I cancel anytime?", a: "Yes. Plans are not auto-renewed — you pay each period manually." },
+            { q: "What's the quarterly plan?", a: "₹1,699 for 3 months (vs ₹1,497 at monthly rate — saves you the hassle of monthly payments, and cheaper than 3 separate months)." },
             { q: "What's the yearly plan?", a: "₹1,899/year (vs ₹5,988 yearly at monthly rate) — pay once, stay Pro for 12 months." },
           ].map((item) => (
             <div key={item.q} className="rounded-xl border border-white/10 p-4 bg-white/5">

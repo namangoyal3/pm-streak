@@ -1,6 +1,23 @@
 import { groqCreate } from "./groq";
 import { isGenericLessonContent, isWeakQuestionSet } from "./lesson-quality";
 
+/** Strips markdown code fences and extracts the JSON object/array from a string. */
+function extractJSON(raw: string): string {
+  // Remove leading/trailing whitespace
+  const s = raw.trim();
+  // Strip ```json ... ``` or ``` ... ``` fences
+  const fenced = s.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+  if (fenced) return fenced[1]!.trim();
+  // Find first { or [ and last } or ]
+  const start = Math.min(
+    s.indexOf("{") === -1 ? Infinity : s.indexOf("{"),
+    s.indexOf("[") === -1 ? Infinity : s.indexOf("[")
+  );
+  const end = Math.max(s.lastIndexOf("}"), s.lastIndexOf("]"));
+  if (start < Infinity && end > start) return s.slice(start, end + 1);
+  return s;
+}
+
 export interface SearchResult {
   guest: string;
   episodeTitle: string | null;
@@ -75,7 +92,7 @@ OUTPUT FORMAT: Return a valid JSON object only.
 
   const rawResult = completion.choices[0]?.message?.content;
   if (!rawResult) throw new Error("No response from Groq");
-  const parsed = JSON.parse(rawResult) as GeneratedLessonContent;
+  const parsed = JSON.parse(extractJSON(rawResult)) as GeneratedLessonContent;
   // Normalize content to string in case the model wraps it in an object
   if (typeof parsed.content !== "string") {
     parsed.content = typeof parsed.content === "object"
@@ -117,7 +134,7 @@ Rules:
   if (!retryRaw) {
     throw new Error("Could not generate high-quality PM lesson content.");
   }
-  const retryParsed = JSON.parse(retryRaw) as GeneratedLessonContent;
+  const retryParsed = JSON.parse(extractJSON(retryRaw)) as GeneratedLessonContent;
   if (typeof retryParsed.content !== "string") {
     retryParsed.content = typeof retryParsed.content === "object"
       ? JSON.stringify(retryParsed.content)

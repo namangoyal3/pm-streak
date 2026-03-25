@@ -1,13 +1,31 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [error, setError] = useState("");
+  const [demoLoading, setDemoLoading] = useState(false);
+
+  const handleDemoLogin = async () => {
+    setDemoLoading(true);
+    try {
+      const res = await fetch("/api/auth/demo", { method: "POST" });
+      if (res.ok) {
+        router.push("/dashboard");
+      } else {
+        setError("Demo login failed. Check database connection.");
+      }
+    } catch {
+      setError("Demo login failed.");
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   useEffect(() => {
     const err = searchParams.get("error");
@@ -77,6 +95,20 @@ function LoginForm() {
               </svg>
               Continue with Google
             </BrowserLink>
+
+            <div className="relative flex items-center gap-3">
+              <div className="flex-1 h-px bg-[var(--border-color)]" />
+              <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">or</span>
+              <div className="flex-1 h-px bg-[var(--border-color)]" />
+            </div>
+
+            <button
+              onClick={handleDemoLogin}
+              disabled={demoLoading}
+              className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl border-2 border-[var(--green-primary)]/40 bg-[var(--green-primary)]/10 hover:bg-[var(--green-primary)]/20 text-[var(--green-primary)] text-sm font-black transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              {demoLoading ? "Logging in…" : "Try Demo Account"}
+            </button>
           </div>
 
           <p className="text-center mt-12 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed font-bold uppercase tracking-tight">

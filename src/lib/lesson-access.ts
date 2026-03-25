@@ -41,6 +41,7 @@ type ArchiveVisibility = {
   lockedLessons: Array<Pick<LessonWithCompletion, "id" | "title" | "dayNumber">>;
   unlockedLockedIds: Set<string>;
   previewIds: Set<string>;
+  proLockedIds: Set<string>;
 };
 
 export type CurriculumLesson = {
@@ -99,13 +100,30 @@ function sortLessonsByDayNumber<T extends { dayNumber: number }>(a: T, b: T) {
   return a.dayNumber - b.dayNumber;
 }
 
+// Lessons beyond the preview batch shown as "upgrade to pro" teasers
+const PRO_PREVIEW_WINDOW = 5;
+/** Lesson lockedReason value indicating pro-gate (UI renders upgrade CTA). */
+export const PRO_GATE_REASON = "UPGRADE_TO_PRO";
+
 function getArchiveVisibility(
   lessons: Pick<LessonWithCompletion, "id" | "title" | "dayNumber" | "isLocked">[],
-  unlockedBatch: number
+  unlockedBatch: number,
+  isPro = false
 ): ArchiveVisibility {
   const lockedLessons = lessons
     .filter((lesson) => lesson.isLocked)
     .sort(sortLessonsByDayNumber);
+
+  if (isPro) {
+    // Pro users: all locked lessons are unlocked
+    return {
+      lockedLessons,
+      unlockedLockedIds: new Set(lockedLessons.map((lesson) => lesson.id)),
+      previewIds: new Set(),
+      proLockedIds: new Set(),
+    };
+  }
+
   // Keep a steady "few lessons open" feel even when a user is early in progression.
   const unlockedCount = Math.max(
     unlockedBatch * ARCHIVE_UNLOCK_BATCH_SIZE,
@@ -120,6 +138,14 @@ function getArchiveVisibility(
     previewIds: new Set(
       lockedLessons
         .slice(unlockedCount, unlockedCount + ARCHIVE_UNLOCK_BATCH_SIZE)
+        .map((lesson) => lesson.id)
+    ),
+    proLockedIds: new Set(
+      lockedLessons
+        .slice(
+          unlockedCount + ARCHIVE_UNLOCK_BATCH_SIZE,
+          unlockedCount + ARCHIVE_UNLOCK_BATCH_SIZE + PRO_PREVIEW_WINDOW
+        )
         .map((lesson) => lesson.id)
     ),
   };
@@ -142,11 +168,20 @@ function mapCurriculumCategory(
         (lesson) =>
           !lesson.isLocked ||
           visibility.unlockedLockedIds.has(lesson.id) ||
-          visibility.previewIds.has(lesson.id)
+          visibility.previewIds.has(lesson.id) ||
+          visibility.proLockedIds.has(lesson.id)
       )
       .map((lesson) => {
-        const isLocked =
-          lesson.isLocked && !visibility.unlockedLockedIds.has(lesson.id);
+        const isAccessible = visibility.unlockedLockedIds.has(lesson.id);
+        const isProLocked = lesson.isLocked && visibility.proLockedIds.has(lesson.id);
+        const isLocked = lesson.isLocked && !isAccessible;
+
+        let lockedReason: string | null = null;
+        if (isProLocked) {
+          lockedReason = PRO_GATE_REASON;
+        } else if (isLocked) {
+          lockedReason = ARCHIVE_LOCKED_REASON;
+        }
 
         return {
           id: lesson.id,
@@ -159,7 +194,7 @@ function mapCurriculumCategory(
           completed: lesson.completedLessons.length > 0,
           isLocked,
           score: lesson.completedLessons[0]?.score ?? null,
-          lockedReason: isLocked ? ARCHIVE_LOCKED_REASON : null,
+          lockedReason,
           prerequisiteLessonId: null,
           prerequisiteLessonTitle: null,
         };
@@ -200,14 +235,16 @@ async function getCoreCategoriesWithCompletion(userId: string) {
 }
 
 export async function getCoreCurriculumForUser(userId: string) {
-  const [unlockedBatch, categories] = await Promise.all([
+  const [unlockedBatch, categories, isPro] = await Promise.all([
     getUserUnlockedBatch(userId),
     getCoreCategoriesWithCompletion(userId),
+    isUserPro(userId),
   ]);
 
   const visibility = getArchiveVisibility(
     categories.flatMap((category) => category.lessons),
-    unlockedBatch
+    unlockedBatch,
+    isPro
   );
 
   return categories
@@ -258,6 +295,20 @@ export async function getCoreLessonAccess(
   }
 
   if (!lesson.isLocked) {
+    return {
+      exists: true,
+      canAccess: true,
+      isCustomLesson: false,
+      isLocked: false,
+      lockedReason: null,
+      prerequisiteLessonId: null,
+      prerequisiteLessonTitle: null,
+    };
+  }
+
+  // Pro users can access any archive lesson regardless of batch unlock
+  const userIsPro = await isUserPro(userId);
+  if (userIsPro) {
     return {
       exists: true,
       canAccess: true,

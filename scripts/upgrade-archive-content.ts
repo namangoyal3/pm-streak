@@ -146,8 +146,9 @@ async function main() {
 
   console.log(`[upgrade-content] starting${dryRun ? " (dry run)" : ""} concurrency=${concurrency}`);
 
-  // Fetch all archive (isLocked=true, aiGenerated=false) lessons that have a transcript
-  const lessons = await prisma.lesson.findMany({
+  // Fetch only archive lessons that still have basic/generic content (not yet AI-upgraded).
+  // AI-upgraded lessons always contain "Tactical Application" in their content.
+  const allLessons = await prisma.lesson.findMany({
     where: {
       aiGenerated: false,
       isLocked: true,
@@ -162,8 +163,12 @@ async function main() {
       content: true,
     },
     orderBy: { dayNumber: "asc" },
-    ...(limit ? { take: limit } : {}),
   });
+
+  // Skip lessons that already passed the upgrade (have "Tactical Application" in content)
+  const lessons = allLessons
+    .filter((l) => isGenericLessonContent(l.content))
+    .slice(0, limit ?? allLessons.length);
 
   console.log(`[upgrade-content] ${lessons.length} archive lessons to process`);
 

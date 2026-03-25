@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   let body: {
     userId?: string;
     email?: string;
-    interval?: "month" | "year";
+    interval?: "month" | "quarter" | "year";
     paidAt?: string;
   };
   try {
@@ -39,9 +39,9 @@ export async function POST(req: NextRequest) {
   }
 
   const interval = body.interval;
-  if (interval !== "month" && interval !== "year") {
+  if (interval !== "month" && interval !== "quarter" && interval !== "year") {
     return NextResponse.json(
-      { error: "interval must be \"month\" or \"year\"" },
+      { error: "interval must be \"month\", \"quarter\", or \"year\"" },
       { status: 400 },
     );
   }
