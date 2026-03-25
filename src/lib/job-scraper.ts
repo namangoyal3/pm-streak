@@ -273,39 +273,48 @@ export async function fetchIndeed(): Promise<NormJob[]> {
   return all;
 }
 
-// ─── Source 6: LinkedIn via jsearch (RapidAPI) ───────────────────────────────
-// Requires RAPIDAPI_KEY env var. Skip silently if not set.
-// Get free key at: https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
+// ─── Source 6: LinkedIn/Google Jobs via jsearch-mega (RapidAPI) ─────────────
+// Uses jsearch-mega which aggregates LinkedIn, Google Jobs, Indeed & more.
+// Requires RAPIDAPI_KEY env var.
 
 export async function fetchLinkedIn(): Promise<NormJob[]> {
   const apiKey = process.env.RAPIDAPI_KEY;
   if (!apiKey) {
-    console.log("  ℹ LinkedIn (jsearch): RAPIDAPI_KEY not set — skipping");
+    console.log("  ℹ LinkedIn/jsearch-mega: RAPIDAPI_KEY not set — skipping");
     return [];
   }
-  const queries = ["product manager", "AI product manager", "full stack engineer", "founding engineer"];
+  const queries = [
+    "product manager remote",
+    "AI product manager",
+    "senior product manager",
+    "full stack engineer remote",
+    "founding engineer startup",
+    "associate product manager",
+  ];
   const seen = new Set<string>();
   const all: NormJob[] = [];
   for (const q of queries) {
     const res = await safeFetch(
-      `https://jsearch.p.rapidapi.com/search?query=${encodeURIComponent(q + " remote")}&num_pages=1&date_posted=week`,
-      { headers: { "X-RapidAPI-Key": apiKey, "X-RapidAPI-Host": "jsearch.p.rapidapi.com" } }
+      `https://jsearch-mega.p.rapidapi.com/search?query=${encodeURIComponent(q)}&num_pages=1&date_posted=week`,
+      { headers: { "x-rapidapi-key": apiKey, "x-rapidapi-host": "jsearch-mega.p.rapidapi.com" } }
     );
     if (!res) continue;
     const data = await res.json() as { data?: Array<{
       job_title: string; employer_name: string; job_apply_link: string;
-      job_description?: string; job_city?: string; job_is_remote?: boolean;
-      job_employment_type?: string; job_posted_at_datetime_utc?: string;
+      job_description?: string; job_city?: string; job_country?: string;
+      job_is_remote?: boolean; job_employment_type?: string;
+      job_posted_at_datetime_utc?: string; job_publisher?: string;
     }> };
     for (const j of data.data ?? []) {
       const url = j.job_apply_link;
       if (!url || seen.has(url)) continue;
       seen.add(url);
+      const location = [j.job_city, j.job_country].filter(Boolean).join(", ") || null;
       all.push({
         title: j.job_title, company: j.employer_name, applyUrl: url,
-        description: j.job_description?.slice(0, 500) ?? null,
-        remote: j.job_is_remote ?? false,
-        location: j.job_city ?? null,
+        description: j.job_description?.replace(/<[^>]+>/g, "").slice(0, 500) ?? null,
+        remote: j.job_is_remote ?? q.includes("remote"),
+        location,
         tags: extractTags(j.job_title, j.job_employment_type ? [j.job_employment_type] : []),
         postedAt: j.job_posted_at_datetime_utc ? new Date(j.job_posted_at_datetime_utc) : null,
         source: "linkedin",
