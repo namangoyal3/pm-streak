@@ -617,6 +617,25 @@ export default function DashboardPage() {
               </div>
             )}
 
+            {/* WhatsApp Pro Community — Pro only */}
+            {user.plan === "pro" && (
+              <a
+                href="https://chat.whatsapp.com/pmstreak-community"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-green-500/30 bg-green-500/10 p-3.5 hover:bg-green-500/15 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare size={15} className="text-green-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-black text-green-300">Pro Community</div>
+                  <div className="text-[10px] text-white/50">WhatsApp · PMs only</div>
+                </div>
+                <ArrowRight size={13} className="text-green-400 flex-shrink-0" />
+              </a>
+            )}
+
             {/* Quick links */}
             <div className="grid grid-cols-2 gap-2">
               <Link href="/jobs" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--green-primary)]/40 transition-colors">
