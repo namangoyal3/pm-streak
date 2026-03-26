@@ -111,7 +111,7 @@ export default async function Home() {
             </p>
             <div className="mb-8 p-4 rounded-2xl bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/20 max-w-md">
               <p className="text-sm text-[var(--green-primary)] font-bold">
-                Join 5,000+ PMs building their product intuition daily.
+                Built on 300+ episodes of Lenny&apos;s Podcast — the #1 resource for PMs.
               </p>
             </div>
 
