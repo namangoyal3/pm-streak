@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { getToday, getYesterday } from "./utils";
-import { sendStreakMilestoneEmail } from "./email";
+import { sendMilestoneEmail as sendStreakMilestoneEmail } from "./email";
 
 export async function checkAndUpdateStreak(userId: string): Promise<{
   streakCount: number;
@@ -127,6 +127,7 @@ export async function recordLessonCompletion(userId: string, xpEarned: number) {
   // Fire milestone email (non-blocking)
   if (milestone && milestoneGems > 0) {
     sendStreakMilestoneEmail({
+      userId,
       toEmail: user.email,
       toName: user.name,
       streakCount: newStreak,

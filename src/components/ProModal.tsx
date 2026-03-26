@@ -16,21 +16,9 @@ export default function ProModal({ isOpen, onClose, reason }: ProModalProps) {
 
   if (!isOpen) return null;
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = () => {
     setLoading(true);
-    try {
-      // For now, this is a mock upgrade to let the user see PRO in action
-      const res = await fetch("/api/billing/mock-upgrade", {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({ isPro: true })
-      });
-      if (res.ok) {
-        window.location.reload();
-      }
-    } catch {
-      setLoading(false);
-    }
+    window.location.href = "/pricing";
   };
 
   return (
@@ -93,11 +81,11 @@ export default function ProModal({ isOpen, onClose, reason }: ProModalProps) {
             disabled={loading}
             className="w-full py-5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-black text-sm font-black transition-all shadow-xl shadow-[var(--green-primary)]/10 active:scale-[0.98] disabled:opacity-50"
           >
-            {loading ? "Activating Pro..." : "Unlock Pro — $12/month"}
+            {loading ? "Loading..." : "See Pro Plans →"}
           </button>
           
           <p className="text-center mt-4 text-[10px] text-[var(--text-secondary)]/50 font-black uppercase tracking-widest">
-            3-Day Free Trial Included
+            From ₹499/month · $9/month
           </p>
         </div>
       </div>

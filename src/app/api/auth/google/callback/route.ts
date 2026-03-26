@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
         },
       });
       // Fire-and-forget welcome email
-      sendWelcomeEmail({ toEmail: email, toName: user.name }).catch(() => {});
+      sendWelcomeEmail({ userId: user.id, toEmail: email, toName: user.name }).catch(() => {});
     } else {
       // Existing user — link Google and sync name + avatar from Google
       user = await prisma.user.update({
