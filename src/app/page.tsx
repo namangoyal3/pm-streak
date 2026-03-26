@@ -338,6 +338,10 @@ export default async function Home() {
               <span className="text-[8px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
             </div>
           </div>
+          <div className="flex items-center gap-4">
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
+          </div>
           <p>Powered by insights from Lenny&apos;s Podcast. Not affiliated with Lenny&apos;s Newsletter.</p>
         </div>
       </footer>
