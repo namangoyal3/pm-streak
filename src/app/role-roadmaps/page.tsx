@@ -1,5 +1,22 @@
 import Link from "next/link";
 import { ArrowRight, Map } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "PM Career Roadmaps — APM to CPO Guide | PM Streak",
+  description:
+    "Step-by-step career paths for Associate PM, Product Manager, Senior PM, Staff PM, and CPO. Skills, timelines, and what to learn at every level.",
+  openGraph: {
+    title: "PM Career Roadmaps — APM to CPO Guide | PM Streak",
+    description: "Step-by-step career paths for every PM level.",
+    images: [{ url: "/api/og?title=PM+Career+Roadmaps&vertical=pm", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PM Career Roadmaps | PM Streak",
+    images: ["/api/og?title=PM+Career+Roadmaps&vertical=pm"],
+  },
+};
 
 export default function RoleRoadmapsPage() {
   return (

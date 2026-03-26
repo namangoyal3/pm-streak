@@ -19,6 +19,20 @@ export const metadata: Metadata = {
   verification: {
     google: "85fab4e21763c3a7",
   },
+  openGraph: {
+    title: "PM Streak - Duolingo for Product Managers",
+    description: "Daily product wisdom with streaks, XP, and leaderboards. Learn PM skills in 2-3 minutes a day.",
+    siteName: "PM Streak",
+    images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak" }],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PM Streak - Duolingo for Product Managers",
+    description: "Daily product wisdom with streaks, XP, and leaderboards.",
+    images: ["/api/og?title=PM+Streak"],
+  },
 };
 
 export const viewport: Viewport = {
