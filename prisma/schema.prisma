@@ -122,6 +122,34 @@ model CountryPriceOverride {
   updatedAt   DateTime @updatedAt
 }
 
+model Coupon {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  email           String
+  discountPercent Int       @default(70)
+  signature       String
+  expiresAt       DateTime
+  usedAt          DateTime?
+  usedByUserId    String?
+  createdAt       DateTime  @default(now())
+
+  @@index([code])
+  @@index([email])
+}
+
+model CouponAttempt {
+  id        String   @id @default(cuid())
+  code      String
+  ip        String
+  userAgent String?
+  success   Boolean
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([code, ip])
+  @@index([ip, createdAt])
+}
+
 model Notification {
   id         String    @id @default(cuid())
   userId     String    // recipient
