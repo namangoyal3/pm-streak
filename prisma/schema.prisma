@@ -68,6 +68,10 @@ model User {
   entitlements       Entitlement[]
   creditTransactions CreditTransaction[]
   emailLogs          EmailLog[]
+  jobTargets         UserJobTarget[]
+  lessonAttempts     LessonAttempt[]
+  skillProfiles      UserSkillProfile[]
+  engagementMetrics  UserEngagementMetric?
 }
 
 model Subscription {
@@ -197,11 +201,16 @@ model Lesson {
   topicKey     String?
   generationMode String?
   sourceLessonId String?
+  type         String?  // product_sense | metrics | execution | strategy | behavioral
+  promptText   String?
+  skillTags    String[] @default([])
   createdAt    DateTime @default(now())
 
   questions        Question[]
   completedLessons CompletedLesson[]
   dailyChallenges  DailyChallenge[]
+  planLessons      PlanLesson[]
+  attempts         LessonAttempt[]
 
   @@index([aiGenerated, generatedForUserId, createdAt])
   @@index([generatedForUserId, topicKey, generationMode])
@@ -330,6 +339,7 @@ model CreditTransaction {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   amount    Int      // positive = earned, negative = spent
   reason    String   // monthly_refresh | lesson_unlock | ai_lesson | interview_prep
+  metadata  Json?
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -360,11 +370,109 @@ model Job {
   description String?
   tags        String[]
   source      String   // wellfound | linkedin | himalayas
+  jdSource    String   @default("scraped") // scraped | pasted
   postedAt    DateTime?
   scrapedAt   DateTime @default(now())
   isActive    Boolean  @default(true)
+  rawJdText   String?
+  parsedSkills Json?
+  parsedLevel String?
+  parsedDomain String?
+  estimatedInterviewFocus Json?
+  userJobTargets UserJobTarget[]
 
   @@index([isActive])
+}
+
+model UserJobTarget {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId        String?
+  job          Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  customJdText String?
+  targetDate   DateTime
+  createdAt    DateTime @default(now())
+  plans        LearningPlan[]
+
+  @@index([userId, createdAt])
+}
+
+model LearningPlan {
+  id              String        @id @default(cuid())
+  userJobTargetId String
+  userJobTarget   UserJobTarget @relation(fields: [userJobTargetId], references: [id], onDelete: Cascade)
+  planConfig      Json
+  generatedAt     DateTime      @default(now())
+  planLessons     PlanLesson[]
+
+  @@index([userJobTargetId, generatedAt])
+}
+
+model PlanLesson {
+  id             String       @id @default(cuid())
+  learningPlanId String
+  learningPlan   LearningPlan @relation(fields: [learningPlanId], references: [id], onDelete: Cascade)
+  dayIndex       Int
+  lessonType     String       // product_sense | metrics | execution | strategy | behavioral
+  skillTags      Json
+  lessonId       String?
+  lesson         Lesson?      @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  @@index([learningPlanId, dayIndex])
+}
+
+model LessonAttempt {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId         String
+  lesson           Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userAnswer       String
+  scoreUserFocus   Int
+  scoreStructure   Int
+  scoreData        Int
+  scoreTradeoffs   Int
+  feedbackSummary  String
+  feedbackComments Json?
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([lessonId, createdAt])
+}
+
+model Skill {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  displayName String
+  createdAt   DateTime @default(now())
+  profiles    UserSkillProfile[]
+}
+
+model UserSkillProfile {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId       String
+  skill         Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  score         Int      @default(50) // 0-100
+  lastUpdatedAt DateTime @updatedAt
+
+  @@unique([userId, skillId])
+  @@index([userId])
+}
+
+model UserEngagementMetric {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalAttempts      Int      @default(0)
+  activeDays         Int      @default(0)
+  lastAttemptDate    String?
+  lastShownPaywallAt DateTime?
+  declineCount       Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model Article {

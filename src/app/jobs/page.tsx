@@ -2,7 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, MapPin, Globe, ExternalLink, Briefcase, Zap, Lock, Sparkles } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Globe,
+  ExternalLink,
+  Briefcase,
+  Zap,
+  Lock,
+  Sparkles,
+  CalendarDays,
+  ClipboardPaste,
+  CheckCircle2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 
@@ -20,12 +32,30 @@ interface Job {
   scrapedAt: string;
 }
 
+type PlanPreview = {
+  learningPlan: {
+    id: string;
+    planConfig: { days?: number; sessionsPerWeek?: number } | null;
+    planLessons: Array<{ dayIndex: number; lessonType: string; skillTags: unknown }>;
+  } | null;
+  reused?: boolean;
+};
+
 export default function JobsPage() {
   const [user, setUser] = useState<any>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [remoteOnly, setRemoteOnly] = useState(false);
+  const [tab, setTab] = useState<"browse" | "paste">("browse");
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [jdText, setJdText] = useState("");
+  const [targetMode, setTargetMode] = useState<"15" | "30" | "60" | "custom">("30");
+  const [customDate, setCustomDate] = useState("");
+  const [creatingPlan, setCreatingPlan] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
+  const [planPreview, setPlanPreview] = useState<PlanPreview["learningPlan"]>(null);
+  const [createdTargetId, setCreatedTargetId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -51,6 +81,84 @@ export default function JobsPage() {
       .finally(() => setLoading(false));
   }, [search, remoteOnly]);
 
+  function resolveTargetDate() {
+    if (targetMode === "custom") return customDate;
+    const days = Number(targetMode);
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split("T")[0] ?? "";
+  }
+
+  async function handleGeneratePlan() {
+    setPlanError(null);
+    setCreatingPlan(true);
+    try {
+      const targetDate = resolveTargetDate();
+      if (!targetDate) {
+        setPlanError("Please choose a valid target date.");
+        return;
+      }
+      if (tab === "browse" && !selectedJobId) {
+        setPlanError("Select a role from Browse Roles first.");
+        return;
+      }
+      if (tab === "paste" && jdText.trim().length < 120) {
+        setPlanError("Paste a fuller JD (at least ~120 characters).");
+        return;
+      }
+
+      const targetRes = await fetch("/api/job-targets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobId: tab === "browse" ? selectedJobId : undefined,
+          customJdText: tab === "paste" ? jdText : undefined,
+          targetDate,
+        }),
+      });
+      const targetData = await targetRes.json();
+      if (!targetRes.ok) {
+        setPlanError(targetData.error ?? "Failed to create target");
+        return;
+      }
+
+      const targetId = targetData.target?.id as string | undefined;
+      if (!targetId) {
+        setPlanError("Target creation failed unexpectedly.");
+        return;
+      }
+      setCreatedTargetId(targetId);
+
+      const planRes = await fetch("/api/learning-plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userJobTargetId: targetId }),
+      });
+      const planData = (await planRes.json()) as PlanPreview;
+      if (!planRes.ok) {
+        setPlanError((planData as any).error ?? "Failed to generate plan");
+        return;
+      }
+      setPlanPreview(planData.learningPlan);
+    } catch {
+      setPlanError("Could not generate your plan right now. Please try again.");
+    } finally {
+      setCreatingPlan(false);
+    }
+  }
+
+  function getSkillTags(value: unknown): string[] {
+    if (!Array.isArray(value)) return [];
+    return value.filter((v): v is string => typeof v === "string");
+  }
+
+  function lessonTypeLabel(raw: string) {
+    return raw
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
   return (
     <div className="min-h-screen bg-[var(--surface-0)] text-white">
       {user && (
@@ -73,6 +181,87 @@ export default function JobsPage() {
             <h1 className="text-2xl font-black">PM Jobs</h1>
           </div>
           <p className="text-white/55 text-sm">Curated Product Manager roles, updated weekly.</p>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="flex items-center gap-2 text-xs font-black text-white/60 uppercase tracking-wider mb-3">
+            <CalendarDays size={14} />
+            Build interview plan
+          </div>
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setTab("browse")}
+              className={cn(
+                "px-3 py-2 text-xs font-black rounded-lg border transition-colors",
+                tab === "browse"
+                  ? "bg-blue-500/20 border-blue-500/50 text-blue-300"
+                  : "bg-white/5 border-white/10 text-white/50 hover:text-white"
+              )}
+            >
+              Browse roles
+            </button>
+            <button
+              onClick={() => setTab("paste")}
+              className={cn(
+                "px-3 py-2 text-xs font-black rounded-lg border transition-colors",
+                tab === "paste"
+                  ? "bg-purple-500/20 border-purple-500/50 text-purple-300"
+                  : "bg-white/5 border-white/10 text-white/50 hover:text-white"
+              )}
+            >
+              <span className="inline-flex items-center gap-1">
+                <ClipboardPaste size={12} />
+                Paste JD
+              </span>
+            </button>
+          </div>
+
+          {tab === "paste" && (
+            <textarea
+              value={jdText}
+              onChange={(e) => setJdText(e.target.value)}
+              placeholder="Paste full job description here..."
+              className="w-full min-h-40 rounded-xl bg-black/20 border border-white/10 px-3 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:border-purple-500/40"
+            />
+          )}
+
+          <div className="mt-4">
+            <p className="text-[11px] text-white/55 font-bold mb-2 uppercase tracking-wider">Target timeframe</p>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {(["15", "30", "60", "custom"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setTargetMode(mode)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-black rounded-lg border transition-colors",
+                    targetMode === mode
+                      ? "bg-green-500/20 border-green-500/50 text-green-300"
+                      : "bg-white/5 border-white/10 text-white/50 hover:text-white"
+                  )}
+                >
+                  {mode === "custom" ? "Custom date" : `${mode} days`}
+                </button>
+              ))}
+            </div>
+            {targetMode === "custom" && (
+              <input
+                type="date"
+                value={customDate}
+                onChange={(e) => setCustomDate(e.target.value)}
+                className="rounded-lg bg-black/20 border border-white/10 px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500/40"
+              />
+            )}
+          </div>
+
+          {planError && <p className="mt-3 text-xs font-bold text-red-300">{planError}</p>}
+
+          <button
+            onClick={handleGeneratePlan}
+            disabled={creatingPlan}
+            className="mt-4 w-full py-3 rounded-xl bg-[var(--green-primary)] text-white text-sm font-black uppercase tracking-wider hover:opacity-90 disabled:opacity-60 transition-opacity"
+          >
+            {creatingPlan ? "Generating plan..." : "Generate my plan"}
+          </button>
         </div>
 
         {/* Filters */}
@@ -114,7 +303,12 @@ export default function JobsPage() {
             {jobs.slice(0, user?.plan === "pro" ? 999 : 3).map((job) => (
               <div
                 key={job.id}
-                className="rounded-2xl border-2 border-[var(--border-color)] bg-[var(--surface-2)] p-4 hover:border-white/10 transition-all"
+                className={cn(
+                  "rounded-2xl border-2 bg-[var(--surface-2)] p-4 transition-all",
+                  selectedJobId === job.id
+                    ? "border-green-500/60 shadow-lg shadow-green-500/10"
+                    : "border-[var(--border-color)] hover:border-white/10"
+                )}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -134,6 +328,22 @@ export default function JobsPage() {
                     {job.description && (
                       <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">{job.description}</p>
                     )}
+
+                    <button
+                      onClick={() => {
+                        setTab("browse");
+                        setSelectedJobId(job.id);
+                      }}
+                      className={cn(
+                        "mt-3 inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1.5 rounded-lg border transition-colors",
+                        selectedJobId === job.id
+                          ? "bg-green-500/20 border-green-500/40 text-green-300"
+                          : "bg-white/5 border-white/10 text-white/60 hover:text-white"
+                      )}
+                    >
+                      {selectedJobId === job.id ? <CheckCircle2 size={12} /> : null}
+                      {selectedJobId === job.id ? "Selected for plan" : "Use for my plan"}
+                    </button>
                   </div>
                   <a
                     href={job.applyUrl}
@@ -169,6 +379,55 @@ export default function JobsPage() {
                   </div>
                 </Link>
               </div>
+            )}
+          </div>
+        )}
+
+        {planPreview && (
+          <div className="mt-8 rounded-2xl border border-green-500/30 bg-green-500/10 p-5">
+            <h3 className="text-sm font-black text-green-300 mb-2">Plan generated</h3>
+            <p className="text-xs text-white/75 mb-4">
+              {planPreview.planConfig?.days ?? planPreview.planLessons.length} days ·{" "}
+              {planPreview.planConfig?.sessionsPerWeek ?? "?"} sessions/week
+            </p>
+            <div className="space-y-2">
+              {Array.from({ length: Math.min(3, Math.ceil(planPreview.planLessons.length / 7)) }, (_, i) => i + 1).map((weekIndex) => {
+                const start = (weekIndex - 1) * 7 + 1;
+                const end = Math.min(weekIndex * 7, planPreview.planLessons.length);
+                const weekLessons = planPreview.planLessons.filter(
+                  (p) => p.dayIndex >= start && p.dayIndex <= end
+                );
+                const mix = weekLessons.reduce<Record<string, number>>((acc, item) => {
+                  acc[item.lessonType] = (acc[item.lessonType] ?? 0) + 1;
+                  return acc;
+                }, {});
+                return (
+                  <div key={weekIndex} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                    <p className="text-xs font-black text-white/80 mb-1">Week {weekIndex}</p>
+                    <p className="text-[11px] text-white/65">
+                      {Object.entries(mix)
+                        .map(([k, v]) => `${lessonTypeLabel(k)} x${v}`)
+                        .join(", ")}
+                    </p>
+                    <p className="text-[10px] text-white/45 mt-1">
+                      Skills:{" "}
+                      {Array.from(
+                        new Set(
+                          weekLessons.flatMap((item) => getSkillTags(item.skillTags)).slice(0, 6)
+                        )
+                      ).join(", ")}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+            {createdTargetId && (
+              <Link
+                href={`/interview-sprint?targetId=${encodeURIComponent(createdTargetId)}`}
+                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white text-black text-xs font-black px-3 py-2"
+              >
+                Start daily drill
+              </Link>
             )}
           </div>
         )}

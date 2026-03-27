@@ -1,12 +1,26 @@
 import { prisma } from "./prisma";
+import type { Prisma } from "@prisma/client";
 
 export const CREDIT_COSTS = {
   lesson_unlock: 5,
   ai_lesson: 2,
   interview_prep: 5,
+  mock_interview: 5,
+  deep_review: 3,
+  portfolio_artifact: 4,
 } as const;
 
-export type CreditReason = "monthly_refresh" | "lesson_unlock" | "ai_lesson" | "interview_prep" | "admin_grant";
+export type CreditReason =
+  | "monthly_refresh"
+  | "lesson_unlock"
+  | "ai_lesson"
+  | "interview_prep"
+  | "admin_grant"
+  | "purchase"
+  | "bonus"
+  | "mock_interview"
+  | "deep_review"
+  | "portfolio_artifact";
 
 /**
  * Atomically deduct credits. Returns true if successful, false if insufficient balance.
@@ -15,7 +29,8 @@ export type CreditReason = "monthly_refresh" | "lesson_unlock" | "ai_lesson" | "
 export async function spendCredits(
   userId: string,
   amount: number,
-  reason: CreditReason
+  reason: CreditReason,
+  metadata?: Record<string, unknown>
 ): Promise<boolean> {
   // Use a transaction to atomically check-and-deduct
   try {
@@ -32,7 +47,12 @@ export async function spendCredits(
         data: { credits: { decrement: amount } },
       });
       await tx.creditTransaction.create({
-        data: { userId, amount: -amount, reason },
+        data: {
+          userId,
+          amount: -amount,
+          reason,
+          metadata: metadata as Prisma.InputJsonValue | undefined,
+        },
       });
     });
     return true;
@@ -88,7 +108,9 @@ export async function getCreditBalance(userId: string): Promise<number> {
  */
 export async function grantCredits(
   userId: string,
-  amount: number
+  amount: number,
+  reason: CreditReason = "admin_grant",
+  metadata?: Record<string, unknown>
 ): Promise<void> {
   await prisma.$transaction([
     prisma.user.update({
@@ -96,7 +118,12 @@ export async function grantCredits(
       data: { credits: { increment: amount } },
     }),
     prisma.creditTransaction.create({
-      data: { userId, amount, reason: "admin_grant" },
+      data: {
+        userId,
+        amount,
+        reason,
+        metadata: metadata as Prisma.InputJsonValue | undefined,
+      },
     }),
   ]);
 }

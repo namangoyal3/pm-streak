@@ -41,6 +41,19 @@ interface Category {
   }[];
 }
 
+type ReadinessResponse = {
+  overallReadiness: number;
+  skillScores: {
+    userFocus: number;
+    structure: number;
+    dataThinking: number;
+    tradeoffs: number;
+  };
+  summary: string;
+  sampleSize: number;
+  paywallEligible: boolean;
+};
+
 const streakMessages = [
   "You're on fire.",
   "Unstoppable. Keep it up.",
@@ -66,6 +79,7 @@ export default function DashboardPage() {
   } | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const categoryRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
@@ -90,6 +104,16 @@ export default function DashboardPage() {
         if (statsRes.status === "fulfilled" && statsRes.value.ok) {
           const statsData = await statsRes.value.json();
           setStats(statsData);
+        }
+
+        try {
+          const readinessRes = await fetch("/api/readiness");
+          if (readinessRes.ok) {
+            const readinessData = (await readinessRes.json()) as ReadinessResponse;
+            setReadiness(readinessData);
+          }
+        } catch {
+          // best effort
         }
 
         if (lessonsRes.status === "fulfilled" && lessonsRes.value.ok) {
@@ -583,6 +607,55 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Readiness */}
+            {readiness && (
+              <div className="rounded-[var(--ds-radius-lg)] border-2 border-blue-500/30 bg-blue-500/10 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Brain size={16} className="text-blue-300" />
+                    <span className="text-sm font-black text-white">Interview Readiness</span>
+                  </div>
+                  <span className="text-sm font-black text-blue-300">{readiness.overallReadiness}/100</span>
+                </div>
+                <div className="h-2.5 overflow-hidden rounded-full bg-black/20 mb-3">
+                  <div
+                    className="h-full rounded-full bg-blue-400"
+                    style={{ width: `${Math.max(0, Math.min(100, readiness.overallReadiness))}%` }}
+                  />
+                </div>
+                <div className="space-y-2 mb-2">
+                  {[
+                    ["User focus", readiness.skillScores.userFocus],
+                    ["Structure", readiness.skillScores.structure],
+                    ["Data thinking", readiness.skillScores.dataThinking],
+                    ["Trade-offs", readiness.skillScores.tradeoffs],
+                  ].map(([label, value]) => (
+                    <div key={String(label)}>
+                      <div className="flex items-center justify-between text-[10px] font-bold text-white/70 mb-1">
+                        <span>{label}</span>
+                        <span>{Number(value)}/100</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-black/20 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-blue-300"
+                          style={{ width: `${Math.max(0, Math.min(100, Number(value)))}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-white/65">{readiness.summary}</p>
+                {readiness.paywallEligible && user.plan !== "pro" && (
+                  <Link
+                    href="/pricing"
+                    className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider bg-purple-500 text-white px-3 py-1.5 rounded-lg"
+                  >
+                    Unlock advanced coaching
+                  </Link>
+                )}
+              </div>
+            )}
 
             {/* Credits & Upgrade */}
             {user.plan !== "pro" ? (
