@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { cn } from "@/lib/utils";
-import { Trophy, Medal, Flame, Crown } from "lucide-react";
+import { Trophy, Medal, Flame, Crown, ChevronDown, ChevronUp } from "lucide-react";
 
 interface LeaderboardEntry {
   rank: number;
@@ -22,6 +22,7 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [type, setType] = useState<"alltime" | "weekly">("alltime");
   const [loading, setLoading] = useState(true);
+  const [showAllRowsMobile, setShowAllRowsMobile] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -64,6 +65,9 @@ export default function LeaderboardPage() {
     return <span className="text-sm font-bold text-[var(--text-secondary)] w-5 text-center">{rank}</span>;
   };
 
+  const visibleRows =
+    showAllRowsMobile || leaderboard.length <= 10 ? leaderboard : leaderboard.slice(0, 10);
+
   return (
     <div className="min-h-screen">
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
@@ -100,7 +104,7 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {leaderboard.map((entry) => (
+            {visibleRows.map((entry) => (
               <div
                 key={entry.id}
                 className={cn(
@@ -129,6 +133,20 @@ export default function LeaderboardPage() {
                 </div>
               </div>
             ))}
+            {leaderboard.length > 10 && (
+              <button
+                type="button"
+                onClick={() => setShowAllRowsMobile((prev) => !prev)}
+                className="md:hidden w-full mt-2 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center justify-between"
+              >
+                <span className="text-xs font-black">
+                  {showAllRowsMobile ? "Show fewer rows" : `Show all ${leaderboard.length} rows`}
+                </span>
+                <span className="text-[var(--text-secondary)]">
+                  {showAllRowsMobile ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </span>
+              </button>
+            )}
           </div>
         )}
       </main>

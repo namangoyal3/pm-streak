@@ -77,21 +77,21 @@ export default async function Home() {
 
       {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/90 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <span className="text-2xl">🔥</span>
             <div className="flex flex-col leading-none">
-              <div className="font-black text-xl tracking-tight flex items-center gap-1">
+              <div className="font-black text-lg sm:text-xl tracking-tight flex items-center gap-1">
                 <span className="text-[var(--green-primary)]">PM</span>
                 <span className="text-white">Streak</span>
               </div>
-              <span className="text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+              <span className="hidden sm:inline text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <BrowserLink
               href="/login"
-              className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
+              className="px-3 sm:px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-xs sm:text-sm font-black transition-colors"
             >
               Sign up with Google
             </BrowserLink>
@@ -100,21 +100,21 @@ export default async function Home() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className="max-w-5xl mx-auto px-5 pt-16 pb-14">
+      <section className="max-w-5xl mx-auto px-4 sm:px-5 pt-10 sm:pt-16 pb-12 sm:pb-14">
         <div className="flex flex-col lg:flex-row lg:items-center lg:gap-16">
           {/* Left: text */}
           <div className="flex-1">
             <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-4">
               Built on Lenny&apos;s Podcast · 300+ episodes
             </p>
-            <h1 className="text-5xl sm:text-6xl font-black tracking-tight leading-[1.05] mb-5">
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] mb-4 sm:mb-5">
               The fastest way<br />to get sharper<br />
               <span className="text-[var(--green-primary)]">as a PM.</span>
             </h1>
-            <p className="text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
+            <p className="text-base sm:text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
               One lesson a day. Streak tracking. XP and leaderboards. The best PM frameworks from Lenny&apos;s podcast — turned into 2-minute lessons that actually stick.
             </p>
-            <div className="mb-8 p-4 rounded-2xl bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/20 max-w-md">
+            <div className="mb-6 sm:mb-8 p-4 rounded-2xl bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/20 max-w-md">
               <p className="text-sm text-[var(--green-primary)] font-bold">
                 Built on 300+ episodes of Lenny&apos;s Podcast — the #1 resource for PMs.
               </p>
@@ -122,7 +122,7 @@ export default async function Home() {
 
             <BrowserLink
               href="/login"
-              className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-lg shadow-[var(--green-primary)]/20 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex w-full sm:w-auto justify-center items-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-lg shadow-[var(--green-primary)]/20 hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="white" fillOpacity="0.9"/>
@@ -162,7 +162,7 @@ export default async function Home() {
 
       {/* ── SOCIAL PROOF STRIP ── */}
       <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
-        <div className="max-w-5xl mx-auto px-5 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 py-4 flex flex-wrap items-center gap-x-6 sm:gap-x-8 gap-y-3">
           <span className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest">By the numbers</span>
           <div className="h-4 w-px bg-[var(--border-color)] hidden sm:block" />
           {[
@@ -178,8 +178,31 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Mobile-first condensed guide */}
+      <section className="sm:hidden max-w-5xl mx-auto px-4 pt-8">
+        <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+          <p className="text-[10px] font-black uppercase tracking-wider text-[var(--green-primary)] mb-2">
+            Start in 3 steps
+          </p>
+          <ul className="space-y-2.5 text-xs text-[var(--text-secondary)]">
+            <li><span className="text-white font-black">1.</span> Read a 2-minute PM lesson</li>
+            <li><span className="text-white font-black">2.</span> Answer 3 quiz questions</li>
+            <li><span className="text-white font-black">3.</span> Keep your streak alive daily</li>
+          </ul>
+          <details className="mt-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/40">
+            <summary className="cursor-pointer list-none px-3 py-2.5 text-xs font-black text-white">
+              See full product breakdown
+            </summary>
+            <div className="px-3 pb-3 text-xs text-[var(--text-secondary)] space-y-2">
+              <p>Includes leaderboard, social challenges, AI-generated lessons, and daily bonus challenges.</p>
+              <p>Designed to build consistency, not just consume content.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
       {/* ── HOW IT WORKS ── */}
-      <section className="max-w-5xl mx-auto px-5 py-20">
+      <section className="hidden sm:block max-w-5xl mx-auto px-5 py-20">
         <div className="max-w-xs mb-12">
           <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-2">How it works</p>
           <h2 className="text-4xl font-black leading-[1.1] tracking-tight">Three steps.<br />Two minutes.<br />Every day.</h2>
@@ -228,7 +251,7 @@ export default async function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+      <section className="hidden sm:block border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
         <div className="max-w-5xl mx-auto px-5 py-20">
 
           {/* Hero features — 2 large cards */}
@@ -295,7 +318,7 @@ export default async function Home() {
 
       {/* ── FINAL CTA ── */}
       <section className="border-t border-[var(--border-color)]">
-        <div className="max-w-5xl mx-auto px-5 py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 py-14 sm:py-20">
           <div className="bg-gradient-to-br from-[var(--green-primary)]/12 via-[var(--bg-card)] to-[var(--bg-card)] border border-[var(--green-primary)]/25 rounded-3xl px-8 py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-3">Ready to start?</p>
@@ -309,7 +332,7 @@ export default async function Home() {
             <div className="flex flex-col gap-3 flex-shrink-0">
               <BrowserLink
                 href="/login"
-                className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[var(--green-primary)]/20"
+                className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[var(--green-primary)]/20 w-full sm:w-auto"
               >
                 <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="white" fillOpacity="0.9"/>
@@ -327,7 +350,7 @@ export default async function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-[var(--border-color)] py-6">
-        <div className="max-w-5xl mx-auto px-5 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
           <div className="flex items-center gap-1.5">
             <span>🔥</span>
             <div className="flex flex-col leading-none">

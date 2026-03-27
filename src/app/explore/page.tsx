@@ -10,6 +10,8 @@ import {
   ArrowRight,
   Zap,
   Compass,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -50,6 +52,8 @@ function ExplorePageContent() {
   const [paywallHard, setPaywallHard] = useState(false);
   const [aiUsage, setAiUsage] = useState<AiUsage | null>(null);
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
+  const [showTopicLibrary, setShowTopicLibrary] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const sourceLessonId = searchParams.get("sourceLessonId");
   const generationMode =
@@ -144,11 +148,11 @@ function ExplorePageContent() {
     <div className={ds.pageShell}>
       <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
 
-      <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 py-6 pb-28 space-y-6">
+      <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 py-5 pb-28 space-y-5">
         <div className="text-center">
-          <Sparkles size={40} className="mx-auto text-[var(--green-primary)] mb-2" />
+          <Sparkles size={34} className="mx-auto text-[var(--green-primary)] mb-2" />
           <h1 className={cn(ds.sectionTitle, "text-xl")}>Explore & Generate</h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
             Custom lessons are generated live using AI from Lenny&apos;s Podcast transcripts. {user?.plan === "pro" ? "Unlimited for Pro." : "Costs 2 Credits."}
           </p>
         </div>
@@ -248,26 +252,39 @@ function ExplorePageContent() {
         )}
 
         <div>
-          <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
-            Updated Content Library
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {availableTopics.map((suggestedTopic) => (
-              <button
-                key={suggestedTopic}
-                onClick={() => {
-                  setTopic(suggestedTopic);
-                  handleGenerate(suggestedTopic);
-                }}
-                disabled={generating}
-                className={ds.topicChip}
-              >
-                {suggestedTopic}
-              </button>
-            ))}
-            {availableTopics.length === 0 && !generating && (
-              <p className="text-[10px] text-[var(--text-secondary)] italic">Loading ready topics...</p>
-            )}
+          <button
+            type="button"
+            onClick={() => setShowTopicLibrary((prev) => !prev)}
+            className="lg:hidden w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 flex items-center justify-between"
+          >
+            <span className="text-xs font-black">Topic library</span>
+            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+              {showTopicLibrary ? "Hide" : "Show"}
+              {showTopicLibrary ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            </span>
+          </button>
+          <div className={cn("mt-2 lg:mt-0", showTopicLibrary ? "block" : "hidden", "lg:block")}>
+            <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
+              Updated Content Library
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {availableTopics.map((suggestedTopic) => (
+                <button
+                  key={suggestedTopic}
+                  onClick={() => {
+                    setTopic(suggestedTopic);
+                    handleGenerate(suggestedTopic);
+                  }}
+                  disabled={generating}
+                  className={ds.topicChip}
+                >
+                  {suggestedTopic}
+                </button>
+              ))}
+              {availableTopics.length === 0 && !generating && (
+                <p className="text-[10px] text-[var(--text-secondary)] italic">Loading ready topics...</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -316,36 +333,50 @@ function ExplorePageContent() {
           </div>
         )}
 
-        <div className={ds.panel}>
-          <h3 className={cn(ds.sectionTitle, "mb-2")}>How it works</h3>
-          <div className="space-y-2 text-xs text-[var(--text-secondary)]">
-            <div className="flex items-start gap-2">
-              <span className="text-[var(--green-primary)] font-bold">1.</span>
-              <span>Choose a PM topic or launch a deeper dive from a lesson page</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-[var(--green-primary)] font-bold">2.</span>
-              <span>We search Lenny&apos;s Podcast transcripts for the most relevant expert insights</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-[var(--green-primary)] font-bold">3.</span>
-              <span>A custom lesson is generated and saved to your library for permanent access</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-[var(--green-primary)] font-bold">4.</span>
-              <span>Custom lessons keep your streak alive, but the main podcast curriculum still unlocks gradually in batches as you finish what&apos;s open</span>
-            </div>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowGuide((prev) => !prev)}
+          className="lg:hidden w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 flex items-center justify-between"
+        >
+          <span className="text-xs font-black">Explore guide</span>
+          <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            {showGuide ? "Hide" : "Show"}
+            {showGuide ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </span>
+        </button>
 
-        <div className={ds.panel}>
-          <div className="flex items-center gap-2 mb-2">
-            <Compass size={16} className="text-[var(--blue-primary)]" />
-            <h3 className={ds.sectionTitle}>What this is best for</h3>
+        <div className={cn("space-y-4", showGuide ? "block" : "hidden", "lg:block")}>
+          <div className={ds.panel}>
+            <h3 className={cn(ds.sectionTitle, "mb-2")}>How it works</h3>
+            <div className="space-y-2 text-xs text-[var(--text-secondary)]">
+              <div className="flex items-start gap-2">
+                <span className="text-[var(--green-primary)] font-bold">1.</span>
+                <span>Choose a PM topic or launch a deeper dive from a lesson page</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-[var(--green-primary)] font-bold">2.</span>
+                <span>We search Lenny&apos;s Podcast transcripts for the most relevant expert insights</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-[var(--green-primary)] font-bold">3.</span>
+                <span>A custom lesson is generated and saved to your library for permanent access</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-[var(--green-primary)] font-bold">4.</span>
+                <span>Custom lessons keep your streak alive, but the main podcast curriculum still unlocks gradually in batches as you finish what&apos;s open</span>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            Use Explore when a lesson summary feels too short, when the video made the idea click and you want more depth, or when you finish a category and want extra practice on that theme.
-          </p>
+
+          <div className={ds.panel}>
+            <div className="flex items-center gap-2 mb-2">
+              <Compass size={16} className="text-[var(--blue-primary)]" />
+              <h3 className={ds.sectionTitle}>What this is best for</h3>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Use Explore when a lesson summary feels too short, when the video made the idea click and you want more depth, or when you finish a category and want extra practice on that theme.
+            </p>
+          </div>
         </div>
       </main>
     </div>

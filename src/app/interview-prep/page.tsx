@@ -24,6 +24,7 @@ export default function InterviewPrepPage() {
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<Set<number>>(new Set());
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -92,20 +93,28 @@ export default function InterviewPrepPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-8 pb-24">
         {/* Hero */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <Brain size={20} className="text-blue-400" />
             <h1 className="text-2xl font-black">AI Interview Prep</h1>
           </div>
-          <p className="text-white/55 text-sm">
-            Get 5 PM interview questions with answer frameworks — grounded in real PM thinking.
-            Costs <strong className="text-purple-300">5 Credits</strong> per session (free for Pro).
+          <p className="text-white/55 text-sm">5 PM questions + frameworks per session.</p>
+          <p className="text-[11px] text-white/40 mt-1">
+            <strong className="text-purple-300">5 Credits</strong> per session (free for Pro).
           </p>
         </div>
 
         {/* Config */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5 mb-6">
-          <div className="grid sm:grid-cols-2 gap-4 mb-5">
+          <button
+            type="button"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="sm:hidden mb-4 w-full flex items-center justify-between px-3 py-2 rounded-xl border border-white/10 bg-black/10 text-xs font-black"
+          >
+            <span>Topic & level</span>
+            <span className="text-white/60">{showFilters ? "Hide" : "Show"}</span>
+          </button>
+          <div className={cn("grid sm:grid-cols-2 gap-4 mb-5", showFilters ? "grid" : "hidden sm:grid")}>
             <div>
               <label className="text-xs font-black text-white/60 uppercase tracking-wider mb-2 block">Topic</label>
               <div className="flex flex-wrap gap-2">
@@ -149,7 +158,7 @@ export default function InterviewPrepPage() {
           <button
             onClick={generate}
             disabled={loading}
-            className="w-full py-3 bg-blue-500 text-white font-black text-sm rounded-xl uppercase tracking-wider hover:bg-blue-400 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-blue-500 text-white font-black text-sm rounded-xl uppercase tracking-wider hover:bg-blue-400 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {loading ? (
               <><Loader2 size={16} className="animate-spin" /> Generating…</>

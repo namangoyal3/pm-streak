@@ -14,6 +14,8 @@ import {
   Flame,
   Zap,
   Clock,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 interface FriendUser {
@@ -45,6 +47,8 @@ export default function SocialPage() {
   const [followingCount, setFollowingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showShare, setShowShare] = useState(false);
+  const [showFriendsList, setShowFriendsList] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -178,7 +182,18 @@ export default function SocialPage() {
               </div>
             ) : (
               <>
-                <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFriendsList((prev) => !prev)}
+                  className="sm:hidden w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 flex items-center justify-between"
+                >
+                  <span className="text-xs font-black">Friends list</span>
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                    {showFriendsList ? "Hide" : "Show"}
+                    {showFriendsList ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  </span>
+                </button>
+                <div className={cn("space-y-2", showFriendsList ? "block" : "hidden", "sm:block")}>
                   {friends.map((f) => (
                     <div key={f.id} className="bg-[var(--bg-card)] rounded-2xl p-3 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--purple-primary)] to-[var(--blue-primary)] flex items-center justify-center font-bold text-sm">
@@ -203,7 +218,18 @@ export default function SocialPage() {
                     <h3 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
                       Recent Activity
                     </h3>
-                    <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowActivity((prev) => !prev)}
+                      className="sm:hidden mb-2 w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 flex items-center justify-between"
+                    >
+                      <span className="text-xs font-black">Activity feed</span>
+                      <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                        {showActivity ? "Hide" : "Show"}
+                        {showActivity ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                      </span>
+                    </button>
+                    <div className={cn("space-y-2", showActivity ? "block" : "hidden", "sm:block")}>
                       {activity.map((a) => (
                         <div key={a.id} className="bg-[var(--bg-card)] rounded-xl p-3 text-xs">
                           <div className="flex items-center justify-between">
