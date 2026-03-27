@@ -54,39 +54,39 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
       <ProBanner plan={plan} />
       {/* Top header bar */}
       <header className={ds.headerShell}>
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-1.5">
-            <Flame size={22} className="text-[var(--orange-primary)] streak-flame" />
+          <Link href="/dashboard" className="flex items-center gap-1.5 min-w-0">
+            <Flame size={20} className="text-[var(--orange-primary)] streak-flame shrink-0" />
             <div className="flex flex-col leading-none">
-              <div className="font-black text-xl tracking-tight flex items-center gap-1">
+              <div className="font-black text-lg sm:text-xl tracking-tight flex items-center gap-1">
                 <span className="text-[var(--green-primary)]">PM</span>
                 <span className="text-white">Streak</span>
               </div>
-              <span className="text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+              <span className="hidden sm:inline text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
             </div>
           </Link>
 
           {/* User Profile */}
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-2 group">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Link href="/dashboard" className="flex items-center gap-2 group shrink-0">
               <div className="relative">
                 {avatarUrl ? (
                   <Image
                     src={avatarUrl}
                     alt={name ?? "User"}
-                    width={28}
-                    height={28}
+                    width={26}
+                    height={26}
                     unoptimized
-                    className="h-7 w-7 rounded-full object-cover transition-all border border-[var(--border-color)]"
+                    className="h-6.5 w-6.5 sm:h-7 sm:w-7 rounded-full object-cover transition-all border border-[var(--border-color)]"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white bg-[var(--green-primary)]">
+                  <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-xs font-black text-white bg-[var(--green-primary)]">
                     {name?.charAt(0).toUpperCase() || "P"}
                   </div>
                 )}
               </div>
-              <div className="hidden sm:block">
+              <div className="hidden md:block">
                 <span className="text-xs font-black text-white group-hover:text-[var(--green-primary)] transition-colors">
                   {name?.split(" ")[0] || "Learner"}
                 </span>
@@ -96,14 +96,14 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
             {/* Streak */}
             <div className="flex items-center gap-0.5 flex-shrink-0">
               <Flame
-                size={18}
+                size={16}
                 className={cn(
                   "streak-flame",
                   streakCount > 0 ? "text-[var(--orange-primary)]" : "text-gray-500"
                 )}
               />
               <span className={cn(
-                "font-black text-sm tabular-nums",
+                "font-black text-xs sm:text-sm tabular-nums",
                 streakCount > 0 ? "text-[var(--orange-primary)]" : "text-gray-500"
               )}>
                 {streakCount}
@@ -111,14 +111,14 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
             </div>
 
             {/* Gems */}
-            <div className="flex items-center gap-0.5 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-0.5 flex-shrink-0">
               <Gem size={16} className="text-[var(--blue-primary)]" />
               <span className="font-black text-sm tabular-nums text-[var(--blue-primary)]">{gems}</span>
             </div>
 
             {/* Credits */}
             {credits !== undefined && (
-              <Link href="/pricing" className="flex items-center gap-1.5 bg-purple-500/10 px-3 py-1 rounded-full flex-shrink-0 hover:bg-purple-500/20 transition-colors border border-purple-500/20">
+              <Link href="/pricing" className="hidden lg:flex items-center gap-1.5 bg-purple-500/10 px-3 py-1 rounded-full flex-shrink-0 hover:bg-purple-500/20 transition-colors border border-purple-500/20">
                 <span className="font-black text-xs tabular-nums text-purple-400">
                   {credits} {plan === "pro" ? "Credits" : "Free Credits"}
                 </span>

@@ -52,18 +52,20 @@ function LoginForm() {
       </div>
 
       {/* Right panel — sign in */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center px-5 sm:px-6 py-10 sm:py-12 relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[var(--green-primary)]/5 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="w-full max-w-sm relative z-10">
-          <div className="text-center lg:text-left mb-10">
-            <h1 className="text-4xl font-black mb-2 tracking-tight">Sign in</h1>
-            <p className="text-sm text-[var(--text-secondary)] font-bold">Build your product intuition, one streak at a time.</p>
+          <div className="text-center lg:text-left mb-8 sm:mb-10">
+            <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight">Sign in</h1>
+            <p className="text-sm text-[var(--text-secondary)] font-bold max-w-xs mx-auto lg:mx-0">
+              Build your product intuition, one streak at a time.
+            </p>
           </div>
 
           {error && (
-            <div className="bg-[var(--red-primary)]/10 border-2 border-[var(--red-primary)]/20 rounded-2xl px-5 py-4 mb-8">
+            <div className="bg-[var(--red-primary)]/10 border-2 border-[var(--red-primary)]/20 rounded-2xl px-4 py-3.5 mb-6">
               <p className="text-[var(--red-primary)] text-sm font-black flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--red-primary)]" />
                 {error}
@@ -71,10 +73,10 @@ function LoginForm() {
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <BrowserLink
               href="/api/auth/google"
-              className="flex items-center justify-center gap-3 w-full py-4.5 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-white/10 text-white text-base font-black transition-all shadow-xl active:scale-[0.98]"
+              className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--surface-1)] hover:bg-[var(--surface-2)] hover:border-white/10 text-white text-base font-black transition-all shadow-xl active:scale-[0.98]"
             >
               <svg width="20" height="20" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
@@ -84,11 +86,12 @@ function LoginForm() {
               </svg>
               Continue with Google
             </BrowserLink>
-
-
+            <p className="text-center text-[11px] text-[var(--text-secondary)] font-bold">
+              Fastest path to start your streak
+            </p>
           </div>
 
-          <p className="text-center mt-12 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed font-bold uppercase tracking-tight">
+          <p className="text-center mt-10 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed font-bold uppercase tracking-tight">
             By signing in you agree to our{" "}
             <a href="/terms" className="underline hover:text-white">Terms</a>
             {" & "}

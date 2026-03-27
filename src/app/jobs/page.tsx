@@ -56,6 +56,8 @@ export default function JobsPage() {
   const [planError, setPlanError] = useState<string | null>(null);
   const [planPreview, setPlanPreview] = useState<PlanPreview["learningPlan"]>(null);
   const [createdTargetId, setCreatedTargetId] = useState<string | null>(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showMobileUpgrade, setShowMobileUpgrade] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -173,9 +175,9 @@ export default function JobsPage() {
         />
       )}
 
-      <main className="max-w-4xl mx-auto px-4 py-8 pb-24">
+      <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8 pb-24">
         {/* Hero */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <Briefcase size={20} className="text-orange-400" />
             <h1 className="text-2xl font-black">PM Jobs</h1>
@@ -264,13 +266,25 @@ export default function JobsPage() {
           </button>
         </div>
 
+        {/* Mobile filter disclosure */}
+        <button
+          type="button"
+          onClick={() => setShowMobileFilters((prev) => !prev)}
+          className="sm:hidden w-full mb-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 flex items-center justify-between"
+        >
+          <span className="text-xs font-black">Search & filters</span>
+          <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
+            {showMobileFilters ? "Hide" : "Show"}
+          </span>
+        </button>
+
         {/* Filters */}
-        <div className="flex gap-3 mb-6">
+        <div className={cn("mb-6 flex gap-3", showMobileFilters ? "flex" : "hidden sm:flex")}>
           <div className="flex-1 relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
             <input
               type="text"
-              placeholder="Search jobs or companies…"
+              placeholder="Search jobs or companies..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-green-500/40"
@@ -432,8 +446,20 @@ export default function JobsPage() {
           </div>
         )}
 
+        {/* Mobile upgrade disclosure */}
+        <button
+          type="button"
+          onClick={() => setShowMobileUpgrade((prev) => !prev)}
+          className="sm:hidden w-full mt-7 rounded-xl border border-purple-500/30 bg-purple-500/10 px-3 py-2.5 flex items-center justify-between"
+        >
+          <span className="text-xs font-black text-purple-300">Upgrade options</span>
+          <span className="text-[10px] font-bold text-purple-300/80 uppercase tracking-wider">
+            {showMobileUpgrade ? "Hide" : "Show"}
+          </span>
+        </button>
+
         {/* Pro CTA */}
-        <div className="mt-8 rounded-2xl border border-purple-500/30 bg-purple-500/10 p-5 flex items-center gap-4">
+        <div className={cn("mt-8 rounded-2xl border border-purple-500/30 bg-purple-500/10 p-5 flex items-center gap-4", showMobileUpgrade ? "flex" : "hidden sm:flex", "sm:flex")}>
           <Zap size={24} className="text-purple-400 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-black">Want direct apply links and PM leader job alerts?</p>
