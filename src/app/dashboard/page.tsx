@@ -7,10 +7,10 @@ import StreakCalendar from "@/components/StreakCalendar";
 import XPProgress from "@/components/XPProgress";
 import LessonCard from "@/components/LessonCard";
 import {
-  Flame, Shield, LogOut, Snowflake, Gem, Calendar, Zap,
+  Flame, LogOut, Snowflake, Gem, Zap,
   ArrowRight, Share2, Target, RotateCcw, Trophy, Star,
   TrendingUp, BookOpen, ChevronRight, Sparkles, Lock,
-  Bot, MessageSquare, Brain, Cpu, Swords, ChevronDown, Anchor,
+  MessageSquare, Brain, Swords, ChevronDown, ChevronUp, Anchor,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -66,6 +66,9 @@ export default function DashboardPage() {
   } | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [showMobileCategoryRail, setShowMobileCategoryRail] = useState(false);
+  const [showMobileProgressDetails, setShowMobileProgressDetails] = useState(false);
+  const [showMobileUtilities, setShowMobileUtilities] = useState(false);
   const categoryRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
@@ -160,6 +163,8 @@ export default function DashboardPage() {
 
   const scrollToCategory = useCallback((categoryId: string) => {
     setExpandedCategory(categoryId);
+    setShowMobileCategoryRail(false);
+    setShowMobileProgressDetails(false);
     setTimeout(() => {
       const el = categoryRefs.current.get(categoryId);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -224,12 +229,8 @@ export default function DashboardPage() {
   const streakCalendar = stats?.calendar ?? [];
   const totalCompleted = stats?.completedCount ?? 0;
   const totalLessons = stats?.totalLessons ?? 0;
-  const totalArchive = stats?.totalArchive ?? 289;
-  const episodesNotYetImported = stats?.episodesNotYetImported ?? 0;
-  const coreLessonCount = stats?.coreLessonCount ?? 0;
-  const archiveImportDisplay = Math.min(coreLessonCount, totalArchive);
-  const archiveUnlockProgress = stats?.archiveUnlockProgress;
   const progressPct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
+  const activeMobileCategory = categories.find((cat) => cat.id === activeCategoryId) ?? categories[0] ?? null;
 
   const lockedPreviewCount = categories.flatMap((c) => c.lessons).filter((l) => l.isLocked).length +
     categories.reduce((sum, c) => sum + c.proGatedCount, 0);
@@ -440,28 +441,50 @@ export default function DashboardPage() {
 
       {/* Mobile sticky category bar */}
       {categories.length > 0 && (
-        <div className="lg:hidden sticky top-14 z-40 bg-[var(--bg-primary)] border-b-2 border-[var(--border-color)] px-4 py-2 flex gap-2 overflow-x-auto scrollbar-none">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => scrollToCategory(cat.id)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors flex-shrink-0",
-                activeCategoryId === cat.id
-                  ? "bg-[var(--green-primary)] text-white"
-                  : cat.lessons.length === 0 && cat.proGatedCount > 0
-                    ? "bg-purple-500/15 text-purple-400 border border-purple-500/30"
-                    : "bg-[var(--surface-2)] text-[var(--text-secondary)] border border-[var(--border-color)]"
-              )}
-            >
-              <span>{cat.icon}</span>
-              {cat.name}
-            </button>
-          ))}
+        <div className="lg:hidden sticky top-14 z-40 bg-[var(--bg-primary)] border-b-2 border-[var(--border-color)] px-4 py-2">
+          <button
+            onClick={() => setShowMobileCategoryRail((prev) => !prev)}
+            className="w-full flex items-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 text-left"
+          >
+            <div className="flex-1 min-w-0 flex items-center gap-2">
+              <span className="text-base leading-none">{activeMobileCategory?.icon ?? "🧭"}</span>
+              <span className="text-xs font-black truncate">
+                {activeMobileCategory ? `Continue in ${activeMobileCategory.name}` : "Jump to a topic"}
+              </span>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+              {showMobileCategoryRail ? "Hide" : "Jump"}
+            </span>
+            <ChevronDown
+              size={14}
+              className={cn("text-[var(--text-secondary)] transition-transform", showMobileCategoryRail && "rotate-180")}
+            />
+          </button>
+          {showMobileCategoryRail && (
+            <div className="mt-2 flex gap-2 overflow-x-auto scrollbar-none pb-0.5">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => scrollToCategory(cat.id)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors flex-shrink-0",
+                    activeCategoryId === cat.id
+                      ? "bg-[var(--green-primary)] text-white"
+                      : cat.lessons.length === 0 && cat.proGatedCount > 0
+                        ? "bg-purple-500/15 text-purple-400 border border-purple-500/30"
+                        : "bg-[var(--surface-2)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+                  )}
+                >
+                  <span>{cat.icon}</span>
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      <main className="w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-28">
+      <main className="w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-28">
         {/* ── Pending challenge alert ── */}
         {pendingChallenges.length > 0 && (
           <Link href="/social" className="block mb-4">
@@ -514,166 +537,206 @@ export default function DashboardPage() {
             )}
 
             {/* ── Stats Row ── */}
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
               {[
                 { icon: <Zap size={16} className="text-[var(--gold-primary)]" />, value: user.xp, label: "XP", color: "text-[var(--gold-primary)]", bg: "bg-[var(--gold-primary)]/8 border-[var(--gold-primary)]/15" },
                 { icon: <Trophy size={16} className="text-[var(--orange-primary)]" />, value: user.longestStreak, label: "Best", color: "text-[var(--orange-primary)]", bg: "bg-[var(--orange-primary)]/8 border-[var(--orange-primary)]/15" },
                 { icon: <BookOpen size={16} className="text-[var(--blue-primary)]" />, value: totalCompleted, label: "Done", color: "text-[var(--blue-primary)]", bg: "bg-[var(--blue-primary)]/8 border-[var(--blue-primary)]/15" },
               ].map(({ icon, value, label, color, bg }) => (
-                <div key={label} className={cn("rounded-[var(--ds-radius-lg)] border-2 p-3 text-center", bg)}>
+                <div key={label} className={cn("rounded-[var(--ds-radius-lg)] border-2 p-2.5 sm:p-3 text-center", bg)}>
                   <div className="flex items-center justify-center mb-1">{icon}</div>
-                  <div className={cn("text-xl font-black tabular-nums", color)}>{value}</div>
+                  <div className={cn("text-lg sm:text-xl font-black tabular-nums", color)}>{value}</div>
                   <div className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-tight">{label}</div>
                 </div>
               ))}
             </div>
 
+            <button
+              type="button"
+              onClick={() => setShowMobileProgressDetails((prev) => !prev)}
+              className="lg:hidden w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 flex items-center justify-between"
+            >
+              <span className="text-xs font-black">Learning details</span>
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                {showMobileProgressDetails ? "Hide" : "Show"}
+                {showMobileProgressDetails ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              </span>
+            </button>
 
+            <div className={cn("space-y-4", showMobileProgressDetails ? "block" : "hidden", "lg:block")}>
+              <XPProgress xp={user.xp} />
+              {streakCalendar.length > 0 && (
+                <StreakCalendar calendar={streakCalendar} />
+              )}
 
-            <XPProgress xp={user.xp} />
-            {streakCalendar.length > 0 && (
-              <StreakCalendar calendar={streakCalendar} />
-            )}
-
-            <div className={ds.panel}>
-              <div className="flex items-center justify-between mb-2.5">
-                <div className="flex items-center gap-2">
-                  <TrendingUp size={16} className="text-[var(--green-primary)]" />
-                  <span className={ds.sectionTitle}>Course Progress</span>
-                </div>
-                <span className="text-sm font-black text-[var(--green-primary)]">{progressPct}%</span>
-              </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-[var(--surface-1)]">
-                <div className="h-full rounded-full progress-fill bg-[var(--green-primary)]" style={{ width: `${progressPct}%` }} />
-              </div>
-              <p className="text-[10px] text-[var(--text-secondary)] mt-2 font-bold uppercase tracking-wider">
-                {totalCompleted} / {totalLessons} lessons done
-              </p>
-            </div>
-
-            <div className={cn(ds.panel, "overflow-hidden !p-0")}>
-              <div className="flex items-center justify-between border-b-2 border-[var(--border-color)] px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <Gem size={16} className="text-[var(--blue-primary)]" />
-                  <span className="text-sm font-black">Shop</span>
-                </div>
-                <div className="flex items-center gap-1 bg-[var(--blue-primary)]/10 px-2.5 py-1 rounded-full">
-                  <Gem size={12} className="text-[var(--blue-primary)]" />
-                  <span className="text-xs font-black text-[var(--blue-primary)] tracking-tighter">{user.gems}</span>
-                </div>
-              </div>
-              {shopMsg && <div className="mx-4 mt-3 rounded-lg bg-[var(--green-primary)]/15 p-2 text-center text-[10px] font-bold text-[var(--green-primary)]">{shopMsg}</div>}
-              <div className="p-4 space-y-3">
-                <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--border-color)] p-3 cursor-pointer" onClick={() => handleShopBuy("streak_freeze")}>
-                  <Snowflake size={18} className="text-[var(--blue-primary)]" />
-                  <div className="flex-1">
-                    <div className="text-xs font-black">Streak Freeze</div>
-                    <div className="text-[9px] text-[var(--text-secondary)]">Skip a day</div>
-                  </div>
-                  <div className="text-xs font-black">50 <Gem size={10} className="inline" /></div>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--border-color)] p-3 cursor-pointer" onClick={() => handleShopBuy("xp_boost")}>
-                  <Zap size={18} className="text-[var(--gold-primary)]" />
-                  <div className="flex-1">
-                    <div className="text-xs font-black">2x XP Boost</div>
-                    <div className="text-[9px] text-[var(--text-secondary)]">Double XP</div>
-                  </div>
-                  <div className="text-xs font-black">75 <Gem size={10} className="inline" /></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Credits & Upgrade */}
-            {user.plan !== "pro" ? (
-              <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-4">
-                <div className="flex items-center justify-between mb-2">
+              <div className={ds.panel}>
+                <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
-                    <Zap size={16} className="text-purple-400" />
-                    <span className="text-sm font-black text-white">Credits</span>
+                    <TrendingUp size={16} className="text-[var(--green-primary)]" />
+                    <span className={ds.sectionTitle}>Course Progress</span>
                   </div>
-                  <div className="flex items-center gap-1 bg-purple-500/20 px-2.5 py-1 rounded-full">
-                    <Zap size={12} className="text-purple-400" />
-                    <span className="text-xs font-black text-purple-400">{user.credits ?? 10}</span>
+                  <span className="text-sm font-black text-[var(--green-primary)]">{progressPct}%</span>
+                </div>
+                <div className="h-2.5 overflow-hidden rounded-full bg-[var(--surface-1)]">
+                  <div className="h-full rounded-full progress-fill bg-[var(--green-primary)]" style={{ width: `${progressPct}%` }} />
+                </div>
+                <p className="text-[10px] text-[var(--text-secondary)] mt-2 font-bold uppercase tracking-wider">
+                  {totalCompleted} / {totalLessons} lessons done
+                </p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-1)] px-2.5 py-2">
+                    <p className="text-[9px] font-bold uppercase tracking-wide text-[var(--text-secondary)]">Today</p>
+                    <p className={cn("text-[11px] font-black mt-1", completedToday ? "text-[var(--green-primary)]" : "text-[var(--orange-primary)]")}>
+                      {completedToday ? "Goal complete" : "1 lesson to go"}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-1)] px-2.5 py-2">
+                    <p className="text-[9px] font-bold uppercase tracking-wide text-[var(--text-secondary)]">Archive</p>
+                    <p className="text-[11px] font-black mt-1 text-[var(--blue-primary)]">
+                      {archiveImportDisplay}/{totalArchive} imported
+                    </p>
                   </div>
                 </div>
-                <p className="text-[10px] text-white/60 mb-3">Use credits to unlock lesson batches, generate AI lessons, and access interview prep.</p>
-                <Link
-                  href="/pricing"
-                  className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-purple-500 text-white text-xs font-black uppercase tracking-wider hover:bg-purple-400 transition-colors"
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowMobileUtilities((prev) => !prev)}
+              className="lg:hidden w-full rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] px-3 py-2.5 flex items-center justify-between"
+            >
+              <span className="text-xs font-black">Tools & account</span>
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                {showMobileUtilities ? "Hide" : "Show"}
+                {showMobileUtilities ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              </span>
+            </button>
+
+            <div className={cn("space-y-4", showMobileUtilities ? "block" : "hidden", "lg:block")}>
+              <div className={cn(ds.panel, "overflow-hidden !p-0")}>
+                <div className="flex items-center justify-between border-b-2 border-[var(--border-color)] px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Gem size={16} className="text-[var(--blue-primary)]" />
+                    <span className="text-sm font-black">Shop</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-[var(--blue-primary)]/10 px-2.5 py-1 rounded-full">
+                    <Gem size={12} className="text-[var(--blue-primary)]" />
+                    <span className="text-xs font-black text-[var(--blue-primary)] tracking-tighter">{user.gems}</span>
+                  </div>
+                </div>
+                {shopMsg && <div className="mx-4 mt-3 rounded-lg bg-[var(--green-primary)]/15 p-2 text-center text-[10px] font-bold text-[var(--green-primary)]">{shopMsg}</div>}
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--border-color)] p-3 cursor-pointer" onClick={() => handleShopBuy("streak_freeze")}>
+                    <Snowflake size={18} className="text-[var(--blue-primary)]" />
+                    <div className="flex-1">
+                      <div className="text-xs font-black">Streak Freeze</div>
+                      <div className="text-[9px] text-[var(--text-secondary)]">Skip a day</div>
+                    </div>
+                    <div className="text-xs font-black">50 <Gem size={10} className="inline" /></div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border-2 border-[var(--border-color)] p-3 cursor-pointer" onClick={() => handleShopBuy("xp_boost")}>
+                    <Zap size={18} className="text-[var(--gold-primary)]" />
+                    <div className="flex-1">
+                      <div className="text-xs font-black">2x XP Boost</div>
+                      <div className="text-[9px] text-[var(--text-secondary)]">Double XP</div>
+                    </div>
+                    <div className="text-xs font-black">75 <Gem size={10} className="inline" /></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Credits & Upgrade */}
+              {user.plan !== "pro" ? (
+                <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Zap size={16} className="text-purple-400" />
+                      <span className="text-sm font-black text-white">Credits</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-purple-500/20 px-2.5 py-1 rounded-full">
+                      <Zap size={12} className="text-purple-400" />
+                      <span className="text-xs font-black text-purple-400">{user.credits ?? 10}</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-white/60 mb-3">Use credits to unlock lesson batches, generate AI lessons, and access interview prep.</p>
+                  <Link
+                    href="/pricing"
+                    className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-purple-500 text-white text-xs font-black uppercase tracking-wider hover:bg-purple-400 transition-colors"
+                  >
+                    <Star size={12} /> Upgrade to Pro ₹499/mo
+                  </Link>
+                </div>
+              ) : (
+                <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star size={14} className="text-purple-400" />
+                    <span className="text-xs font-black text-purple-300">Pro</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Zap size={12} className="text-purple-400" />
+                    <span className="text-xs font-black text-purple-400">{user.credits ?? 50} credits</span>
+                  </div>
+                </div>
+              )}
+
+              {/* WhatsApp Pro Community — Pro only */}
+              {user.plan === "pro" && (
+                <a
+                  href="https://chat.whatsapp.com/pmstreak-community"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-green-500/30 bg-green-500/10 p-3.5 hover:bg-green-500/15 transition-colors"
                 >
-                  <Star size={12} /> Upgrade to Pro ₹499/mo
+                  <div className="w-8 h-8 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                    <MessageSquare size={15} className="text-green-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-black text-green-300">Pro Community</div>
+                    <div className="text-[10px] text-white/50">WhatsApp · PMs only</div>
+                  </div>
+                  <ArrowRight size={13} className="text-green-400 flex-shrink-0" />
+                </a>
+              )}
+
+              {/* Quick links */}
+              <div className="grid grid-cols-2 gap-2">
+                <Link href="/jobs" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--green-primary)]/40 transition-colors">
+                  <Target size={14} className="text-[var(--green-primary)]" />
+                  <div>
+                    <div className="text-[10px] font-black">PM Jobs</div>
+                    <div className="text-[9px] text-[var(--text-secondary)]">Find roles</div>
+                  </div>
+                </Link>
+                <Link href="/interview-prep" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--blue-primary)]/40 transition-colors">
+                  <Brain size={14} className="text-[var(--blue-primary)]" />
+                  <div>
+                    <div className="text-[10px] font-black">Interview</div>
+                    <div className="text-[9px] text-[var(--text-secondary)]">5⚡ / session</div>
+                  </div>
                 </Link>
               </div>
-            ) : (
-              <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Star size={14} className="text-purple-400" />
-                  <span className="text-xs font-black text-purple-300">Pro</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Zap size={12} className="text-purple-400" />
-                  <span className="text-xs font-black text-purple-400">{user.credits ?? 50} credits</span>
-                </div>
-              </div>
-            )}
 
-            {/* WhatsApp Pro Community — Pro only */}
-            {user.plan === "pro" && (
-              <a
-                href="https://chat.whatsapp.com/pmstreak-community"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-[var(--ds-radius-lg)] border-2 border-green-500/30 bg-green-500/10 p-3.5 hover:bg-green-500/15 transition-colors"
-              >
-                <div className="w-8 h-8 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                  <MessageSquare size={15} className="text-green-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-black text-green-300">Pro Community</div>
-                  <div className="text-[10px] text-white/50">WhatsApp · PMs only</div>
-                </div>
-                <ArrowRight size={13} className="text-green-400 flex-shrink-0" />
-              </a>
-            )}
-
-            {/* Quick links */}
-            <div className="grid grid-cols-2 gap-2">
-              <Link href="/jobs" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--green-primary)]/40 transition-colors">
-                <Target size={14} className="text-[var(--green-primary)]" />
-                <div>
-                  <div className="text-[10px] font-black">PM Jobs</div>
-                  <div className="text-[9px] text-[var(--text-secondary)]">Find roles</div>
-                </div>
-              </Link>
-              <Link href="/interview-prep" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--blue-primary)]/40 transition-colors">
-                <Brain size={14} className="text-[var(--blue-primary)]" />
-                <div>
-                  <div className="text-[10px] font-black">Interview</div>
-                  <div className="text-[9px] text-[var(--text-secondary)]">5⚡ / session</div>
-                </div>
-              </Link>
+              <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[var(--border-color)] py-3 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--red-primary)] transition-colors">
+                <LogOut size={14} /> Sign Out
+              </button>
             </div>
-
-            <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[var(--border-color)] py-3 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--red-primary)] transition-colors">
-              <LogOut size={14} /> Sign Out
-            </button>
           </div>
 
           {/* LEFT CONTENT (CURRICULUM) */}
           <div className="space-y-4 min-w-0 order-1 lg:order-1">
             <div className={cn(
-              "relative overflow-hidden rounded-[var(--ds-radius-xl)] p-5",
+              "relative overflow-hidden rounded-[var(--ds-radius-xl)] p-4 sm:p-5",
               isPerfect ? "bg-gradient-to-br from-[#1a1200] to-[#2a1f00] border-2 border-[var(--gold-primary)]/30" : "bg-gradient-to-br from-[#10271a] to-[#153726] border-2 border-[var(--green-primary)]/30"
             )}>
-              <div className="relative flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <Flame size={48} className={isPerfect ? "text-[var(--gold-primary)]" : "text-[var(--orange-primary)]"} />
+              <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <Flame size={42} className={isPerfect ? "text-[var(--gold-primary)]" : "text-[var(--orange-primary)]"} />
                   <div>
-                    <div className="text-4xl font-black text-white">{user.streakCount}</div>
+                    <div className="text-3xl sm:text-4xl font-black text-white">{user.streakCount}</div>
                     <div className="text-[10px] font-black uppercase text-white/50 tracking-widest">Day Streak</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="rounded-xl bg-black/15 px-3 py-2 sm:bg-transparent sm:px-0 sm:py-0 sm:text-right">
                   <div className="text-[10px] font-black text-[var(--green-primary)] uppercase tracking-wider mb-1">Status</div>
                   <div className="text-xs font-bold text-white">{streakMsg}</div>
                 </div>
