@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "npm run db:push && next build",
+    "build": "sh -c 'if [ -n \"$DATABASE_URL\" ]; then DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} npx prisma db push; else echo \"Skipping prisma db push (DATABASE_URL not set)\"; fi && next build'",
     "start": "next start",
     "lint": "next lint",
     "db:push": "bash -lc 'export DATABASE_URL=\"${DATABASE_URL:-postgresql://pmstreak:pmstreak@localhost:5432/pmstreak_dev?schema=public}\"; export DIRECT_URL=\"${DIRECT_URL:-$DATABASE_URL}\"; npx prisma db push'",
