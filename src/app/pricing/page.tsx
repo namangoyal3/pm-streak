@@ -7,6 +7,7 @@ import {
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isProEffective } from "@/lib/entitlements";
+import { cn } from "@/lib/utils";
 
 // Countries billed in INR (India)
 const INR_COUNTRIES = new Set(["IN"]);
@@ -137,23 +138,45 @@ export default async function PricingPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-12 pb-24">
+      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12 pb-24">
         {/* Hero */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <div className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-500/30 rounded-full px-4 py-1.5 text-xs font-black text-purple-300 uppercase tracking-wider mb-4">
             <Star size={12} /> Pro Plan
           </div>
-          <h1 className="text-4xl font-black mb-3">
+          <h1 className="text-3xl sm:text-4xl font-black mb-3">
             Learn PM like a{" "}
             <span className="text-green-400">pro</span>
           </h1>
-          <p className="text-white/60 text-sm max-w-md mx-auto">
+          <p className="text-white/60 text-sm max-w-md mx-auto mb-4">
             Unlock all 292+ Lenny&apos;s Podcast lessons, unlimited AI lessons, PM leader content, interview prep, and the job board.
           </p>
+          <a
+            href={
+              userPlan === "pro"
+                ? "/dashboard"
+                : plans.find((p) => p.key === "quarterly" && p.productId)
+                  ? buildCheckoutUrl({
+                      productId: plans.find((p) => p.key === "quarterly")!.productId,
+                      email: userEmail,
+                      userId: userId ?? undefined,
+                      plan: "quarterly",
+                    })
+                  : "#comparison"
+            }
+            className={cn(
+              "sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black",
+              userPlan === "pro"
+                ? "bg-[var(--surface-1)] border border-[var(--border-color)] text-white"
+                : "bg-purple-500 text-white"
+            )}
+          >
+            {userPlan === "pro" ? "Manage Pro" : "Start Pro"}
+          </a>
         </div>
 
         {/* Free vs Pro Comparison */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
+        <div id="comparison" className="grid md:grid-cols-2 gap-6 mb-10 sm:mb-12">
           {/* Free */}
           <div className="rounded-2xl border-2 border-white/10 p-6 bg-white/5">
             <div className="mb-4">
@@ -263,7 +286,7 @@ export default async function PricingPage() {
         </div>
 
         {/* WhatsApp Community */}
-        <div className="rounded-2xl border-2 border-green-500/30 p-5 mb-12 bg-green-900/10">
+        <div className="rounded-2xl border-2 border-green-500/30 p-4 sm:p-5 mb-10 sm:mb-12 bg-green-900/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
               <MessageSquare size={20} className="text-green-400" />
@@ -284,7 +307,7 @@ export default async function PricingPage() {
         </div>
 
         {/* Credits Explainer */}
-        <div className="rounded-2xl border-2 border-white/10 p-6 mb-12 bg-white/5">
+        <div className="rounded-2xl border-2 border-white/10 p-4 sm:p-6 mb-10 sm:mb-12 bg-white/5">
           <div className="flex items-center gap-2 mb-4">
             <Zap size={18} className="text-purple-400" />
             <h2 className="text-base font-black">How Credits Work</h2>
@@ -306,7 +329,7 @@ export default async function PricingPage() {
         </div>
 
         {/* Feature Highlights */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-12">
+        <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-10 sm:mb-12">
           {[
             { icon: <BookOpen size={20} className="text-green-400" />, title: "292+ Archive Lessons", desc: "Full Lenny's Podcast library — Shreyas, Reforge, Figma, Stripe PMs and more." },
             { icon: <Brain size={20} className="text-blue-400" />, title: "AI Interview Prep", desc: "5 PM interview questions with frameworks per session — strategy, metrics, execution." },
@@ -324,7 +347,32 @@ export default async function PricingPage() {
         </div>
 
         {/* FAQ */}
-        <div className="space-y-3">
+        <details className="sm:hidden rounded-2xl border border-white/10 bg-white/5 p-4">
+          <summary className="text-xs font-black uppercase tracking-wide cursor-pointer text-white/75">
+            More details & FAQ
+          </summary>
+          <div className="mt-3 space-y-3">
+            {[
+              { q: "When will my Pro access activate?", a: "Instantly after payment — Dodo Payments processes your subscription and your Pro access is activated automatically." },
+              { q: "Are credits cumulative?", a: "No — they reset on the 1st of each month. Unused credits don't roll over." },
+              { q: "Can I cancel anytime?", a: "Yes. Cancel through the customer portal and you keep Pro access until your current period ends." },
+              isIndia
+                ? { q: "What's the quarterly plan?", a: "₹1,699 for 3 months — saves ₹298 vs paying monthly and no hassle of manual payments." }
+                : { q: "What's the quarterly plan?", a: "$24 for 3 months — saves $3 vs monthly and no hassle of monthly payments." },
+              isIndia
+                ? { q: "What's the yearly plan?", a: "₹2,499/year (vs ₹5,988 at monthly rate) — pay once, stay Pro for 12 months. Save 58%." }
+                : { q: "What's the yearly plan?", a: "$49/year (vs $108 at monthly rate) — pay once, stay Pro for 12 months. Save 55%." },
+              { q: "What payment methods are accepted?", a: isIndia ? "UPI, credit/debit cards, net banking, and more — via Dodo Payments secure checkout." : "Credit/debit cards, PayPal, and more — via Dodo Payments secure checkout." },
+            ].map((item) => (
+              <div key={`mobile-${item.q}`} className="rounded-xl border border-white/10 p-4 bg-white/5">
+                <h3 className="text-xs font-black mb-1.5">{item.q}</h3>
+                <p className="text-[11px] text-white/55">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </details>
+
+        <div className="hidden sm:block space-y-3">
           <h2 className="text-base font-black mb-4">FAQ</h2>
           {[
             { q: "When will my Pro access activate?", a: "Instantly after payment — Dodo Payments processes your subscription and your Pro access is activated automatically." },
