@@ -4,21 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import ProBanner from "./ProBanner";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Zap } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap } from "lucide-react";
 
 interface NavbarProps {
   streakCount: number;
   xp: number;
   gems: number;
+  credits?: number;
   avatarUrl?: string | null;
   name?: string;
   plan?: string;
   unreadNotifications?: number;
 }
 
-export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadNotifications: propUnread }: NavbarProps) {
+export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name, plan, unreadNotifications: propUnread }: NavbarProps) {
   const pathname = usePathname();
   const [unreadNotifications, setUnreadNotifications] = useState(propUnread ?? 0);
 
@@ -41,23 +43,28 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
   }, [pathname, propUnread]);
 
   const navItems = [
-    { href: "/dashboard", label: "Learn", icon: BookOpen },
-    { href: "/daily-challenge", label: "Daily", icon: Calendar },
-    { href: "/explore", label: "Explore", icon: Sparkles },
-    { href: "/social", label: "Social", icon: Users },
-    { href: "/leaderboard", label: "Ranks", icon: Trophy },
+    { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
+    { href: "/explore", label: "Explore", icon: Sparkles, locked: false },
+    { href: "/social", label: "Social", icon: Users, locked: false },
+    { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: false },
   ];
 
   return (
     <>
+      <ProBanner plan={plan} />
       {/* Top header bar */}
       <header className={ds.headerShell}>
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-1.5 font-black text-xl tracking-tight">
+          <Link href="/dashboard" className="flex items-center gap-1.5">
             <Flame size={22} className="text-[var(--orange-primary)] streak-flame" />
-            <span className="text-[var(--green-primary)]">PM</span>
-            <span className="text-white">Streak</span>
+            <div className="flex flex-col leading-none">
+              <div className="font-black text-xl tracking-tight flex items-center gap-1">
+                <span className="text-[var(--green-primary)]">PM</span>
+                <span className="text-white">Streak</span>
+              </div>
+              <span className="text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+            </div>
           </Link>
 
           {/* User Profile */}
@@ -109,6 +116,15 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
               <span className="font-black text-sm tabular-nums text-[var(--blue-primary)]">{gems}</span>
             </div>
 
+            {/* Credits */}
+            {credits !== undefined && (
+              <Link href="/pricing" className="flex items-center gap-1.5 bg-purple-500/10 px-3 py-1 rounded-full flex-shrink-0 hover:bg-purple-500/20 transition-colors border border-purple-500/20">
+                <span className="font-black text-xs tabular-nums text-purple-400">
+                  {credits} {plan === "pro" ? "Credits" : "Free Credits"}
+                </span>
+              </Link>
+            )}
+
             {/* XP */}
             <div className="flex items-center gap-1 bg-[var(--gold-primary)]/10 px-2 py-1 rounded-full flex-shrink-0">
               <Zap size={13} className="text-[var(--gold-primary)]" />
@@ -124,6 +140,22 @@ export default function Navbar({ streakCount, xp, gems, avatarUrl, name, unreadN
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href;
+            if (item.locked) {
+              return (
+                <div
+                  key={item.href}
+                  className="flex-1 flex flex-col items-center justify-center gap-0.5 text-[var(--border-color)] cursor-not-allowed relative"
+                >
+                  <div className="relative w-10 h-8 flex items-center justify-center rounded-xl">
+                    <Icon size={22} strokeWidth={2} />
+                    <div className="absolute top-0 right-0.5 bg-[var(--bg-secondary)] rounded-full p-0.5">
+                      <Lock size={8} className="text-[var(--border-color)]" />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold">{item.label}</span>
+                </div>
+              );
+            }
             const showBadge = item.href === "/social" && unreadNotifications > 0;
             return (
               <Link

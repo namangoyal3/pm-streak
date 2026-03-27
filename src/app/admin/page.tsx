@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Users, Activity, TrendingUp, BookOpen, Zap, Flame, Trophy, Lock,
   RefreshCw, Search, Mail, CheckCircle, MousePointer, AlertCircle,
-  ChevronLeft, ChevronRight, ArrowUpDown, Eye
+  ChevronLeft, ChevronRight, ArrowUpDown, Eye, Crown,
 } from "lucide-react";
 
 interface AdminStats {
@@ -67,6 +67,13 @@ interface EmailStats {
   complained: number;
 }
 
+interface CleanupPreview {
+  scannedLessons: number;
+  weakLessonsFound: number;
+  affectedUsers: number;
+  sampleTitles: string[];
+}
+
 function isAdminEmail(email: string): boolean {
   return email === "namangoyal21197@gmail.com";
 }
@@ -105,7 +112,13 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "emails">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "emails" | "pro-grants">("overview");
+
+  // Pro grants state
+  const [grantEmail, setGrantEmail] = useState("");
+  const [grantInterval, setGrantInterval] = useState<"month" | "quarter" | "year">("month");
+  const [grantLoading, setGrantLoading] = useState(false);
+  const [grantResult, setGrantResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   // Users table state
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -124,6 +137,10 @@ export default function AdminPage() {
   const [emailHasMore, setEmailHasMore] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupPreview, setCleanupPreview] = useState<CleanupPreview | null>(null);
+  const [cleanupMsg, setCleanupMsg] = useState("");
+  const [cleanupRegenN, setCleanupRegenN] = useState(20);
 
   const fetchStats = useCallback(async () => {
     setRefreshing(true);
@@ -175,6 +192,100 @@ export default function AdminPage() {
       setEmailLoading(false);
     }
   }, []);
+
+  const runCleanupPreview = useCallback(async () => {
+    setCleanupLoading(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-weak-ai-lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: false }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCleanupMsg(data.error || "Could not run cleanup preview.");
+        return;
+      }
+      setCleanupPreview(data.preview);
+      setCleanupMsg("Preview ready.");
+    } finally {
+      setCleanupLoading(false);
+    }
+  }, []);
+
+  const runCleanupApply = useCallback(async () => {
+    setCleanupLoading(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-weak-ai-lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: true, regenerateTopN: 0 }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCleanupMsg(data.error || "Could not apply cleanup.");
+        return;
+      }
+      setCleanupPreview(data.preview);
+      const deletedLessons = data?.deleted?.deletedLessons ?? 0;
+      setCleanupMsg(`Cleanup applied. Deleted ${deletedLessons} weak AI lessons.`);
+      await fetchStats();
+    } finally {
+      setCleanupLoading(false);
+    }
+  }, [fetchStats]);
+
+  const runCleanupApplyWithRegen = useCallback(async () => {
+    setCleanupLoading(true);
+    setCleanupMsg("");
+    try {
+      const res = await fetch("/api/admin/cleanup-weak-ai-lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: true, regenerateTopN: cleanupRegenN }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCleanupMsg(data.error || "Could not apply cleanup + regenerate.");
+        return;
+      }
+      setCleanupPreview(data.preview);
+      const deletedLessons = data?.deleted?.deletedLessons ?? 0;
+      const regenerated = data?.regeneration?.regenerated ?? 0;
+      const failed = data?.regeneration?.failed ?? 0;
+      setCleanupMsg(
+        `Cleanup applied. Deleted ${deletedLessons} weak lessons. Regenerated ${regenerated} topic replacements (${failed} failed).`
+      );
+      await fetchStats();
+    } finally {
+      setCleanupLoading(false);
+    }
+  }, [cleanupRegenN, fetchStats]);
+
+  const grantPro = useCallback(async () => {
+    if (!grantEmail.trim()) return;
+    setGrantLoading(true);
+    setGrantResult(null);
+    try {
+      const res = await fetch("/api/admin/grant-upi-pro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: grantEmail.trim().toLowerCase(), interval: grantInterval }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const expiry = new Date(data.currentPeriodEnd).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+        setGrantResult({ ok: true, message: `✅ Pro activated! Expires: ${expiry}` });
+        setGrantEmail("");
+      } else {
+        setGrantResult({ ok: false, message: data.error || "Grant failed" });
+      }
+    } finally {
+      setGrantLoading(false);
+    }
+  }, [grantEmail, grantInterval]);
 
   useEffect(() => {
     async function init() {
@@ -240,19 +351,19 @@ export default function AdminPage() {
         </div>
 
         {/* Tab bar */}
-        <div className="max-w-6xl mx-auto mt-3 flex gap-1">
-          {(["overview", "users", "emails"] as const).map((tab) => (
+        <div className="max-w-6xl mx-auto mt-3 flex gap-1 flex-wrap">
+          {(["overview", "users", "emails", "pro-grants"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className="px-4 py-2 rounded-xl text-xs font-black capitalize transition-all"
               style={{
-                background: activeTab === tab ? "#58cc02" : "var(--bg-secondary)",
+                background: activeTab === tab ? (tab === "pro-grants" ? "#a855f7" : "#58cc02") : "var(--bg-secondary)",
                 color: activeTab === tab ? "white" : "var(--text-secondary)",
-                border: "1px solid " + (activeTab === tab ? "#58cc02" : "var(--border-color)"),
+                border: "1px solid " + (activeTab === tab ? (tab === "pro-grants" ? "#a855f7" : "#58cc02") : "var(--border-color)"),
               }}
             >
-              {tab === "users" ? `Users (${stats.totalUsers})` : tab === "emails" ? "Email Analytics" : "Overview"}
+              {tab === "users" ? `Users (${stats.totalUsers})` : tab === "emails" ? "Email Analytics" : tab === "pro-grants" ? "Pro Grants" : "Overview"}
             </button>
           ))}
         </div>
@@ -276,7 +387,7 @@ export default function AdminPage() {
               <StatCard icon={<Lock size={20} style={{ color: "#58cc02" }} />} label="7+ Day Streaks" value={stats.usersWithStreakOver7} color="#58cc02" sub="Loss aversion locked in 🔒" />
             </div>
 
-            <Section title="Lenny catalog vs database (live)">
+            <Section title="Archive Coverage">
               <div
                 className="rounded-2xl p-4 space-y-2 text-sm"
                 style={{
@@ -288,8 +399,7 @@ export default function AdminPage() {
                   <span className="font-black" style={{ color: "var(--text-primary)" }}>
                     {stats.coreLessonCount} / {stats.catalogEpisodes}
                   </span>{" "}
-                  core lesson rows in Postgres (Lenny catalog reference ={" "}
-                  {stats.catalogEpisodes} episodes).
+                  archive lessons are currently available in the app.
                 </p>
                 <p style={{ color: "var(--text-secondary)" }}>
                   Breakdown:{" "}
@@ -307,12 +417,83 @@ export default function AdminPage() {
                   AI / Explore lessons.
                 </p>
                 <p style={{ color: "var(--text-secondary)" }}>
-                  Catalog not yet in DB:{" "}
+                  Remaining lessons being prepared:{" "}
                   <span className="font-black" style={{ color: stats.episodesNotYetImported > 0 ? "#ff9600" : "var(--green-primary)" }}>
                     {stats.episodesNotYetImported}
-                  </span>{" "}
-                  episodes (run archive backfill to approach full catalog).
+                  </span>
+                  .
                 </p>
+              </div>
+            </Section>
+
+            <Section title="AI Lesson Quality Cleanup">
+              <div className="rounded-2xl p-4 space-y-3 text-sm" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
+                <p style={{ color: "var(--text-secondary)" }}>
+                  Remove previously generated weak/generic AI lessons permanently.
+                </p>
+                <p style={{ color: "var(--text-secondary)" }}>
+                  Deleted lessons are not rewritten in place. Users get improved replacements when they generate fresh custom lessons.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={runCleanupPreview}
+                    disabled={cleanupLoading}
+                    className="px-3 py-2 rounded-xl text-xs font-black disabled:opacity-50"
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
+                  >
+                    {cleanupLoading ? "Running..." : "Preview Cleanup"}
+                  </button>
+                  <button
+                    onClick={runCleanupApply}
+                    disabled={cleanupLoading}
+                    className="px-3 py-2 rounded-xl text-xs font-black text-white disabled:opacity-50"
+                    style={{ background: "#ff4b4b", border: "1px solid #ff4b4b" }}
+                  >
+                    {cleanupLoading ? "Running..." : "Apply Cleanup"}
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>
+                    Auto-regenerate top
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={cleanupRegenN}
+                    onChange={(e) => setCleanupRegenN(Math.max(1, Math.min(50, Number(e.target.value) || 1)))}
+                    className="w-20 px-2 py-1 rounded-lg text-xs"
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+                  />
+                  <label className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>
+                    topics
+                  </label>
+                  <button
+                    onClick={runCleanupApplyWithRegen}
+                    disabled={cleanupLoading}
+                    className="px-3 py-2 rounded-xl text-xs font-black text-white disabled:opacity-50"
+                    style={{ background: "#58cc02", border: "1px solid #58cc02" }}
+                  >
+                    {cleanupLoading ? "Running..." : "Apply + Regenerate"}
+                  </button>
+                </div>
+                {cleanupPreview && (
+                  <div className="text-xs space-y-1" style={{ color: "var(--text-secondary)" }}>
+                    <p>
+                      Scanned: <span className="font-black text-[var(--text-primary)]">{cleanupPreview.scannedLessons}</span> · Weak found:{" "}
+                      <span className="font-black text-[#ff9600]">{cleanupPreview.weakLessonsFound}</span> · Affected users:{" "}
+                      <span className="font-black text-[var(--text-primary)]">{cleanupPreview.affectedUsers}</span>
+                    </p>
+                    {cleanupPreview.sampleTitles.length > 0 && (
+                      <p className="truncate">Examples: {cleanupPreview.sampleTitles.slice(0, 3).join(" | ")}</p>
+                    )}
+                  </div>
+                )}
+                {cleanupMsg && (
+                  <p className="text-xs font-bold" style={{ color: cleanupMsg.includes("Deleted") ? "#58cc02" : "#ff9600" }}>
+                    {cleanupMsg}
+                  </p>
+                )}
               </div>
             </Section>
 
@@ -629,6 +810,87 @@ export default function AdminPage() {
               </>
             ) : null}
           </>
+        )}
+
+        {/* ── PRO GRANTS TAB ── */}
+        {activeTab === "pro-grants" && (
+          <Section title="Grant Pro Subscription">
+            <div className="space-y-4">
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                After confirming a UPI payment (via email/screenshot), enter the user&apos;s email and select the plan period to activate Pro immediately.
+              </p>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wide block mb-1" style={{ color: "var(--text-secondary)" }}>
+                    User Email
+                  </label>
+                  <div className="relative">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-secondary)" }} />
+                    <input
+                      type="email"
+                      placeholder="user@example.com"
+                      value={grantEmail}
+                      onChange={(e) => { setGrantEmail(e.target.value); setGrantResult(null); }}
+                      onKeyDown={(e) => e.key === "Enter" && grantPro()}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm"
+                      style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wide block mb-2" style={{ color: "var(--text-secondary)" }}>
+                    Plan Period
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {([
+                      { key: "month", label: "Monthly", amount: "₹499" },
+                      { key: "quarter", label: "Quarterly", amount: "₹1,699" },
+                      { key: "year", label: "Yearly", amount: "₹1,899" },
+                    ] as const).map((plan) => (
+                      <button
+                        key={plan.key}
+                        onClick={() => setGrantInterval(plan.key)}
+                        className="rounded-xl p-3 border-2 text-center transition-all"
+                        style={{
+                          background: grantInterval === plan.key ? "rgba(168,85,247,0.15)" : "var(--bg-secondary)",
+                          borderColor: grantInterval === plan.key ? "#a855f7" : "var(--border-color)",
+                          color: grantInterval === plan.key ? "#a855f7" : "var(--text-secondary)",
+                        }}
+                      >
+                        <div className="text-sm font-black">{plan.amount}</div>
+                        <div className="text-[10px] font-bold mt-0.5">{plan.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={grantPro}
+                  disabled={grantLoading || !grantEmail.trim()}
+                  className="w-full py-3 rounded-xl text-sm font-black text-white transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ background: "#a855f7" }}
+                >
+                  <Crown size={16} />
+                  {grantLoading ? "Activating…" : "Activate Pro"}
+                </button>
+
+                {grantResult && (
+                  <div
+                    className="rounded-xl px-4 py-3 text-sm font-bold"
+                    style={{
+                      background: grantResult.ok ? "rgba(88,204,2,0.1)" : "rgba(255,75,75,0.1)",
+                      border: `1px solid ${grantResult.ok ? "rgba(88,204,2,0.3)" : "rgba(255,75,75,0.3)"}`,
+                      color: grantResult.ok ? "#58cc02" : "#ff4b4b",
+                    }}
+                  >
+                    {grantResult.message}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Section>
         )}
 
       </div>

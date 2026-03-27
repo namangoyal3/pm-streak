@@ -1,0 +1,230 @@
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import ReactMarkdown from "react-markdown";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+
+// Always render on-demand — articles are added by the SEO agent without deploys
+export const dynamic = "force-dynamic";
+
+interface Props {
+  params: Promise<{ vertical: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug, vertical } = await params;
+  const article = await prisma.article.findUnique({
+    where: { slug, published: true },
+    select: { title: true, description: true },
+  });
+  if (!article) return { title: "Article not found" };
+  const ogUrl = `/api/og?title=${encodeURIComponent(article.title)}&vertical=${encodeURIComponent(vertical)}`;
+  return {
+    title: `${article.title} | PM Streak`,
+    description: article.description,
+    openGraph: {
+      title: article.title,
+      description: article.description,
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.description,
+      images: [ogUrl],
+    },
+  };
+}
+
+export async function generateStaticParams() {
+  try {
+    const articles = await prisma.article.findMany({
+      where: { published: true },
+      select: { slug: true, vertical: true },
+    });
+    return articles.map((a) => ({ vertical: a.vertical, slug: a.slug }));
+  } catch {
+    return [];
+  }
+}
+
+const VERTICAL_LABELS: Record<string, string> = {
+  pm: "Product Management",
+  design: "Design",
+  engineering: "Engineering",
+  growth: "Growth",
+};
+
+export default async function ArticlePage({ params }: Props) {
+  const { slug, vertical } = await params;
+  const article = await prisma.article.findUnique({
+    where: { slug, published: true },
+  });
+
+  if (!article) notFound();
+
+  const readTime = Math.ceil(article.wordCount / 200);
+  const publishedDate = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.description,
+    datePublished: article.publishedAt?.toISOString(),
+    dateModified: article.updatedAt.toISOString(),
+    publisher: {
+      "@type": "Organization",
+      name: "PM Streak",
+      url: process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro",
+    },
+    keywords: article.tags.join(", "),
+  };
+
+  const related = await prisma.article.findMany({
+    where: { published: true, vertical, slug: { not: slug } },
+    take: 3,
+    orderBy: { publishedAt: "desc" },
+    select: { slug: true, title: true, description: true, wordCount: true, vertical: true },
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <main className="min-h-screen bg-[var(--bg-primary)] text-white">
+        <div className="max-w-2xl mx-auto px-4 py-12">
+          {/* Breadcrumb */}
+          <nav className="text-xs text-[var(--text-secondary)] mb-8 flex gap-2">
+            <Link href="/learn" className="hover:text-white">
+              Learn
+            </Link>
+            <span>/</span>
+            <span>{VERTICAL_LABELS[vertical] ?? vertical}</span>
+          </nav>
+
+          {/* Header */}
+          <header className="mb-8">
+            <p className="text-xs font-bold text-[var(--green-primary)] uppercase tracking-wider mb-3">
+              {VERTICAL_LABELS[vertical] ?? vertical} &middot; {readTime} min read
+              {publishedDate && ` · ${publishedDate}`}
+            </p>
+            <h1 className="text-2xl font-black leading-tight mb-3">{article.title}</h1>
+            <p className="text-[var(--text-secondary)] text-base leading-relaxed">{article.description}</p>
+          </header>
+
+          {/* Article body */}
+          <article className="prose-article">
+            <ReactMarkdown
+              components={{
+                h2: ({ children }) => (
+                  <h2 className="text-xl font-black mt-8 mb-3 text-white">{children}</h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-lg font-bold mt-6 mb-2 text-white">{children}</h3>
+                ),
+                p: ({ children }) => (
+                  <p className="text-[var(--text-secondary)] leading-relaxed mb-4">{children}</p>
+                ),
+                strong: ({ children }) => (
+                  <strong className="text-white font-bold">{children}</strong>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-inside mb-4 space-y-1 text-[var(--text-secondary)]">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-inside mb-4 space-y-1 text-[var(--text-secondary)]">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    className="text-[var(--green-primary)] underline hover:opacity-80"
+                    target={href?.startsWith("http") ? "_blank" : undefined}
+                    rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    {children}
+                  </a>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-[var(--green-primary)] pl-4 my-4 italic text-[var(--text-secondary)]">
+                    {children}
+                  </blockquote>
+                ),
+                code: ({ children }) => (
+                  <code className="bg-[var(--bg-secondary)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--green-primary)]">
+                    {children}
+                  </code>
+                ),
+              }}
+            >
+              {article.body}
+            </ReactMarkdown>
+          </article>
+
+          {/* Tags */}
+          {article.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-8 mb-10">
+              {article.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-[var(--bg-secondary)] text-xs px-3 py-1 rounded-full text-[var(--text-secondary)]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* CTA */}
+          <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 my-10 text-center">
+            <p className="font-black text-lg mb-1">Practice what you just learned</p>
+            <p className="text-[var(--text-secondary)] text-sm mb-4">
+              PM Streak gives you daily 3-minute lessons with streaks, XP, and a leaderboard.
+            </p>
+            <Link
+              href="/signup"
+              className="inline-block bg-[var(--green-primary)] text-white font-black px-6 py-3 rounded-2xl text-sm hover:opacity-90 transition-opacity"
+            >
+              Start your streak &mdash; it&apos;s free
+            </Link>
+          </div>
+
+          {/* Related articles */}
+          {related.length > 0 && (
+            <section className="mt-12">
+              <h2 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-4">
+                Related Articles
+              </h2>
+              <div className="space-y-3">
+                {related.map((r) => (
+                  <Link
+                    key={r.slug}
+                    href={`/learn/${r.vertical}/${r.slug}`}
+                    className="block bg-[var(--bg-secondary)] rounded-xl p-4 hover:bg-[var(--bg-tertiary)] transition-colors"
+                  >
+                    <p className="text-sm font-bold mb-1">{r.title}</p>
+                    <p className="text-xs text-[var(--text-secondary)] line-clamp-1">{r.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </main>
+    </>
+  );
+}

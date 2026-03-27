@@ -1,6 +1,8 @@
 import { prisma } from "./prisma";
-import { buildExploreInsightQuestions, buildSourceTranscript } from "./podcast-quiz-helpers";
+import { buildSourceTranscript } from "./podcast-quiz-helpers";
 import { generateActionablePMLesson, SearchResult } from "./llm-lessons";
+import { spendCredits, CREDIT_COSTS } from "./credits";
+import { isUserPro } from "./entitlements";
 
 type GenerationMode = "explore" | "deep_dive";
 
@@ -9,6 +11,7 @@ interface GenerateLessonInput {
   userId: string;
   generationMode?: GenerationMode;
   sourceLessonId?: string | null;
+  bypassDailyLimit?: boolean;
 }
 
 export class TranscriptEvidenceError extends Error {}
@@ -24,6 +27,7 @@ const MCP_HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json, text/event-stream",
 } as const;
+const AI_LESSON_GENERATION_VERSION = "qv4";
 
 function normalizeTopicKey(topic: string) {
   return topic
@@ -223,9 +227,10 @@ export async function generateLesson({
   userId,
   generationMode = "explore",
   sourceLessonId = null,
+  bypassDailyLimit = false,
 }: GenerateLessonInput) {
   const normalizedTopic = topic.trim();
-  const topicKey = normalizeTopicKey(normalizedTopic);
+  const topicKey = `${normalizeTopicKey(normalizedTopic)}:${AI_LESSON_GENERATION_VERSION}`;
 
   const existingLesson = await prisma.lesson.findFirst({
     where: {
@@ -242,25 +247,13 @@ export async function generateLesson({
     return existingLesson;
   }
 
-  // Monetization: Check daily limit for free users
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { plan: true },
-  });
-
-  if (user?.plan !== "pro") {
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const dailyAiLessonsCount = await prisma.lesson.count({
-      where: {
-        generatedForUserId: userId,
-        aiGenerated: true,
-        createdAt: { gte: twentyFourHoursAgo },
-      },
-    });
-
-    if (dailyAiLessonsCount >= 1) {
+  // Monetization: credit gate for free users (2 credits per AI lesson)
+  const pro = await isUserPro(userId);
+  if (!bypassDailyLimit && !pro) {
+    const ok = await spendCredits(userId, CREDIT_COSTS.ai_lesson, "ai_lesson");
+    if (!ok) {
       throw new DailyLimitError(
-        "You've reached your daily limit for AI lessons. Upgrade to Pro for unlimited Deep Dives."
+        "Not enough credits to generate an AI lesson. Upgrade to Pro for unlimited lessons or wait for your monthly refresh."
       );
     }
   }
@@ -286,17 +279,9 @@ export async function generateLesson({
       ? `A deeper follow-up lesson on ${normalizedTopic}`
       : `Custom lesson on ${normalizedTopic} from Lenny's Podcast insights`;
 
-  // Use Groq for richer narrative content, but keep quiz generation strictly transcript-grounded.
   const llmResult = await generateActionablePMLesson(normalizedTopic, searchResults);
   const content = llmResult.content;
-  const questions = buildExploreInsightQuestions(
-    normalizedTopic,
-    searchResults.map((r) => ({
-      guest: r.guest,
-      episodeTitle: r.episodeTitle,
-      snippet: r.snippet,
-    }))
-  );
+  const questions = llmResult.questions;
   const sourceTranscript = buildSourceTranscript(normalizedTopic, searchResults);
 
   const leadResult = searchResults[0];

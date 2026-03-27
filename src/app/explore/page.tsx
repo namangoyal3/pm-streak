@@ -14,7 +14,6 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { EXPLORE_SEED_TOPICS } from "@/lib/explore-topics";
 
 type GeneratedLesson = {
   id: string;
@@ -27,11 +26,7 @@ type GeneratedLesson = {
 };
 
 type AiUsage = {
-  usedToday: number;
-  usedThisMonth: number;
-  monthlyFreeLimit: number | null;
-  dailyFreeLimit: number | null;
-  remainingDailyCredits: number | null;
+  remainingCredits: number | null;
   unlimited: boolean;
 };
 
@@ -54,6 +49,7 @@ function ExplorePageContent() {
   const [error, setError] = useState("");
   const [paywallHard, setPaywallHard] = useState(false);
   const [aiUsage, setAiUsage] = useState<AiUsage | null>(null);
+  const [availableTopics, setAvailableTopics] = useState<string[]>([]);
 
   const sourceLessonId = searchParams.get("sourceLessonId");
   const generationMode =
@@ -61,9 +57,10 @@ function ExplorePageContent() {
 
   useEffect(() => {
     async function load() {
-      const [userRes, generatedRes] = await Promise.all([
+      const [userRes, generatedRes, topicsRes] = await Promise.all([
         fetch("/api/auth/me"),
         fetch("/api/generated-lessons"),
+        fetch("/api/explore/available-topics"),
       ]);
 
       if (!userRes.ok) {
@@ -77,7 +74,11 @@ function ExplorePageContent() {
       if (generatedRes.ok) {
         const generatedData = await generatedRes.json();
         setGeneratedLessons(generatedData.lessons ?? []);
-        setAiUsage(generatedData.aiUsage ?? null);
+      }
+
+      if (topicsRes.ok) {
+        const topicsData = await topicsRes.json();
+        setAvailableTopics(topicsData.topics ?? []);
       }
     }
 
@@ -148,29 +149,26 @@ function ExplorePageContent() {
           <Sparkles size={40} className="mx-auto text-[var(--green-primary)] mb-2" />
           <h1 className={cn(ds.sectionTitle, "text-xl")}>Explore & Generate</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Lessons are served from your AI lesson library in the database (no live model dependency).
+            Custom lessons are generated live using AI from Lenny&apos;s Podcast transcripts. {user?.plan === "pro" ? "Unlimited for Pro." : "Costs 2 Credits."}
           </p>
         </div>
 
-        {aiUsage && (
-          <div
-            className={cn(
-              ds.panelFlat,
-              aiUsage.unlimited
-                ? "border-[var(--green-primary)]/30 bg-[var(--green-primary)]/10"
-                : "border-[var(--gold-primary)]/30 bg-[var(--gold-primary)]/10"
-            )}
-          >
+        {user && user.plan !== "pro" && (
+          <div className={cn(ds.panelFlat, "border-[var(--gold-primary)]/30 bg-[var(--gold-primary)]/10")}>
             <div className="text-sm font-black text-[var(--text-primary)]">
-              {aiUsage.unlimited
-                ? "PM Streak Pro: unlimited AI lesson access"
-                : `${aiUsage.remainingDailyCredits ?? 0} free AI lesson credit left today`}
+              {user.credits} Free Credits left
             </div>
-            {!aiUsage.unlimited && (
-              <p className="text-xs text-[var(--text-secondary)] mt-1">
-                You get 1 free credit each day and up to {aiUsage.monthlyFreeLimit ?? 5} per month.
-              </p>
-            )}
+            <p className="text-xs text-[var(--text-secondary)] mt-1">
+              AI Explore lessons cost <strong className="text-white">2 Credits</strong> per session. Pro members get unlimited access.
+            </p>
+          </div>
+        )}
+
+        {user?.plan === "pro" && (
+          <div className={cn(ds.panelFlat, "border-[var(--green-primary)]/30 bg-[var(--green-primary)]/10")}>
+            <div className="text-sm font-black text-[var(--green-primary)]">
+              PM Streak Pro: unlimited AI Explore access
+            </div>
           </div>
         )}
 
@@ -221,7 +219,7 @@ function ExplorePageContent() {
               </>
             ) : (
               <>
-                <Sparkles size={12} /> Generate
+                <Sparkles size={12} /> Generate {user?.plan === "pro" ? "" : "(2 Credits)"}
               </>
             )}
           </button>
@@ -251,10 +249,10 @@ function ExplorePageContent() {
 
         <div>
           <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
-            Suggested Topics
+            Updated Content Library
           </h3>
           <div className="flex flex-wrap gap-2">
-            {EXPLORE_SEED_TOPICS.map((suggestedTopic) => (
+            {availableTopics.map((suggestedTopic) => (
               <button
                 key={suggestedTopic}
                 onClick={() => {
@@ -267,6 +265,9 @@ function ExplorePageContent() {
                 {suggestedTopic}
               </button>
             ))}
+            {availableTopics.length === 0 && !generating && (
+              <p className="text-[10px] text-[var(--text-secondary)] italic">Loading ready topics...</p>
+            )}
           </div>
         </div>
 
@@ -324,11 +325,11 @@ function ExplorePageContent() {
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">2.</span>
-              <span>We first look for a matching lesson from the stored AI lesson library</span>
+              <span>We search Lenny&apos;s Podcast transcripts for the most relevant expert insights</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">3.</span>
-              <span>If available, we instantly attach that lesson to your profile for later reuse</span>
+              <span>A custom lesson is generated and saved to your library for permanent access</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-[var(--green-primary)] font-bold">4.</span>

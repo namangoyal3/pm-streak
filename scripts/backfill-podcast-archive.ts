@@ -1,11 +1,13 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { PrismaClient } from "@prisma/client";
+import Groq from "groq-sdk";
 import {
   buildArchiveInsightQuestions,
   extractSentences,
   truncateOption,
 } from "../src/lib/podcast-quiz-helpers";
+import { classifyEpisodeTopic } from "../src/lib/archive-category-map";
 
 const envPath = resolve(process.cwd(), ".env");
 if (existsSync(envPath)) {
@@ -28,6 +30,15 @@ if (existsSync(envPath)) {
 }
 
 const prisma = new PrismaClient();
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+
+const TOPIC_CATEGORY_SLUGS = [
+  "product-strategy",
+  "growth-metrics",
+  "user-psychology",
+  "leadership-execution",
+  "pricing-monetization",
+] as const;
 
 const LENNY_MCP_URL = "https://lenny-mcp.onrender.com/mcp";
 const MCP_HEADERS = {
@@ -35,7 +46,6 @@ const MCP_HEADERS = {
   Accept: "application/json, text/event-stream",
 } as const;
 
-const ARCHIVE_CATEGORY_SLUG = "podcast-archive";
 const DEFAULT_CONCURRENCY = 6;
 
 type EpisodeRecord = {
@@ -356,27 +366,34 @@ function buildEpisodeRecord(
   };
 }
 
-async function ensureArchiveCategory() {
-  return prisma.category.upsert({
-    where: { slug: ARCHIVE_CATEGORY_SLUG },
-    update: {
-      name: "Podcast Archive",
-      description:
-        "Unlock the full Lenny's Podcast archive episode by episode.",
-      icon: "🎙️",
-      color: "#0ea5e9",
-      sortOrder: 7,
-    },
-    create: {
-      name: "Podcast Archive",
-      slug: ARCHIVE_CATEGORY_SLUG,
-      description:
-        "Unlock the full Lenny's Podcast archive episode by episode.",
-      icon: "🎙️",
-      color: "#0ea5e9",
-      sortOrder: 7,
-    },
+/** Cache of slug → categoryId resolved from DB. */
+const categoryIdCache = new Map<string, string>();
+
+async function getCategoryIdForEpisode(title: string, guest: string): Promise<string> {
+  const slug = await classifyEpisodeTopic(groq, title, guest);
+
+  if (categoryIdCache.has(slug)) {
+    return categoryIdCache.get(slug)!;
+  }
+
+  const cat = await prisma.category.findUnique({
+    where: { slug },
+    select: { id: true },
   });
+
+  if (!cat) {
+    // Fallback: product-strategy is always present
+    const fallback = await prisma.category.findUnique({
+      where: { slug: "product-strategy" },
+      select: { id: true },
+    });
+    if (!fallback) throw new Error("product-strategy category not found in DB");
+    categoryIdCache.set(slug, fallback.id);
+    return fallback.id;
+  }
+
+  categoryIdCache.set(slug, cat.id);
+  return cat.id;
 }
 
 async function createArchiveLesson(
@@ -493,7 +510,6 @@ async function main() {
     return;
   }
 
-  const archiveCategory = await ensureArchiveCategory();
   const maxDay = await prisma.lesson.aggregate({
     where: { aiGenerated: false },
     _max: { dayNumber: true },
@@ -535,10 +551,11 @@ async function main() {
           return;
         }
 
+        const categoryId = await getCategoryIdForEpisode(episode.title, episode.guest);
         const dayNumber = await allocateDayNumber();
 
         const result = await createArchiveLesson(
-          archiveCategory.id,
+          categoryId,
           dayNumber,
           episode
         );
@@ -569,7 +586,7 @@ async function main() {
   const archiveCount = await prisma.lesson.count({
     where: {
       aiGenerated: false,
-      OR: [{ category: { slug: ARCHIVE_CATEGORY_SLUG } }, { isLocked: true }],
+      isLocked: true,
     },
   });
 

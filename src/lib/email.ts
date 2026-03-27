@@ -1,106 +1,336 @@
+/**
+ * Email sending via Resend (open-source SDK: github.com/resend/resend-node)
+ * Templates built with React Email (open-source: github.com/resend/react-email)
+ *
+ * All sends are logged to EmailLog for analytics (open/click tracked via Resend webhooks).
+ * Rate-limiting: checked before send via EmailLog — no duplicate sends per type per window.
+ */
+import React from "react";
+import { render } from "@react-email/render";
 import { Resend } from "resend";
+import { prisma } from "./prisma";
+import crypto from "node:crypto";
+
+// ── client ─────────────────────────────────────────────────────────────────
 
 function getResend() {
-  return new Resend(process.env.RESEND_API_KEY || "placeholder");
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://duolingo-for-pms.vercel.app";
-const FROM = "Naman @ PM Streak <onboarding@resend.dev>";
-const REPLY_TO = "namangoyal21197@gmail.com";
-
-// ── Shared layout wrapper ──────────────────────────────────────────────────
-function wrap(preheader: string, body: string) {
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PM Streak</title></head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-  <!-- Preheader (hidden preview text in inbox) -->
-  <span style="display:none;max-height:0;overflow:hidden;mso-hide:all">${preheader}&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌</span>
-
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px">
-    <tr><td align="center">
-      <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
-
-        <!-- Header -->
-        <tr>
-          <td style="background:#111111;padding:24px 32px;text-align:center">
-            <span style="font-size:20px;font-weight:900;color:#58cc02;letter-spacing:-0.5px">PM</span>
-            <span style="font-size:20px;font-weight:900;color:#ffffff;letter-spacing:-0.5px"> Streak</span>
-            <span style="font-size:18px;margin-left:4px">🔥</span>
-          </td>
-        </tr>
-
-        <!-- Body -->
-        <tr><td style="padding:32px">${body}</td></tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="padding:20px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center">
-            <p style="margin:0;font-size:12px;color:#9ca3af">Daily PM micro-lessons from Lenny's Podcast</p>
-            <p style="margin:4px 0 0;font-size:12px;color:#9ca3af">Questions? Just reply to this email.</p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
+// EMAIL_FROM must be set to a verified Resend domain — e.g. "Naman @ PM Streak <naman@yourdomain.com>"
+// Without it, Resend's @resend.dev sandbox only delivers to the account owner's email.
+const FROM = process.env.EMAIL_FROM;
+if (!FROM) {
+  console.error("[email] EMAIL_FROM env var is not set. Emails will NOT be delivered to users. Set a verified Resend domain sender.");
 }
 
-function btn(text: string, url: string, color = "#58cc02") {
-  return `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding-top:8px">
-    <a href="${url}" style="display:inline-block;background:${color};color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:12px;letter-spacing:-0.2px">${text}</a>
-  </td></tr></table>`;
+// ── unsubscribe token ──────────────────────────────────────────────────────
+
+export function generateUnsubscribeToken(userId: string): string {
+  const secret = process.env.UNSUBSCRIBE_SECRET || "pm-streak-unsub-secret";
+  return crypto.createHmac("sha256", secret).update(userId).digest("hex").slice(0, 32);
 }
 
-function statBox(value: string, label: string, color: string) {
-  return `<td width="33%" style="text-align:center;padding:16px 8px;background:#f9fafb;border-radius:12px">
-    <div style="font-size:26px;font-weight:900;color:${color};line-height:1">${value}</div>
-    <div style="font-size:11px;color:#6b7280;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${label}</div>
-  </td>`;
+export function verifyUnsubscribeToken(userId: string, token: string): boolean {
+  return generateUnsubscribeToken(userId) === token;
 }
 
-// ── Welcome ────────────────────────────────────────────────────────────────
-export async function sendWelcomeEmail({ toEmail, toName }: { toEmail: string; toName: string }) {
-  if (!process.env.RESEND_API_KEY) return;
+// ── rate-limit guard ───────────────────────────────────────────────────────
+
+async function alreadySent(userId: string, emailType: string, cooldownHours: number): Promise<boolean> {
+  if (cooldownHours === 0) return false;
+  const since = new Date(Date.now() - cooldownHours * 60 * 60 * 1000);
+  const existing = await prisma.emailLog.findFirst({
+    where: { userId, emailType, sentAt: { gte: since } },
+    select: { id: true },
+  });
+  return !!existing;
+}
+
+// ── core send helper ───────────────────────────────────────────────────────
+
+async function sendEmail({
+  userId,
+  emailType,
+  toEmail,
+  subject,
+  reactElement,
+  cooldownHours = 20,
+}: {
+  userId: string;
+  emailType: string;
+  toEmail: string;
+  subject: string;
+  reactElement: React.ReactElement;
+  cooldownHours?: number;
+}): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { emailOptOut: true },
+  });
+  if (user?.emailOptOut) return false;
+
+  if (await alreadySent(userId, emailType, cooldownHours)) return false;
+
+  const resend = getResend();
+  if (!resend) {
+    console.warn("[email] RESEND_API_KEY not set — skipping send");
+    return false;
+  }
+
+  if (!FROM) {
+    console.error(`[email] EMAIL_FROM not set — skipping send of ${emailType} to ${toEmail}`);
+    return false;
+  }
+
+  const html = await render(reactElement);
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to: toEmail,
+      subject,
+      html,
+      headers: {
+        "List-Unsubscribe": `<${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}>`,
+      },
+    });
+
+    if (error || !data) {
+      console.error(`[email] Resend error for ${emailType}:`, error);
+      return false;
+    }
+
+    await prisma.emailLog.create({
+      data: { userId, emailType, resendId: data.id },
+    });
+
+    return true;
+  } catch (err) {
+    console.error(`[email] Send failed for ${emailType}:`, err instanceof Error ? err.message : err);
+    return false;
+  }
+}
+
+// ── lazy template imports ──────────────────────────────────────────────────
+// Imported lazily to avoid build-time JSX issues in non-React contexts
+
+async function getTemplates() {
+  const [
+    { WelcomeEmail },
+    { Day2NudgeEmail },
+    { StreakAtRiskEmail },
+    { ProNudgeEmail },
+    { ReengagementEmail },
+    { WeeklyDigestEmail },
+    { MilestoneEmail },
+    { ProWinbackEmail },
+    { ChallengeReceivedEmail },
+    { ChallengeAcceptedEmail },
+  ] = await Promise.all([
+    import("@/emails/welcome"),
+    import("@/emails/day2-nudge"),
+    import("@/emails/streak-at-risk"),
+    import("@/emails/pro-nudge"),
+    import("@/emails/reengagement"),
+    import("@/emails/weekly-digest"),
+    import("@/emails/milestone"),
+    import("@/emails/pro-winback"),
+    import("@/emails/challenge-received"),
+    import("@/emails/challenge-accepted"),
+  ]);
+  return {
+    WelcomeEmail, Day2NudgeEmail, StreakAtRiskEmail, ProNudgeEmail,
+    ReengagementEmail, WeeklyDigestEmail, MilestoneEmail, ProWinbackEmail,
+    ChallengeReceivedEmail, ChallengeAcceptedEmail,
+  };
+}
+
+// ── public send functions ──────────────────────────────────────────────────
+
+export async function sendWelcomeEmail({
+  userId, toEmail, toName,
+}: { userId: string; toEmail: string; toName: string }) {
+  const { WelcomeEmail } = await getTemplates();
   const first = toName.split(" ")[0];
-  const body = `
-    <h1 style="margin:0 0 8px;font-size:26px;font-weight:900;color:#111;letter-spacing:-0.5px">Welcome, ${first}! 👋</h1>
-    <p style="margin:0 0 24px;font-size:15px;color:#6b7280;line-height:1.6">You just joined the best 3-minute daily habit a PM can have. Here's the deal:</p>
-
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px">
-      ${[
-        ["📖", "Read a micro-lesson", "Distilled insights from Lenny's 300+ podcast interviews"],
-        ["✅", "Answer a quick quiz", "1-3 questions to lock in what you learned"],
-        ["🔥", "Build your streak", "Miss a day? Streak resets. But you've got gems to freeze it."],
-        ["🏆", "Climb the leaderboard", "Beat your friends — 7-day streak unlocks Social + Rankings"],
-      ].map(([icon, title, desc]) => `
-        <tr>
-          <td width="40" valign="top" style="padding:0 12px 16px 0;font-size:22px">${icon}</td>
-          <td style="padding-bottom:16px">
-            <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:2px">${title}</div>
-            <div style="font-size:13px;color:#6b7280;line-height:1.5">${desc}</div>
-          </td>
-        </tr>
-      `).join("")}
-    </table>
-
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:24px">
-      <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:6px">Your starter pack 🎁</div>
-      <div style="font-size:13px;color:#166534">💎 50 gems &nbsp;·&nbsp; 🛡 2 streak freezes &nbsp;·&nbsp; Lesson 1 is waiting</div>
-    </div>
-
-    ${btn("Start my first lesson →", `${APP_URL}/dashboard`)}
-
-    <p style="margin:20px 0 0;font-size:13px;color:#9ca3af;text-align:center">Takes 2-3 minutes. You'll learn something real.</p>
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: `You're in, ${first}! Your first PM lesson is ready 🚀`,
-    html: wrap(`Your PM Streak journey starts now — complete lesson 1 in 3 minutes`, body),
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "welcome", toEmail,
+    subject: `${first}, your first lesson is a 3-minute shortcut to thinking like a top-10% PM`,
+    reactElement: React.createElement(WelcomeEmail, { firstName: first, unsubscribeUrl }),
+    cooldownHours: 0,
   });
 }
+
+export async function sendDay2NudgeEmail({
+  userId, toEmail, toName,
+}: { userId: string; toEmail: string; toName: string }) {
+  const { Day2NudgeEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "day2_nudge", toEmail,
+    subject: `${first}, you still haven't started (your 48h window is closing)`,
+    reactElement: React.createElement(Day2NudgeEmail, { firstName: first, unsubscribeUrl }),
+    cooldownHours: 24,
+  });
+}
+
+export async function sendStreakAtRiskEmail({
+  userId, toEmail, toName, streakCount, nextLessonTitle,
+}: { userId: string; toEmail: string; toName: string; streakCount: number; nextLessonTitle?: string }) {
+  const { StreakAtRiskEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "streak_at_risk", toEmail,
+    subject: getStreakSubject(first, streakCount),
+    reactElement: React.createElement(StreakAtRiskEmail, {
+      firstName: first, streakCount, nextLessonTitle, unsubscribeUrl,
+    }),
+    cooldownHours: 20,
+  });
+}
+
+export async function sendProNudgeEmail({
+  userId, toEmail, toName, streakCount, creditsLeft, variant,
+}: { userId: string; toEmail: string; toName: string; streakCount: number; creditsLeft: number; variant: "7day" | "14day" }) {
+  const { ProNudgeEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: `pro_nudge_${variant}`, toEmail,
+    subject: variant === "14day"
+      ? `${first}, ${streakCount} days of consistency deserves deeper learning`
+      : `Your ${streakCount}-day streak unlocked something — most free users never see it`,
+    reactElement: React.createElement(ProNudgeEmail, {
+      firstName: first, streakCount, creditsLeft, variant, unsubscribeUrl,
+    }),
+    cooldownHours: 7 * 24,
+  });
+}
+
+export async function sendReengagementEmail({
+  userId, toEmail, toName, streakCount, daysInactive, variant,
+}: { userId: string; toEmail: string; toName: string; streakCount: number; daysInactive: number; variant: "3day" | "7day" }) {
+  const { ReengagementEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: `reengagement_${variant}`, toEmail,
+    subject: variant === "7day"
+      ? `${first}, we built new things while you were gone`
+      : streakCount > 0
+        ? `Your ${streakCount}-day streak is gone. Here's how to start a better one.`
+        : `${first}, it's been 3 days. One lesson brings the habit back.`,
+    reactElement: React.createElement(ReengagementEmail, {
+      firstName: first, streakCount, daysInactive, variant, unsubscribeUrl,
+    }),
+    cooldownHours: 72,
+  });
+}
+
+export async function sendWeeklyDigestEmail({
+  userId, toEmail, toName, streakCount, xp, lessonsThisWeek, plan, creditsLeft,
+  leaderboardRank, topFriend, unusedFeature,
+}: {
+  userId: string; toEmail: string; toName: string; streakCount: number; xp: number;
+  lessonsThisWeek: number; plan: string; creditsLeft: number;
+  leaderboardRank?: number;
+  topFriend?: { name: string; lessonsCompleted: number };
+  unusedFeature?: "interview_prep" | "ai_lessons" | "jobs";
+}) {
+  const { WeeklyDigestEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  const subjectLine = lessonsThisWeek === 0
+    ? `${first}, your PM learning streak is at risk this week`
+    : streakCount >= 14
+      ? `${streakCount} days 🔥 ${first}'s weekly PM recap`
+      : `Your PM week: ${lessonsThisWeek} lessons, ${streakCount}-day streak`;
+  return sendEmail({
+    userId, emailType: "weekly_digest", toEmail,
+    subject: subjectLine,
+    reactElement: React.createElement(WeeklyDigestEmail, {
+      firstName: first, streakCount, xp, lessonsThisWeek,
+      plan: plan as "free" | "pro", creditsLeft,
+      leaderboardRank, topFriend, unusedFeature,
+      unsubscribeUrl,
+    }),
+    cooldownHours: 6 * 24,
+  });
+}
+
+export async function sendMilestoneEmail({
+  userId, toEmail, toName, streakCount, gemsEarned,
+}: { userId: string; toEmail: string; toName: string; streakCount: number; gemsEarned: number }) {
+  const { MilestoneEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  const milestoneEmoji: Record<number, string> = { 7: "⚡", 14: "💎", 30: "👑", 50: "🏆", 100: "🌟" };
+  const emoji = milestoneEmoji[streakCount] ?? "🔥";
+  return sendEmail({
+    userId, emailType: `milestone_${streakCount}`, toEmail,
+    subject: `${emoji} ${streakCount} days, ${first} — you're in the top ${streakCount >= 30 ? "3%" : "15%"} of PM learners`,
+    reactElement: React.createElement(MilestoneEmail, {
+      firstName: first, streakCount, gemsEarned, unsubscribeUrl,
+    }),
+    cooldownHours: 0,
+  });
+}
+
+export async function sendProWinbackEmail({
+  userId, toEmail, toName, daysInactive, creditsLeft,
+}: { userId: string; toEmail: string; toName: string; daysInactive: number; creditsLeft: number }) {
+  const { ProWinbackEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "pro_winback", toEmail,
+    subject: `${first}, ${creditsLeft} Pro credits are expiring unused`,
+    reactElement: React.createElement(ProWinbackEmail, {
+      firstName: first, daysInactive, creditsLeft, unsubscribeUrl,
+    }),
+    cooldownHours: 7 * 24,
+  });
+}
+
+export async function sendChallengeReceivedEmail({
+  userId, toEmail, toName, fromName, message,
+}: { userId: string; toEmail: string; toName: string; fromName: string; message: string }) {
+  const { ChallengeReceivedEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "challenge_received", toEmail,
+    subject: `${fromName} challenged you to a PM duel ⚔️`,
+    reactElement: React.createElement(ChallengeReceivedEmail, {
+      firstName: first, fromName, message, unsubscribeUrl,
+    }),
+    cooldownHours: 0,
+  });
+}
+
+export async function sendChallengeAcceptedEmail({
+  userId, toEmail, toName, fromName,
+}: { userId: string; toEmail: string; toName: string; fromName: string }) {
+  const { ChallengeAcceptedEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "challenge_accepted", toEmail,
+    subject: `${fromName} accepted 🔥 Don't let them beat you`,
+    reactElement: React.createElement(ChallengeAcceptedEmail, {
+      firstName: first, fromName, unsubscribeUrl,
+    }),
+    cooldownHours: 0,
+  });
+}
+
+// ── transactional (no logging needed) ─────────────────────────────────────
 
 export async function sendPasswordResetEmail({
   toEmail,
@@ -113,249 +343,49 @@ export async function sendPasswordResetEmail({
   resetUrl: string;
   loginUrl: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return;
+  const resend = getResend();
+  if (!resend || !FROM) return;
   const first = toName.split(" ")[0] || "there";
-  const body = `
-    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px">Reset your password</h1>
-    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6">
-      Hi ${first}, we received a request to reset your PM Streak password.
-      This link expires in 30 minutes.
-    </p>
-
-    ${btn("Log in securely →", loginUrl, "#58cc02")}
-    ${btn("Reset password instead →", resetUrl, "#2563eb")}
-
-    <p style="margin:18px 0 0;font-size:12px;color:#9ca3af;line-height:1.6">
-      If you did not request this, you can safely ignore this email.
-    </p>
-  `;
-  await getResend().emails.send({
+  await resend.emails.send({
     from: FROM,
-    replyTo: REPLY_TO,
     to: toEmail,
     subject: "Reset your PM Streak password",
-    html: wrap("Reset your password link (expires in 30 minutes).", body),
+    html: `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:480px;margin:32px auto;padding:24px">
+      <h2 style="color:#111">Reset your PM Streak password</h2>
+      <p style="color:#374151">Hi ${first}, we received a request for your account. This link expires in 30 minutes.</p>
+      <p style="margin:16px 0">
+        <a href="${loginUrl}" style="display:inline-block;background:#58cc02;color:#fff;font-weight:700;padding:12px 28px;border-radius:10px;text-decoration:none;margin-right:8px">Log in securely →</a>
+      </p>
+      <p style="margin:16px 0">
+        <a href="${resetUrl}" style="display:inline-block;background:#2563eb;color:#fff;font-weight:700;padding:12px 28px;border-radius:10px;text-decoration:none">Reset password instead →</a>
+      </p>
+      <p style="color:#9ca3af;font-size:13px">If you didn't request this, ignore this email.</p>
+    </body></html>`,
   });
 }
 
-// ── Day-2 nudge ────────────────────────────────────────────────────────────
-export async function sendDay2NudgeEmail({ toEmail, toName }: { toEmail: string; toName: string }) {
-  if (!process.env.RESEND_API_KEY) return;
-  const first = toName.split(" ")[0];
-  const body = `
-    <div style="text-align:center;margin-bottom:24px">
-      <span style="font-size:48px">⏳</span>
-    </div>
-    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px;text-align:center">${first}, your streak hasn't started</h1>
-    <p style="margin:0 0 24px;font-size:15px;color:#6b7280;line-height:1.6;text-align:center">You signed up for PM Streak but haven't done your first lesson yet. No judgment — but here's the truth:</p>
+// ── analytics ─────────────────────────────────────────────────────────────
 
-    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:20px;margin-bottom:24px;text-align:center">
-      <div style="font-size:32px;margin-bottom:8px">💡</div>
-      <div style="font-size:14px;color:#92400e;line-height:1.6">PMs who complete their <strong>first lesson within 48 hours</strong> of signing up are <strong>4x more likely</strong> to build a 7-day streak.</div>
-    </div>
-
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;text-align:center">Lesson 1 is <strong>3 minutes</strong>. One real insight from Lenny's Podcast. One quiz question.</p>
-
-    ${btn("Complete lesson 1 right now →", `${APP_URL}/dashboard`, "#f59e0b")}
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: `${first}, you still haven't started 👀 (takes 3 mins)`,
-    html: wrap(`Your PM Streak account is set up. Just need you to show up once.`, body),
+export async function markEmailOpened(resendId: string) {
+  await prisma.emailLog.updateMany({
+    where: { resendId },
+    data: { openedAt: new Date() },
   });
 }
 
-// ── Streak at-risk ─────────────────────────────────────────────────────────
-export async function sendStreakAtRiskEmail({
-  toEmail, toName, streakCount,
-}: { toEmail: string; toName: string; streakCount: number }) {
-  if (!process.env.RESEND_API_KEY) return;
-  const first = toName.split(" ")[0];
-  const isLong = streakCount >= 7;
-  const body = `
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="display:inline-block;background:#fff7ed;border:2px solid #fed7aa;border-radius:16px;padding:20px 32px">
-        <div style="font-size:42px;line-height:1">🔥</div>
-        <div style="font-size:36px;font-weight:900;color:#ea580c;margin-top:4px">${streakCount}</div>
-        <div style="font-size:12px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:1px">day streak</div>
-      </div>
-    </div>
-
-    <h1 style="margin:0 0 8px;font-size:22px;font-weight:900;color:#111;letter-spacing:-0.5px;text-align:center">
-      ${isLong ? `Don't let ${streakCount} days go to waste` : `Your streak resets at midnight`}
-    </h1>
-    <p style="margin:0 0 24px;font-size:15px;color:#6b7280;line-height:1.6;text-align:center">
-      ${isLong
-        ? `You've been consistent for ${streakCount} days. One lesson stands between you and breaking that. It's 3 minutes.`
-        : `You're building something. Missing today means starting over from zero tomorrow.`}
-    </p>
-
-    ${btn("Protect my streak →", `${APP_URL}/dashboard`, "#ea580c")}
-
-    <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;text-align:center">
-      Low on time? Use a streak freeze (50 💎 gems) to skip today and keep your streak.
-    </p>
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: isLong
-      ? `⚠️ Your ${streakCount}-day streak resets tonight, ${first}`
-      : `Don't break your streak today, ${first} 🔥`,
-    html: wrap(`You haven't done today's lesson yet. It takes 3 minutes.`, body),
+export async function markEmailClicked(resendId: string) {
+  await prisma.emailLog.updateMany({
+    where: { resendId },
+    data: { clickedAt: new Date() },
   });
 }
 
-// ── Weekly digest ──────────────────────────────────────────────────────────
-export async function sendWeeklyDigestEmail({
-  toEmail, toName, streakCount, xp, lessonsCompleted, friendActivity,
-}: {
-  toEmail: string; toName: string; streakCount: number; xp: number;
-  lessonsCompleted: number; friendActivity: { name: string; lessonsCompleted: number }[];
-}) {
-  if (!process.env.RESEND_API_KEY) return;
-  const first = toName.split(" ")[0];
-  const friendRows = friendActivity.slice(0, 3).map((f) => `
-    <tr>
-      <td style="padding:10px 0;font-size:14px;color:#374151;border-bottom:1px solid #f3f4f6">
-        <span style="display:inline-block;width:28px;height:28px;background:#e5e7eb;border-radius:50%;text-align:center;line-height:28px;font-weight:700;font-size:12px;margin-right:10px;vertical-align:middle">${f.name.charAt(0)}</span>
-        ${f.name}
-      </td>
-      <td style="padding:10px 0;font-size:14px;font-weight:700;color:#58cc02;text-align:right;border-bottom:1px solid #f3f4f6">${f.lessonsCompleted} lessons</td>
-    </tr>
-  `).join("");
+// ── helpers ────────────────────────────────────────────────────────────────
 
-  const body = `
-    <h1 style="margin:0 0 4px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px">Hey ${first}! 👋</h1>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280">Your weekly PM Streak update — week ending ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</p>
-
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;border-spacing:8px">
-      <tr>
-        ${statBox(streakCount.toString(), "Day Streak", "#ea580c")}
-        <td width="4%"></td>
-        ${statBox(xp.toString(), "Total XP", "#d97706")}
-        <td width="4%"></td>
-        ${statBox(lessonsCompleted.toString(), "This Week", "#58cc02")}
-      </tr>
-    </table>
-
-    ${friendRows ? `
-    <div style="margin-bottom:24px">
-      <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Friends this week</div>
-      <table width="100%" cellpadding="0" cellspacing="0">${friendRows}</table>
-    </div>` : ""}
-
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:24px">
-      <div style="font-size:13px;color:#166534;line-height:1.6">
-        ${streakCount >= 7 ? `🏆 You've unlocked Social & Leaderboard. Challenge your friends!` : `🎯 ${7 - streakCount} more days to unlock the Leaderboard and Social features.`}
-      </div>
-    </div>
-
-    ${btn("Continue learning →", `${APP_URL}/dashboard`)}
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: `Your PM week in review — ${streakCount} day streak 🔥`,
-    html: wrap(`${lessonsCompleted} lessons done this week. Here's how you're doing.`, body),
-  });
-}
-
-// ── Challenge received ─────────────────────────────────────────────────────
-export async function sendChallengeReceivedEmail({
-  toEmail, toName, fromName, message,
-}: { toEmail: string; toName: string; fromName: string; message: string }) {
-  if (!process.env.RESEND_API_KEY) return;
-  const first = toName.split(" ")[0];
-  const body = `
-    <div style="text-align:center;margin-bottom:24px">
-      <span style="font-size:48px">⚔️</span>
-    </div>
-    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px;text-align:center">${fromName} just challenged you</h1>
-    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;text-align:center">${first}, someone thinks they can out-learn you.</p>
-
-    <div style="background:#f9fafb;border-left:4px solid #6366f1;border-radius:0 12px 12px 0;padding:16px;margin-bottom:24px">
-      <div style="font-size:12px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:6px">${fromName} says:</div>
-      <div style="font-size:14px;color:#374151;font-style:italic;line-height:1.6">"${message}"</div>
-    </div>
-
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px">
-      <tr>
-        <td style="padding-right:6px">
-          <a href="${APP_URL}/social" style="display:block;background:#58cc02;color:#fff;font-weight:700;font-size:14px;text-decoration:none;padding:13px;border-radius:10px;text-align:center">✅ Accept</a>
-        </td>
-        <td style="padding-left:6px">
-          <a href="${APP_URL}/social" style="display:block;background:#f3f4f6;color:#6b7280;font-weight:700;font-size:14px;text-decoration:none;padding:13px;border-radius:10px;text-align:center">✕ Decline</a>
-        </td>
-      </tr>
-    </table>
-
-    <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;text-align:center">Challenge expires in 48 hours</p>
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: `${fromName} challenged you to a PM duel ⚔️`,
-    html: wrap(`${fromName} thinks they can out-learn you. Will you accept?`, body),
-  });
-}
-
-// ── Challenge accepted ─────────────────────────────────────────────────────
-export async function sendChallengeAcceptedEmail({
-  toEmail, toName, fromName,
-}: { toEmail: string; toName: string; fromName: string }) {
-  if (!process.env.RESEND_API_KEY) return;
-  const first = toName.split(" ")[0];
-  const body = `
-    <div style="text-align:center;margin-bottom:24px">
-      <span style="font-size:48px">🔥</span>
-    </div>
-    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px;text-align:center">Game on, ${first}!</h1>
-    <p style="margin:0 0 20px;font-size:15px;color:#6b7280;line-height:1.6;text-align:center">
-      <strong style="color:#111">${fromName}</strong> accepted your challenge. You challenged them — now you have to actually go learn something.
-    </p>
-
-    <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px;margin-bottom:24px;text-align:center">
-      <div style="font-size:13px;color:#9a3412;line-height:1.6">
-        Complete today's lesson before ${fromName} does.<br>
-        <strong>First to finish wins the bragging rights.</strong>
-      </div>
-    </div>
-
-    ${btn("Go learn now — don't let them win →", `${APP_URL}/dashboard`, "#ea580c")}
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: `${fromName} accepted 🔥 Don't let them beat you`,
-    html: wrap(`${fromName} is ready. Are you?`, body),
-  });
-}
-
-export async function sendStreakMilestoneEmail({
-  toEmail, toName, streakCount, gemsEarned,
-}: { toEmail: string; toName: string; streakCount: number; gemsEarned: number }) {
-  if (!process.env.RESEND_API_KEY) return;
-  const first = toName.split(" ")[0];
-  const milestoneEmoji: Record<number, string> = { 3: "🔥", 7: "⚡", 14: "💎", 30: "👑", 50: "🏆", 100: "🌟", 365: "🦉" };
-  const emoji = milestoneEmoji[streakCount] ?? "🔥";
-  const body = `
-    <div style="text-align:center;margin-bottom:24px">
-      <span style="font-size:48px">${emoji}</span>
-    </div>
-    <h1 style="margin:0 0 8px;font-size:24px;font-weight:900;color:#111;letter-spacing:-0.5px;text-align:center">${streakCount}-Day Streak, ${first}!</h1>
-    <p style="margin:0 0 20px;font-size:15px;color:#6b7280;line-height:1.6;text-align:center">
-      ${streakCount} consecutive days of PM learning. You're in the top tier of learners on PM Streak.
-    </p>
-
-    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px;margin-bottom:24px;text-align:center">
-      <div style="font-size:13px;color:#166534;line-height:1.6">
-        🏅 Milestone bonus: <strong>+${gemsEarned} gems</strong> added to your account.<br>
-        Use them to buy Streak Freezes, XP Boosts, or save your streak.
-      </div>
-    </div>
-
-    ${btn(`Keep your streak alive →`, `${APP_URL}/dashboard`, "#58cc02")}
-  `;
-  await getResend().emails.send({
-    from: FROM, replyTo: REPLY_TO, to: toEmail,
-    subject: `${emoji} ${streakCount}-day streak! You're unstoppable`,
-    html: wrap(`${streakCount} days in a row. ${emoji}`, body),
-  });
+function getStreakSubject(firstName: string, streak: number): string {
+  if (streak >= 30) return `⚠️ ${streak} days → 0. Not on your watch, ${firstName}.`;
+  if (streak >= 14) return `${streak}-day streak. 3 minutes to save it. ${firstName}, go.`;
+  if (streak >= 7) return `Your ${streak}-day streak resets at midnight, ${firstName} 🔥`;
+  if (streak >= 3) return `Don't let ${streak} days end tonight, ${firstName}`;
+  return `Today's lesson is 3 minutes, ${firstName}. Your streak is waiting.`;
 }

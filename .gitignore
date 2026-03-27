@@ -4,6 +4,8 @@ prisma/dev.db
 prisma/dev.db-journal
 .env
 .env.local
+.env.production
+.env.vercel
 .env.vercel.production
 *.tsbuildinfo
 next-env.d.ts

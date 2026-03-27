@@ -17,6 +17,11 @@ function addMonthlyPeriod(from: Date): Date {
   return new Date(from.getTime() + 30 * MS_PER_DAY);
 }
 
+/** Quarterly UPI plan: exactly 90 days from the paid-from instant. */
+function addQuarterlyPeriod(from: Date): Date {
+  return new Date(from.getTime() + 90 * MS_PER_DAY);
+}
+
 /** Yearly UPI plan: one calendar year from the paid-from instant. */
 function addYearlyPeriod(from: Date): Date {
   const d = new Date(from.getTime());
@@ -26,9 +31,11 @@ function addYearlyPeriod(from: Date): Date {
 
 export function computeUpiPeriodEnd(
   paidFrom: Date,
-  interval: "month" | "year",
+  interval: "month" | "quarter" | "year",
 ): Date {
-  return interval === "month" ? addMonthlyPeriod(paidFrom) : addYearlyPeriod(paidFrom);
+  if (interval === "month") return addMonthlyPeriod(paidFrom);
+  if (interval === "quarter") return addQuarterlyPeriod(paidFrom);
+  return addYearlyPeriod(paidFrom);
 }
 
 export async function getActiveUpiSubscription(userId: string) {
@@ -109,7 +116,7 @@ async function upsertProEntitlements(userId: string, expiresAt: Date) {
  */
 export async function grantUpiIndiaPro(opts: {
   userId: string;
-  interval: "month" | "year";
+  interval: "month" | "quarter" | "year";
   /** When the payment applies from (default: now). */
   paidAt?: Date;
 }): Promise<{ currentPeriodEnd: Date; subscriptionId: string }> {
@@ -131,7 +138,7 @@ export async function grantUpiIndiaPro(opts: {
       : paidAt;
   const periodEnd = computeUpiPeriodEnd(base, opts.interval);
 
-  const billingInterval = opts.interval === "month" ? "month" : "year";
+  const billingInterval = opts.interval === "year" ? "year" : "month";
 
   let subId: string;
   if (existing) {

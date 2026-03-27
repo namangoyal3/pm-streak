@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { maybeGrantProTrial } from "@/lib/billing/trial";
+import { isUserPro } from "@/lib/entitlements";
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -38,6 +39,8 @@ export async function GET() {
         proPreviewConsumed: true,
         country: true,
         priceBand: true,
+        credits: true,
+        creditsRefreshedAt: true,
       },
     }),
     prisma.notification.count({ where: { userId, readAt: null } }),
@@ -47,7 +50,15 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ user: { ...user, unreadNotifications } });
+  const effectiveIsPro = await isUserPro(userId);
+
+  return NextResponse.json({ 
+    user: { 
+      ...user, 
+      plan: effectiveIsPro ? "pro" : user.plan,
+      unreadNotifications 
+    } 
+  });
 }
 
 export async function DELETE() {

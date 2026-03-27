@@ -1,31 +1,20 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [error, setError] = useState("");
+
 
   useEffect(() => {
     const err = searchParams.get("error");
-    const reason = searchParams.get("reason");
-    if (err === "google_failed") {
-      setError(
-        reason
-          ? `Google sign-in failed: ${reason}`
-          : "Google sign-in failed. Please try again."
-      );
-    }
+    if (err === "google_failed") setError("Google sign-in failed. Please try again in a moment.");
     if (err === "google_cancelled") setError("Sign-in was cancelled.");
-    if (err === "google_not_configured") {
-      setError("Google sign-in is temporarily unavailable right now.");
-    }
-    if (err === "invalid_link") {
-      setError("This sign-in link is invalid or expired. Request a new one.");
-    }
   }, [searchParams]);
 
   return (
@@ -35,9 +24,14 @@ function LoginForm() {
       {/* Left panel — branding */}
       <div className="hidden lg:flex flex-col justify-between w-80 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] p-8 flex-shrink-0 shadow-2xl z-10 transition-colors">
         <div>
-          <div className="flex items-center gap-1.5 font-black text-2xl tracking-tight mb-12">
-            <span className="text-[var(--green-primary)]">PM</span>
-            <span>Streak</span>
+          <div className="flex items-center gap-1.5 mb-12">
+            <div className="flex flex-col leading-none">
+              <div className="font-black text-2xl tracking-tight flex items-center gap-1">
+                <span className="text-[var(--green-primary)]">PM</span>
+                <span>Streak</span>
+              </div>
+              <span className="text-[10px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+            </div>
           </div>
           <div className="space-y-8">
             {[
@@ -90,9 +84,11 @@ function LoginForm() {
               </svg>
               Continue with Google
             </BrowserLink>
+
+
           </div>
 
-          <p className="text-center mt-8 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed">
+          <p className="text-center mt-12 text-[10px] text-[var(--text-secondary)]/50 leading-relaxed font-bold uppercase tracking-tight">
             By signing in you agree to our{" "}
             <a href="/terms" className="underline hover:text-white">Terms</a>
             {" & "}

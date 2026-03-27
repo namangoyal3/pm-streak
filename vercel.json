@@ -1,8 +1,21 @@
 {
+  "functions": {
+    "src/app/api/generate-lesson/route.ts": {
+      "maxDuration": 60
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/daily-emails",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-jobs",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-credits",
+      "schedule": "0 0 1 * *"
     }
   ]
 }

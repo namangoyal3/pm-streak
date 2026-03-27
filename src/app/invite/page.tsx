@@ -13,9 +13,10 @@ function InviteContent() {
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm text-center">
         <Flame size={56} className="text-[var(--orange-primary)] streak-flame mx-auto mb-4" />
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-3xl font-bold mb-0.5">
           <span className="text-[var(--green-primary)]">PM</span> Streak
         </h1>
+        <p className="text-[10px] font-bold text-[var(--text-secondary)] tracking-wide mb-2">by learnanything.pro</p>
         <p className="text-[var(--text-secondary)] text-sm mb-6">
           Your friend invited you to learn product management in 2-3 minutes a day
         </p>

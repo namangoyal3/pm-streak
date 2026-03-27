@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
 
   // Fire-and-forget email (don't block response)
   sendChallengeReceivedEmail({
+    userId: challengeeId,
     toEmail: challengee.email,
     toName: challengee.name,
     fromName: challenger?.name ?? "A friend",
@@ -130,6 +131,7 @@ export async function PATCH(req: NextRequest) {
   // Send email to challenger if accepted
   if (newStatus === "accepted") {
     sendChallengeAcceptedEmail({
+      userId: challenge.challenger.id,
       toEmail: challenge.challenger.email,
       toName: challenge.challenger.name,
       fromName: challenge.challengee.name,

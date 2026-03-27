@@ -1,62 +1,37 @@
 import type { Metadata, Viewport } from "next";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import GoogleAnalyticsInit from "@/components/GoogleAnalyticsInit";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
+import GoogleAnalyticsTracker from "@/components/GoogleAnalyticsTracker";
+import { Suspense } from "react";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://duolingo-for-pms.vercel.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "PM Streak | Daily Product Management Lessons",
-    template: "%s | PM Streak",
-  },
-  description:
-    "Build product intuition with daily PM micro-lessons from podcast insights. Keep your streak, earn XP, and level up in minutes.",
-  applicationName: "PM Streak",
-  keywords: [
-    "product management",
-    "PM lessons",
-    "PM interview prep",
-    "product strategy",
-    "daily learning",
-    "Lenny podcast",
-  ],
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    type: "website",
-    url: "/",
-    title: "PM Streak | Daily Product Management Lessons",
-    description:
-      "Build product intuition with daily PM micro-lessons from podcast insights. Keep your streak, earn XP, and level up in minutes.",
-    siteName: "PM Streak",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "PM Streak | Daily Product Management Lessons",
-    description:
-      "Build product intuition with daily PM micro-lessons from podcast insights. Keep your streak, earn XP, and level up in minutes.",
-  },
+  title: "PM Streak - Duolingo for Product Managers",
+  description: "Daily product wisdom with streaks, XP, and leaderboards. Learn PM skills in 2-3 minutes a day.",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", rel: "shortcut icon", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
-    shortcut: ["/icon.svg"],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
+  verification: {
+    google: "85fab4e21763c3a7",
+  },
+  openGraph: {
+    title: "PM Streak - Duolingo for Product Managers",
+    description: "Daily product wisdom with streaks, XP, and leaderboards. Learn PM skills in 2-3 minutes a day.",
+    siteName: "PM Streak",
+    images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak" }],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PM Streak - Duolingo for Product Managers",
+    description: "Daily product wisdom with streaks, XP, and leaderboards.",
+    images: ["/api/og?title=PM+Streak"],
   },
 };
 
@@ -67,14 +42,22 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID?.trim();
+  const gaDebug = process.env.NEXT_PUBLIC_GA_DEBUG === "true";
+
   return (
     <html lang="en">
       <body className="antialiased min-h-screen">
         <PostHogProvider>
           {children}
         </PostHogProvider>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        {gaId && (
+          <>
+            <GoogleAnalyticsInit gaId={gaId} debugMode={gaDebug} />
+            <Suspense fallback={null}>
+              <GoogleAnalyticsTracker gaId={gaId} />
+            </Suspense>
+          </>
         )}
       </body>
     </html>

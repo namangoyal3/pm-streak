@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { CheckCircle2, Lock, Zap, PlayCircle, Star } from "lucide-react";
+import { CheckCircle2, Lock, Zap, PlayCircle, Star, Sparkles } from "lucide-react";
+
+const PRO_GATE_REASON = "UPGRADE_TO_PRO";
 
 interface LessonCardProps {
   id: string;
@@ -33,6 +35,32 @@ export default function LessonCard({
   const accent = "var(--lesson-accent)";
 
   if (locked) {
+    const isProGate = lockedReason === PRO_GATE_REASON;
+
+    if (isProGate) {
+      return (
+        <Link href="/pricing" className="block">
+          <div className="lesson-card border-2 border-purple-500/30 bg-purple-900/10 p-4 hover:border-purple-500/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 flex items-center justify-center flex-shrink-0 rounded-[var(--ds-radius-md)] bg-purple-500/15">
+                <Sparkles size={18} className="text-purple-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-sm truncate text-white/60">{title}</h3>
+                <p className="text-xs text-white/40 truncate mt-0.5">{description}</p>
+                <p className="text-[10px] text-purple-400 font-black mt-2">
+                  🔒 Pro — Upgrade to unlock all 292+ lessons
+                </p>
+              </div>
+              <span className="text-[10px] font-black px-2 py-1 rounded-full bg-purple-500/20 text-purple-300 flex-shrink-0 whitespace-nowrap">
+                PRO
+              </span>
+            </div>
+          </div>
+        </Link>
+      );
+    }
+
     return (
       <div className="lesson-card cursor-not-allowed border-2 border-[var(--border-color)] bg-[var(--surface-2)] p-4">
         <div className="flex items-center gap-3">

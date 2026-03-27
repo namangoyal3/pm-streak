@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -113,6 +113,13 @@ export default function QuizView({
   } | null>(null);
   const [generatingDeepDive, setGeneratingDeepDive] = useState(false);
   const [deepDiveError, setDeepDiveError] = useState("");
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setUser(data.user); });
+  }, []);
 
   const question = questions[currentQ];
   const isCorrect = selected === question?.correctIndex;
@@ -299,7 +306,7 @@ export default function QuizView({
                       </>
                     ) : (
                       <>
-                        <Sparkles size={14} /> Generate Deeper Dive
+                        <Sparkles size={14} /> Generate Deeper Dive {user?.plan === "pro" ? "" : "(2 Credits)"}
                       </>
                     )}
                   </button>

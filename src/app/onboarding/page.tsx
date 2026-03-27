@@ -75,9 +75,10 @@ export default function OnboardingPage() {
                 className="text-center"
               >
                 <Flame size={64} className="mx-auto text-[var(--orange-primary)] streak-flame mb-6" />
-                <h1 className="text-2xl font-bold mb-2">
+                <h1 className="text-2xl font-bold mb-0.5">
                   Welcome to <span className="text-[var(--green-primary)]">PM</span> Streak
                 </h1>
+                <p className="text-[10px] font-bold text-[var(--text-secondary)] tracking-wide mb-2">by learnanything.pro</p>
                 <p className="text-[var(--text-secondary)] text-sm mb-2">
                   Learn product management in 2-3 minutes a day.
                 </p>

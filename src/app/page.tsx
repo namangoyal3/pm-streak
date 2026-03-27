@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
 
@@ -42,7 +43,7 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "PM Streak",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://duolingo-for-pms.vercel.app",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro",
     description:
       "Daily product management learning platform with streaks, XP, and rankings.",
   };
@@ -76,11 +77,24 @@ export default async function Home() {
 
       {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/90 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center">
-          <div className="flex items-center gap-1.5 font-black text-xl tracking-tight">
+        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
             <span className="text-2xl">🔥</span>
-            <span className="text-[var(--green-primary)]">PM</span>
-            <span className="text-white">Streak</span>
+            <div className="flex flex-col leading-none">
+              <div className="font-black text-xl tracking-tight flex items-center gap-1">
+                <span className="text-[var(--green-primary)]">PM</span>
+                <span className="text-white">Streak</span>
+              </div>
+              <span className="text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <BrowserLink
+              href="/login"
+              className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-colors"
+            >
+              Sign up with Google
+            </BrowserLink>
           </div>
         </div>
       </nav>
@@ -102,24 +116,22 @@ export default async function Home() {
             </p>
             <div className="mb-8 p-4 rounded-2xl bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/20 max-w-md">
               <p className="text-sm text-[var(--green-primary)] font-bold">
-                Join 5,000+ PMs building their product intuition daily.
+                Built on 300+ episodes of Lenny&apos;s Podcast — the #1 resource for PMs.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <BrowserLink
-                href="/api/auth/google"
-                className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-lg shadow-[var(--green-primary)]/20 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="white" fillOpacity="0.9"/>
-                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="white" fillOpacity="0.9"/>
-                  <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="white" fillOpacity="0.9"/>
-                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="white" fillOpacity="0.9"/>
-                </svg>
-                Be a 10x PM Now
-              </BrowserLink>
-            </div>
+            <BrowserLink
+              href="/login"
+              className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-base font-black transition-all shadow-lg shadow-[var(--green-primary)]/20 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="white" fillOpacity="0.9"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="white" fillOpacity="0.9"/>
+                <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="white" fillOpacity="0.9"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="white" fillOpacity="0.9"/>
+              </svg>
+              Sign up with Google
+            </BrowserLink>
             <p className="mt-3 text-xs text-[var(--text-secondary)]">No credit card · 30 seconds to set up</p>
           </div>
 
@@ -284,18 +296,30 @@ export default async function Home() {
       {/* ── FINAL CTA ── */}
       <section className="border-t border-[var(--border-color)]">
         <div className="max-w-5xl mx-auto px-5 py-20">
-          <div className="bg-gradient-to-br from-[var(--green-primary)]/12 via-[var(--bg-card)] to-[var(--bg-card)] border border-[var(--green-primary)]/25 rounded-3xl px-8 py-12">
-            <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-3">Ready to start?</p>
-            <h2 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight mb-3">
-              Day 1 starts<br />today.
-            </h2>
-            <div className="pt-2">
+          <div className="bg-gradient-to-br from-[var(--green-primary)]/12 via-[var(--bg-card)] to-[var(--bg-card)] border border-[var(--green-primary)]/25 rounded-3xl px-8 py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-3">Ready to start?</p>
+              <h2 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight mb-3">
+                Day 1 starts<br />today.
+              </h2>
+              <p className="text-[var(--text-secondary)] text-sm max-w-xs leading-relaxed">
+                The best PMs aren&apos;t born sharp — they build the habit. Two minutes is all it takes to start.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 flex-shrink-0">
               <BrowserLink
-                href="/api/auth/google"
-                className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[var(--green-primary)]/20"
+                href="/login"
+                className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white text-sm font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[var(--green-primary)]/20"
               >
-                Be a 10x PM now!
+                <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="white" fillOpacity="0.9"/>
+                  <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="white" fillOpacity="0.9"/>
+                  <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="white" fillOpacity="0.9"/>
+                  <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="white" fillOpacity="0.9"/>
+                </svg>
+                Sign up with Google
               </BrowserLink>
+              <p className="text-center text-xs text-[var(--text-secondary)]">No password · Takes 30 seconds</p>
             </div>
           </div>
         </div>
@@ -304,10 +328,19 @@ export default async function Home() {
       {/* ── FOOTER ── */}
       <footer className="border-t border-[var(--border-color)] py-6">
         <div className="max-w-5xl mx-auto px-5 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
-          <div className="flex items-center gap-1.5 font-black text-sm">
+          <div className="flex items-center gap-1.5">
             <span>🔥</span>
-            <span className="text-[var(--green-primary)]">PM</span>
-            <span className="text-white">Streak</span>
+            <div className="flex flex-col leading-none">
+              <div className="font-black text-sm flex items-center gap-1">
+                <span className="text-[var(--green-primary)]">PM</span>
+                <span className="text-white">Streak</span>
+              </div>
+              <span className="text-[8px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
           </div>
           <p>Powered by insights from Lenny&apos;s Podcast. Not affiliated with Lenny&apos;s Newsletter.</p>
         </div>

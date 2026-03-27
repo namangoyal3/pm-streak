@@ -7,6 +7,8 @@ import type { NextConfig } from "next";
  */
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(process.cwd()),
+  // Crawlee / Playwright / Puppeteer use Node.js native modules — exclude from webpack bundle
+  serverExternalPackages: ["crawlee", "playwright", "playwright-core", "puppeteer", "puppeteer-core", "@crawlee/playwright", "@crawlee/puppeteer"],
 };
 
 export default nextConfig;

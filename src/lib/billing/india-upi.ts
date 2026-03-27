@@ -10,9 +10,14 @@ const BUNDLED = {
     amount: "₹1,899 / year",
     title: "Yearly Pro",
   },
+  quarterly: {
+    path: "/india-upi-quarterly.png",
+    amount: "₹1,699 / 3 months",
+    title: "Quarterly Pro",
+  },
   monthly: {
     path: "/india-upi-monthly.png",
-    amount: "₹299 / month",
+    amount: "₹499 / month",
     title: "Monthly Pro",
   },
 } as const;
@@ -52,9 +57,9 @@ export function getIndiaUpiPlans(): IndiaUpiPlan[] {
   );
   push(
     out,
-    process.env.NEXT_PUBLIC_INDIA_UPI_QUARTERLY_QR_URL,
-    process.env.NEXT_PUBLIC_INDIA_UPI_QUARTERLY_AMOUNT,
-    process.env.NEXT_PUBLIC_INDIA_UPI_QUARTERLY_TITLE,
+    process.env.NEXT_PUBLIC_INDIA_UPI_QUARTERLY_QR_URL?.trim() || BUNDLED.quarterly.path,
+    process.env.NEXT_PUBLIC_INDIA_UPI_QUARTERLY_AMOUNT?.trim() || BUNDLED.quarterly.amount,
+    process.env.NEXT_PUBLIC_INDIA_UPI_QUARTERLY_TITLE?.trim() || BUNDLED.quarterly.title,
   );
   push(
     out,

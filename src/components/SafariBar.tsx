@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const APP_URL = "https://duolingo-for-pms.vercel.app";
+const APP_URL = "https://learnanything.pro";
 
 function isIOSWebView() {
   if (typeof navigator === "undefined") return false;
@@ -30,8 +30,8 @@ export default function SafariBar() {
         onClick={() => window.open(url, "_blank")}
         className="w-full flex items-center justify-between gap-3 px-5 py-4 rounded-2xl bg-[var(--green-primary)] text-white font-black text-sm shadow-2xl"
       >
-        <span>Google sign-in requires Safari</span>
-        <span>Open in Safari →</span>
+        <span>Google sign-in requires Browser</span>
+        <span>Open in Browser →</span>
       </button>
     </div>
   );

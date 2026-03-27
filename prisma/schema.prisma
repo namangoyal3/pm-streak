@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -30,6 +31,10 @@ model User {
   lostStreakVal Int      @default(0)    // the streak value that was lost
   xpBoostActive Boolean  @default(false) // next lesson gives 2× XP
   unlockedBatch Int      @default(0)     // how many batches of locked lessons have been unlocked
+  credits            Int      @default(10)    // spendable credits (free=10/mo, pro=50/mo)
+  creditsRefreshedAt DateTime?               // when credits were last reset
+  emailOptOut        Boolean   @default(false)
+  emailOptOutAt      DateTime?
 
   // Billing / PM Streak Pro (Paddle)
   plan               String    @default("free") // free | pro
@@ -61,6 +66,8 @@ model User {
   subscriptions      Subscription[]
   billingEvents      BillingEvent[]
   entitlements       Entitlement[]
+  creditTransactions CreditTransaction[]
+  emailLogs          EmailLog[]
 }
 
 model Subscription {
@@ -113,6 +120,34 @@ model CountryPriceOverride {
   priceBand   String   // A | B | C
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Coupon {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  email           String
+  discountPercent Int       @default(70)
+  signature       String
+  expiresAt       DateTime
+  usedAt          DateTime?
+  usedByUserId    String?
+  createdAt       DateTime  @default(now())
+
+  @@index([code])
+  @@index([email])
+}
+
+model CouponAttempt {
+  id        String   @id @default(cuid())
+  code      String
+  ip        String
+  userAgent String?
+  success   Boolean
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([code, ip])
+  @@index([ip, createdAt])
 }
 
 model Notification {
@@ -287,4 +322,67 @@ model FriendChallenge {
 
   challenger User @relation("challenger", fields: [challengerId], references: [id])
   challengee User @relation("challengee", fields: [challengeeId], references: [id])
+}
+
+model CreditTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int      // positive = earned, negative = spent
+  reason    String   // monthly_refresh | lesson_unlock | ai_lesson | interview_prep
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model EmailLog {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailType String    // welcome | day2_nudge | first_lesson_done | streak_at_risk | habit_day3 | close_to_7 | milestone | pro_nudge_7d | pro_nudge_14d | reengagement_3d | reengagement_7d | weekly_digest | pro_digest | pro_winback
+  sentAt    DateTime  @default(now())
+  openedAt  DateTime?
+  clickedAt DateTime?
+  resendId  String?   // Resend email ID for webhook matching
+
+  @@index([userId, emailType])
+  @@index([userId, sentAt])
+  @@index([resendId])
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  location    String?
+  remote      Boolean  @default(false)
+  applyUrl    String
+  description String?
+  tags        String[]
+  source      String   // wellfound | linkedin | himalayas
+  postedAt    DateTime?
+  scrapedAt   DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  @@index([isActive])
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  description String
+  body        String    @db.Text
+  vertical    String    // "pm" | "design" | "engineering" | "growth"
+  tags        String[]
+  seoScore    Int       @default(0)
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  wordCount   Int       @default(0)
+  sourceUrls  String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([published, vertical])
+  @@index([slug])
 }
