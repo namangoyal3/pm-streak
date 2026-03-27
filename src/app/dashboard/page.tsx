@@ -561,24 +561,7 @@ export default function DashboardPage() {
                 : ` · ${totalArchive}+ episodes in Lenny's catalog, unlocking batch by batch`}
           </p>
           <p className="text-[10px] text-[var(--text-secondary)] mt-2 leading-relaxed border-t border-[var(--border-color)] pt-2">
-            <span className="font-bold text-[var(--text-primary)]">
-              {coreLessonCount > totalArchive
-                ? `${coreLessonCount} (${totalArchive} catalog reference)`
-                : `${archiveImportDisplay} of ${totalArchive}`}
-            </span>{" "}
-            podcast-archive lesson rows in the database
-            {episodesNotYetImported > 0 ? (
-              <>
-                {" "}
-                ·{" "}
-                <span className="font-bold text-[var(--orange-primary)]">
-                  {episodesNotYetImported} not imported yet
-                </span>{" "}
-                (run the archive backfill on the server to grow toward full catalog)
-              </>
-            ) : (
-              <> · Full catalog imported</>
-            )}
+            New podcast lessons are added in batches as you progress.
           </p>
         </div>
 
@@ -594,12 +577,10 @@ export default function DashboardPage() {
                 {stats.archiveUnlockProgress.completedAvailable}/
                 {stats.archiveUnlockProgress.availableLessonTotal}
               </span>{" "}
-              core lessons on your map completed. When you finish{" "}
+              core lessons completed. When you finish{" "}
               <span className="text-[var(--text-primary)] font-bold">every</span>{" "}
               open lesson here, the next{" "}
-              {stats.archiveUnlockProgress.batchSize} Lenny podcast lessons
-              unlock. Bonus lessons from Explore don&apos;t count toward this
-              gate.
+              {stats.archiveUnlockProgress.batchSize} podcast lessons unlock.
             </p>
             <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-1)]">
               <div

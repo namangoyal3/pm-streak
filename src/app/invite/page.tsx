@@ -71,10 +71,10 @@ function InviteContent() {
         </div>
 
         <Link
-          href={`/signup${ref ? `?ref=${ref}` : ""}`}
+          href={ref ? `/?ref=${encodeURIComponent(ref)}` : "/"}
           className="block w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors mb-3 text-center"
         >
-          Join Free
+          Be a 10x PM Now
         </Link>
 
         <Link

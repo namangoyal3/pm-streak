@@ -106,10 +106,12 @@ export async function sendPasswordResetEmail({
   toEmail,
   toName,
   resetUrl,
+  loginUrl,
 }: {
   toEmail: string;
   toName: string;
   resetUrl: string;
+  loginUrl: string;
 }) {
   if (!process.env.RESEND_API_KEY) return;
   const first = toName.split(" ")[0] || "there";
@@ -120,7 +122,8 @@ export async function sendPasswordResetEmail({
       This link expires in 30 minutes.
     </p>
 
-    ${btn("Reset password →", resetUrl, "#58cc02")}
+    ${btn("Log in securely →", loginUrl, "#58cc02")}
+    ${btn("Reset password instead →", resetUrl, "#2563eb")}
 
     <p style="margin:18px 0 0;font-size:12px;color:#9ca3af;line-height:1.6">
       If you did not request this, you can safely ignore this email.
