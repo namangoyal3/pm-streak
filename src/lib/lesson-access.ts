@@ -111,20 +111,21 @@ const FREE_LESSONS_PER_CATEGORY = 5;
 /**
  * These categories are entirely premium for free users (show 0 free lessons,
  * full pro-gate card regardless of how many lessons they contain).
- * Typically thought-leader specific categories with few total lessons.
+ *
+ * We gate any `pm-leader-*` category by default so newly added PM leaders
+ * automatically appear as paid content without requiring code updates.
  */
-const FULLY_PREMIUM_CATEGORY_SLUGS = new Set([
-  // Thought-leader specific categories — always fully premium for free users
-  "pm-leader-aakash",
-  "pm-leader-shreyas",
-  "pm-leader-wes",
-  "pm-leader-lenny",
-  "pm-leader-jason",
-  "pm-leader-elena",
-  "pm-leader-andrew",
-  "pm-leader-casey",
-  "pm-leader-brian",
-]);
+const FULLY_PREMIUM_CATEGORY_SLUG_PREFIXES = ["pm-leader-"] as const;
+const FULLY_PREMIUM_CATEGORY_SLUGS = new Set<string>();
+
+function isFullyPremiumCategorySlug(slug: string): boolean {
+  return (
+    FULLY_PREMIUM_CATEGORY_SLUGS.has(slug) ||
+    FULLY_PREMIUM_CATEGORY_SLUG_PREFIXES.some((prefix) =>
+      slug.startsWith(prefix)
+    )
+  );
+}
 
 function getArchiveVisibility(
   lessons: Pick<LessonWithCompletion, "id" | "title" | "dayNumber" | "isLocked">[],
@@ -182,7 +183,7 @@ function mapCurriculumCategory(
   // Free-tier enforcement: cap visible lessons per category regardless of DB isLocked.
   // Pro users always see every lesson. Fully premium categories (e.g. thought-leader
   // specific categories) show 0 free lessons regardless of total count.
-  const isFullyPremium = !isPro && FULLY_PREMIUM_CATEGORY_SLUGS.has(category.slug);
+  const isFullyPremium = !isPro && isFullyPremiumCategorySlug(category.slug);
   const freeLimit = isPro ? sortedLessons.length : isFullyPremium ? 0 : FREE_LESSONS_PER_CATEGORY;
   const freeLessons = sortedLessons.slice(0, freeLimit);
   const proGatedCount = Math.max(0, sortedLessons.length - freeLimit);
