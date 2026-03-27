@@ -7,13 +7,13 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma db push && next build",
+    "build": "if [ -n \"$DATABASE_URL\" ]; then DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} prisma db push; else echo \"Skipping prisma db push: DATABASE_URL is not set\"; fi && next build",
     "start": "next start",
     "lint": "next lint",
-    "db:push": "npx prisma db push",
+    "db:push": "DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:studio": "npx prisma studio",
-    "db:reset": "npx prisma db push --force-reset && npx tsx prisma/seed.ts",
+    "db:reset": "DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} npx prisma db push --force-reset && npx tsx prisma/seed.ts",
     "db:cleanup:weak-ai-lessons": "npx tsx scripts/cleanup-weak-ai-lessons.ts --apply",
     "catalog:count": "npx tsx scripts/catalog-count.ts",
     "postinstall": "prisma generate"

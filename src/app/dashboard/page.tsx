@@ -229,6 +229,9 @@ export default function DashboardPage() {
   const streakCalendar = stats?.calendar ?? [];
   const totalCompleted = stats?.completedCount ?? 0;
   const totalLessons = stats?.totalLessons ?? 0;
+  const totalArchive = stats?.totalArchive ?? 289;
+  const coreLessonCount = stats?.coreLessonCount ?? 0;
+  const archiveImportDisplay = Math.min(coreLessonCount, totalArchive);
   const progressPct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
   const activeMobileCategory = categories.find((cat) => cat.id === activeCategoryId) ?? categories[0] ?? null;
 
