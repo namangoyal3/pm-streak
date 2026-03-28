@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "sh -c 'if [ -n \"$DATABASE_URL\" ]; then DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} npx prisma db push; else echo \"Skipping prisma db push (DATABASE_URL not set)\"; fi && next build'",
+    "build": "sh -c 'if [ -n \"$DATABASE_URL\" ] && [ \"$VERCEL\" != \"1\" ]; then DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} npx prisma db push; else echo \"Skipping prisma db push (Vercel CI or no DATABASE_URL)\"; fi && npx prisma generate && next build'",
     "start": "next start",
     "lint": "next lint",
     "db:push": "bash -lc 'export DATABASE_URL=\"${DATABASE_URL:-postgresql://pmstreak:pmstreak@localhost:5432/pmstreak_dev?schema=public}\"; export DIRECT_URL=\"${DIRECT_URL:-$DATABASE_URL}\"; npx prisma db push'",
