@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const ORIGINAL_PRICE = 499;
 const INCREASED_PRICE = Math.round(ORIGINAL_PRICE * 1.7);
-const SALE_PRICE = ORIGINAL_PRICE;
+const SALE_PRICE = Math.round(INCREASED_PRICE * 0.3);
 
 export default function PricingBannerModal() {
   const [isOpen, setIsOpen] = useState(false);
