@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, ChevronRight } from "lucide-react";
+import { Sparkles, ChevronRight, Zap } from "lucide-react";
 
 interface ProBannerProps {
   plan?: string;
@@ -14,9 +14,9 @@ export default function ProBanner({ plan }: ProBannerProps) {
     <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 px-4 relative z-[60]">
       <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 overflow-hidden">
-          <Sparkles size={16} className="text-yellow-300 flex-shrink-0 animate-pulse" />
+          <Zap size={14} className="text-yellow-300 flex-shrink-0 animate-pulse" />
           <p className="text-[11px] sm:text-xs font-black truncate leading-tight">
-            Unlock 292+ lessons, AI Prep & more with Pro!
+            🎉 70% OFF for first 500 users — Limited time!
           </p>
         </div>
         <Link 

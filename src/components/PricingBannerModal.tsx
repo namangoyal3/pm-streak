@@ -5,6 +5,10 @@ import { X, Sparkles, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+const OLD_PRICE = 499;
+const NEW_PRICE = Math.round(OLD_PRICE * 1.7);
+const SALE_PRICE = OLD_PRICE;
+
 export default function PricingBannerModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasClosed, setHasClosed] = useState(false);
@@ -58,10 +62,10 @@ export default function PricingBannerModal() {
               <div className="bg-white/10 rounded-xl p-4 mb-6">
                 <p className="text-white/60 text-xs mb-2">Monthly Pro</p>
                 <div className="flex items-center justify-center gap-2">
-                  <span className="text-3xl font-black text-white">₹499</span>
-                  <span className="text-white/40 line-through text-lg">₹849</span>
+                  <span className="text-3xl font-black text-white">₹{SALE_PRICE}</span>
+                  <span className="text-white/40 line-through text-lg">₹{NEW_PRICE}</span>
                 </div>
-                <p className="text-green-400 text-xs font-bold mt-2">You save ₹350!</p>
+                <p className="text-green-400 text-xs font-bold mt-2">You save ₹{NEW_PRICE - SALE_PRICE}!</p>
               </div>
 
               <Link

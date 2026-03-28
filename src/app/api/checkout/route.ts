@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
 
   checkoutUrl.searchParams.set("quantity", "1");
   checkoutUrl.searchParams.set("redirect_url", RETURN_URL);
+  checkoutUrl.searchParams.set("coupon_code", "FLAT70");
 
   const email = searchParams.get("email");
   if (email) checkoutUrl.searchParams.set("email", email);
