@@ -5,6 +5,10 @@ import Link from "next/link";
 import { CheckCircle2, AlertTriangle, Star, Loader2, Brain, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
+import {
+  INTERVIEW_PREP_PRICING,
+  interviewPrepSessionCreditTotal,
+} from "@/lib/interview-prep-pricing";
 
 interface InterviewQuestion {
   question: string;
@@ -55,7 +59,9 @@ export default function InterviewPrepPage() {
 
     if (!res.ok) {
       if (data.error === "insufficient_credits") {
-        setError(`Not enough credits. You have ${data.credits} ⚡ but need ${data.needed} ⚡.`);
+        setError(
+          `Not enough credits. You have ${data.credits} but need ${data.needed} (one full session is ${interviewPrepSessionCreditTotal()} credits).`
+        );
       } else {
         setError(data.error ?? "Something went wrong");
       }
@@ -110,7 +116,11 @@ export default function InterviewPrepPage() {
           </p>
           <p className="text-white/55 text-sm mt-3">Five PM questions + answer frameworks per session.</p>
           <p className="text-[11px] text-white/40 mt-1">
-            <strong className="text-purple-300">1 credit per lesson</strong> (5 lessons per session = 5 credits). Pro: unlimited.
+            <strong className="text-purple-300">
+              {INTERVIEW_PREP_PRICING.creditsPerQuestion} credit per question
+            </strong>{" "}
+            ({INTERVIEW_PREP_PRICING.questionsPerSession} questions = {interviewPrepSessionCreditTotal()} credits per
+            session). Pro: unlimited.
           </p>
         </div>
 
@@ -173,7 +183,8 @@ export default function InterviewPrepPage() {
             {loading ? (
               <><Loader2 size={16} className="animate-spin" /> Generating…</>
             ) : (
-              <><Brain size={16} /> Generate 5 questions (5 credits)</>
+              <><Brain size={16} /> Generate {INTERVIEW_PREP_PRICING.questionsPerSession} questions (
+              {interviewPrepSessionCreditTotal()} credits)</>
             )}
           </button>
         </div>
@@ -266,7 +277,7 @@ export default function InterviewPrepPage() {
               disabled={loading}
               className="w-full py-4 rounded-xl border-2 border-[var(--border-color)] bg-[var(--surface-2)] text-xs font-black text-white/70 hover:text-white hover:border-white/10 transition-all active:scale-[0.98] uppercase tracking-widest"
             >
-              Generate new set (5 credits)
+              Generate new set ({interviewPrepSessionCreditTotal()} credits)
             </button>
           </div>
         )}

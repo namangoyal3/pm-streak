@@ -18,6 +18,10 @@ import { ds } from "@/lib/ds";
 import ShareCard from "@/components/ShareCard";
 import StreakCelebration from "@/components/StreakCelebration";
 import GoalSelectionModal from "@/components/GoalSelectionModal";
+import {
+  INTERVIEW_PREP_PRICING,
+  interviewPrepSessionCreditTotal,
+} from "@/lib/interview-prep-pricing";
 
 interface Category {
   id: string;
@@ -821,8 +825,10 @@ export default function DashboardPage() {
                       <span className="text-sm font-black text-white">Credits</span>
                     </div>
                     <div className="flex items-center gap-1 bg-purple-500/20 px-2.5 py-1 rounded-full">
-                      <Zap size={12} className="text-purple-400" />
-                      <span className="text-xs font-black text-purple-400">{user.credits ?? 10}</span>
+                      <Zap size={12} className="text-purple-400" aria-hidden />
+                      <span className="text-xs font-black text-purple-400">
+                        {user.credits ?? 10} credits
+                      </span>
                     </div>
                   </div>
                   <p className="text-[10px] text-white/60 mb-3">Use credits to unlock lesson batches, generate AI lessons, and access interview prep.</p>
@@ -881,7 +887,10 @@ export default function DashboardPage() {
                       <span className="text-[10px] font-black">Interview</span>
                       <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-blue-500/25 text-blue-200">AI</span>
                     </div>
-                    <div className="text-[9px] text-[var(--text-secondary)]">1⚡ / lesson</div>
+                    <div className="text-[9px] text-[var(--text-secondary)] leading-tight">
+                      {interviewPrepSessionCreditTotal()} credits / session ·{" "}
+                      {INTERVIEW_PREP_PRICING.creditsPerQuestion} / question
+                    </div>
                   </div>
                 </Link>
               </div>

@@ -8,7 +8,7 @@ import ProBanner from "./ProBanner";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
 import type { LucideIcon } from "lucide-react";
-import { Flame, BookOpen, Trophy, Users, Sparkles, Gem, Lock, Zap, Brain } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Sparkles, Gem, Lock, Zap, Brain, Briefcase } from "lucide-react";
 
 type NavItemConfig = {
   href: string;
@@ -19,6 +19,8 @@ type NavItemConfig = {
   aiCapsule?: boolean;
   /** Second capsule offset so sweeps don’t pulse in lockstep */
   aiCapsuleStagger?: boolean;
+  /** Smaller label (six-tab bar) */
+  compactNavLabel?: boolean;
 };
 
 interface NavbarProps {
@@ -65,6 +67,7 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
     },
     { href: "/social", label: "Social", icon: Users, locked: false },
     { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: false },
+    { href: "/jobs", label: "PM Jobs", icon: Briefcase, locked: false, compactNavLabel: true },
     {
       href: "/interview-prep",
       label: "Interview Prep",
@@ -222,7 +225,9 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
                 <span
                   className={cn(
                     "font-bold text-center max-w-full px-0.5",
-                    item.aiCapsule && item.label.length > 8 ? "text-[8px] sm:text-[9px] leading-tight" : "text-[10px] leading-none",
+                    item.compactNavLabel || (item.aiCapsule && item.label.length > 8)
+                      ? "text-[8px] sm:text-[9px] leading-tight"
+                      : "text-[10px] leading-none",
                     active ? "text-[var(--green-primary)]" : ""
                   )}
                 >

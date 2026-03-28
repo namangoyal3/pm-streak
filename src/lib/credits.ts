@@ -1,12 +1,16 @@
 import { prisma } from "./prisma";
 import type { Prisma } from "@prisma/client";
+import {
+  INTERVIEW_PREP_PRICING,
+  interviewPrepSessionCreditTotal,
+} from "./interview-prep-pricing";
 
 export const CREDIT_COSTS = {
   lesson_unlock: 5,
   ai_lesson: 2,
-  /** One credit per interview-prep “lesson” (each of the 5 questions). */
-  interview_prep_per_question: 1,
-  interview_prep_questions_per_session: 5,
+  /** One credit per interview-prep question (billed per revealed/generated question). */
+  interview_prep_per_question: INTERVIEW_PREP_PRICING.creditsPerQuestion,
+  interview_prep_questions_per_session: INTERVIEW_PREP_PRICING.questionsPerSession,
   /** Daily interview sprint drill submission (non-Pro). */
   daily_drill: 1,
   mock_interview: 5,
@@ -16,9 +20,7 @@ export const CREDIT_COSTS = {
 
 /** Total credits for one AI Interview Prep session (5 questions). */
 export function interviewPrepSessionCredits(): number {
-  return (
-    CREDIT_COSTS.interview_prep_per_question * CREDIT_COSTS.interview_prep_questions_per_session
-  );
+  return interviewPrepSessionCreditTotal();
 }
 
 export type CreditReason =
