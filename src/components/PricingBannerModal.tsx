@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Sparkles, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import CouponInputModal from "./CouponInputModal";
 
 const ORIGINAL_PRICE = 499;
 const SALE_PRICE = ORIGINAL_PRICE;
@@ -11,6 +11,7 @@ const SALE_PRICE = ORIGINAL_PRICE;
 export default function PricingBannerModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasClosed, setHasClosed] = useState(false);
+  const [showCouponModal, setShowCouponModal] = useState(false);
 
   useEffect(() => {
     const closed = localStorage.getItem("pricing-banner-closed");
@@ -28,11 +29,15 @@ export default function PricingBannerModal() {
     localStorage.setItem("pricing-banner-closed", "true");
   };
 
+  const handleClaim = () => {
+    setShowCouponModal(true);
+  };
+
   if (hasClosed && !isOpen) return null;
 
   return (
     <>
-      {isOpen && (
+      {isOpen && !showCouponModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -67,14 +72,13 @@ export default function PricingBannerModal() {
                 <p className="text-green-400 text-xs font-bold mt-2">70% OFF!</p>
               </div>
 
-              <Link
-                href="/pricing"
-                onClick={handleClose}
-                className="block w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-black py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+              <button
+                onClick={handleClaim}
+                className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-white font-black py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Sparkles size={16} className="inline mr-2" />
                 Claim Your Discount
-              </Link>
+              </button>
               
               <p className="text-white/40 text-[10px] mt-4">
                 Offer valid for first 500 users. Prices go up after limit reached.
@@ -82,6 +86,18 @@ export default function PricingBannerModal() {
             </div>
           </div>
         </div>
+      )}
+
+      {showCouponModal && (
+        <CouponInputModal 
+          onClose={() => {
+            setShowCouponModal(false);
+            handleClose();
+          }} 
+          onSuccess={() => {
+            window.location.href = "/pricing";
+          }}
+        />
       )}
     </>
   );
