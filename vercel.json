@@ -2,6 +2,15 @@
   "functions": {
     "src/app/api/generate-lesson/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/cron/ingest-leader-content/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/cron/linkedin-jobs/route.ts": {
+      "maxDuration": 120
+    },
+    "src/app/api/job-targets/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
@@ -16,6 +25,14 @@
     {
       "path": "/api/cron/refresh-credits",
       "schedule": "0 0 1 * *"
+    },
+    {
+      "path": "/api/cron/ingest-leader-content",
+      "schedule": "30 0 * * *"
+    },
+    {
+      "path": "/api/cron/linkedin-jobs",
+      "schedule": "30 12 * * *"
     }
   ]
 }

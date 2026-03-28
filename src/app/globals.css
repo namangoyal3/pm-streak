@@ -160,3 +160,53 @@ body {
 .card-in {
   animation: card-in 0.3s ease-out forwards;
 }
+
+/* Bottom nav — AI capsule premium sweep (light travels right → left) */
+@keyframes nav-ai-capsule-sweep {
+  0% {
+    transform: translateX(110%) skewX(-14deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-220%) skewX(-14deg);
+    opacity: 0;
+  }
+}
+
+.nav-ai-capsule {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-ai-capsule::after {
+  content: "";
+  position: absolute;
+  inset: -60% -50%;
+  width: 55%;
+  z-index: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 62%,
+    transparent 100%
+  );
+  animation: nav-ai-capsule-sweep 2.75s ease-in-out infinite;
+  animation-delay: var(--nav-ai-sweep-delay, 0s);
+  pointer-events: none;
+}
+
+.nav-ai-capsule--sweep-delay::after {
+  --nav-ai-sweep-delay: 1.38s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-ai-capsule::after {
+    animation: none;
+    opacity: 0;
+  }
+}

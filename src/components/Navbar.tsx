@@ -7,7 +7,19 @@ import { useEffect, useState } from "react";
 import ProBanner from "./ProBanner";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
-import { Flame, BookOpen, Trophy, Users, Calendar, Sparkles, Gem, Lock, Zap } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Sparkles, Gem, Lock, Zap, Brain } from "lucide-react";
+
+type NavItemConfig = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  locked: boolean;
+  /** Animated “AI” capsule top-right (Learn + AI, Interview Prep, …) */
+  aiCapsule?: boolean;
+  /** Second capsule offset so sweeps don’t pulse in lockstep */
+  aiCapsuleStagger?: boolean;
+};
 
 interface NavbarProps {
   streakCount: number;
@@ -42,11 +54,25 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
       .catch(() => {});
   }, [pathname, propUnread]);
 
-  const navItems = [
+  const navItems: NavItemConfig[] = [
     { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
-    { href: "/explore", label: "Explore", icon: Sparkles, locked: false },
+    {
+      href: "/explore",
+      label: "Learn",
+      icon: Sparkles,
+      locked: false,
+      aiCapsule: true,
+    },
     { href: "/social", label: "Social", icon: Users, locked: false },
     { href: "/leaderboard", label: "Ranks", icon: Trophy, locked: false },
+    {
+      href: "/interview-prep",
+      label: "Interview Prep",
+      icon: Brain,
+      locked: false,
+      aiCapsule: true,
+      aiCapsuleStagger: true,
+    },
   ];
 
   return (
@@ -144,7 +170,7 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
               return (
                 <div
                   key={item.href}
-                  className="flex-1 flex flex-col items-center justify-center gap-0.5 text-[var(--border-color)] cursor-not-allowed relative"
+                  className="flex-1 flex flex-col items-center justify-center gap-0.5 text-[var(--border-color)] cursor-not-allowed relative min-w-0"
                 >
                   <div className="relative w-10 h-8 flex items-center justify-center rounded-xl">
                     <Icon size={22} strokeWidth={2} />
@@ -152,7 +178,7 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
                       <Lock size={8} className="text-[var(--border-color)]" />
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold">{item.label}</span>
+                  <span className="text-[10px] font-bold truncate max-w-full px-0.5">{item.label}</span>
                 </div>
               );
             }
@@ -162,14 +188,28 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex-1 flex flex-col items-center justify-center gap-0.5 transition-all duration-150",
+                  "flex-1 flex flex-col items-center justify-center gap-0.5 transition-all duration-150 min-w-0",
+                  item.aiCapsule && "relative",
                   active
                     ? "text-[var(--green-primary)]"
                     : "text-[var(--text-secondary)] hover:text-white"
                 )}
               >
+                {item.aiCapsule && (
+                  <span
+                    className={cn(
+                      "nav-ai-capsule pointer-events-none absolute top-0.5 right-0.5 z-10 inline-flex items-center justify-center text-[8px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded-full leading-none border shadow-sm",
+                      item.aiCapsuleStagger && "nav-ai-capsule--sweep-delay",
+                      active
+                        ? "bg-[var(--green-primary)]/20 text-[var(--green-primary)] border-[var(--green-primary)]/45"
+                        : "bg-blue-500/25 text-blue-200 border-blue-500/40"
+                    )}
+                  >
+                    <span className="relative z-[1]">AI</span>
+                  </span>
+                )}
                 <div className={cn(
-                  "relative w-10 h-8 flex items-center justify-center rounded-xl transition-all duration-150",
+                  "relative w-10 h-8 flex items-center justify-center rounded-xl transition-all duration-150 shrink-0",
                   active ? "bg-[var(--green-primary)]/15" : ""
                 )}>
                   <Icon size={22} strokeWidth={active ? 2.5 : 2} />
@@ -179,10 +219,13 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
                     </span>
                   )}
                 </div>
-                <span className={cn(
-                  "text-[10px] font-bold",
-                  active ? "text-[var(--green-primary)]" : ""
-                )}>
+                <span
+                  className={cn(
+                    "font-bold text-center max-w-full px-0.5",
+                    item.aiCapsule && item.label.length > 8 ? "text-[8px] sm:text-[9px] leading-tight" : "text-[10px] leading-none",
+                    active ? "text-[var(--green-primary)]" : ""
+                  )}
+                >
                   {item.label}
                 </span>
               </Link>

@@ -171,10 +171,13 @@ export default function InterviewSprintPage() {
             className="w-full min-h-48 rounded-xl bg-black/20 border border-white/10 px-3 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:border-[var(--green-primary)]/40"
           />
           {error && <p className="text-xs text-red-300 font-bold mt-2">{error}</p>}
+          <p className="text-[10px] text-white/45 mt-2">
+            Uses <strong className="text-white/70">1 credit</strong> per submitted drill (Pro: no charge).
+          </p>
           <button
             onClick={submitAnswer}
             disabled={submitting}
-            className="mt-4 w-full py-3 rounded-xl bg-[var(--green-primary)] text-white text-sm font-black uppercase tracking-wider disabled:opacity-60"
+            className="mt-3 w-full py-3 rounded-xl bg-[var(--green-primary)] text-white text-sm font-black uppercase tracking-wider disabled:opacity-60"
           >
             {submitting ? "Evaluating..." : "Submit for AI judge"}
           </button>

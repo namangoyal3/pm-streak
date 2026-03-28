@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Bottom nav preview (dev)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #131f24;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .hint {
+      padding: 1rem;
+      text-align: center;
+      color: #afafaf;
+      font-size: 13px;
+      max-width: 24rem;
+      margin: 0 auto 1rem;
+    }
+    @keyframes nav-ai-sweep {
+      0% { transform: translateX(110%) skewX(-14deg); opacity: 0; }
+      12% { opacity: 1; }
+      100% { transform: translateX(-220%) skewX(-14deg); opacity: 0; }
+    }
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a2b32;
+      border-top: 2px solid #37464f;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .row {
+      display: flex;
+      height: 64px;
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 0 8px;
+    }
+    .tab {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #afafaf;
+      font-size: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      position: relative;
+    }
+    .tab.active { color: #58cc02; }
+    .tab .ic {
+      width: 40px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+    .tab.active .ic { background: rgba(88, 204, 2, 0.15); }
+    .ai-cap {
+      position: absolute;
+      top: 6px;
+      right: 2px;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      line-height: 1;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: rgba(59, 130, 246, 0.25);
+      color: #bfdbfe;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .ai-cap.delay::after { animation-delay: 1.38s; }
+    .ai-cap::after {
+      content: "";
+      position: absolute;
+      inset: -60% -50%;
+      width: 55%;
+      z-index: 0;
+      background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 62%, transparent 100%);
+      animation: nav-ai-sweep 2.75s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .ai-cap span { position: relative; z-index: 1; }
+    .tab.active .ai-cap {
+      border-color: rgba(88, 204, 2, 0.45);
+      background: rgba(88, 204, 2, 0.2);
+      color: #58cc02;
+    }
+    .tab .lbl { font-size: 8px; line-height: 1.2; max-width: 100%; padding: 0 2px; }
+    @media (min-width: 380px) {
+      .tab .lbl { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="hint"><strong>Learn</strong> + animated <strong>AI</strong> capsule; Interview Prep capsule uses offset sweep (preview).</p>
+  <nav aria-label="Preview bottom navigation">
+    <div class="row">
+      <div class="tab active"><div class="ic">📖</div>Learn</div>
+      <div class="tab">
+        <span class="ai-cap"><span>AI</span></span>
+        <div class="ic" style="color:#60a5fa">✨</div>
+        Learn
+      </div>
+      <div class="tab"><div class="ic">👥</div>Social</div>
+      <div class="tab"><div class="ic">🏆</div>Ranks</div>
+      <a class="tab prep" href="/interview-prep">
+        <span class="ai-cap delay"><span>AI</span></span>
+        <div class="ic" style="color:#60a5fa">🧠</div>
+        <span class="lbl">Interview Prep</span>
+      </a>
+    </div>
+  </nav>
+</body>
+</html>

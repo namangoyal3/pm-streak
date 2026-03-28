@@ -24,6 +24,7 @@ model User {
   gems          Int      @default(50)
   lastActiveAt  DateTime?
   onboarded     Boolean  @default(false)
+  learningGoal  String?  // breaking_in | interview_prep | staying_sharp | lead_strategy (set at onboarding)
   dailyGoal     Int      @default(1)    // lessons per day: 1, 2, or 3
   streakGoal    Int      @default(7)    // target streak: 7, 14, 30
   perfectStreak Int      @default(0)    // consecutive days without using a freeze
@@ -392,6 +393,8 @@ model UserJobTarget {
   job          Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
   customJdText String?
   targetDate   DateTime
+  /** AI-enriched frameworks, company signals, archetype questions (JSON) */
+  interviewPrepContext Json?
   createdAt    DateTime @default(now())
   plans        LearningPlan[]
 

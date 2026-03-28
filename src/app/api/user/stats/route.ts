@@ -37,6 +37,8 @@ export async function GET() {
       longestStreak: true,
       streakFreezes: true,
       gems: true,
+      dailyGoal: true,
+      learningGoal: true,
     },
   });
 
@@ -85,6 +87,26 @@ export async function GET() {
     };
   });
 
+  // Path progress calculation
+  const LEARNING_GOAL_CONFIG: Record<string, { label: string; icon: string }> = {
+    breaking_in: { label: "Breaking into PM", icon: "🚀" },
+    interview_prep: { label: "PM Interview Prep", icon: "💼" },
+    staying_sharp: { label: "Staying Sharp", icon: "🧠" },
+    lead_strategy: { label: "Lead & Strategy", icon: "👑" },
+  };
+
+  const goalKey = user?.learningGoal ?? "staying_sharp";
+  const goalConfig = LEARNING_GOAL_CONFIG[goalKey] ?? LEARNING_GOAL_CONFIG["staying_sharp"];
+
+  const pathProgress = {
+    goalKey,
+    goalLabel: goalConfig.label,
+    goalIcon: goalConfig.icon,
+    completedCount,
+    totalLessons,
+    progressPct: totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0,
+  };
+
   return NextResponse.json({
     user,
     streak: streakInfo,
@@ -96,5 +118,7 @@ export async function GET() {
     episodesNotYetImported,
     archiveUnlockProgress,
     calendar,
+    pathProgress,
+    hasExplicitGoal: user?.learningGoal !== null,
   });
 }

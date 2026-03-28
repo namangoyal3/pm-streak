@@ -36,6 +36,21 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [showReadyDetails, setShowReadyDetails] = useState(false);
 
+  const learningGoalFromWhy = (why: string | null) => {
+    switch (why) {
+      case "career":
+        return "breaking_in";
+      case "interview":
+        return "interview_prep";
+      case "curiosity":
+        return "staying_sharp";
+      case "leadership":
+        return "lead_strategy";
+      default:
+        return "staying_sharp";
+    }
+  };
+
   const handleFinish = async () => {
     setSaving(true);
     await fetch("/api/onboarding", {
@@ -44,6 +59,7 @@ export default function OnboardingPage() {
       body: JSON.stringify({
         dailyGoal: dailyGoal ?? 1,
         streakGoal: streakGoal ?? 7,
+        learningGoal: learningGoalFromWhy(selectedWhy),
       }),
     });
     router.push("/dashboard");
