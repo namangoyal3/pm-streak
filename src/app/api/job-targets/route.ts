@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parseJdText } from "@/lib/jd-parser";
 import { estimateDaysUntilTarget } from "@/lib/pm-foundations";
+import { enrichInterviewPrepContext } from "@/lib/interview-research";
+import type { JDParseResult } from "@/lib/pm-foundations";
+
+export const maxDuration = 60;
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -73,15 +78,39 @@ export async function POST(req: Request) {
   }
 
   let selectedJobId = jobId ?? null;
+  let parsed: JDParseResult;
+
   if (jobId) {
     const existing = await prisma.job.findUnique({ where: { id: jobId } });
     if (!existing) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
-  }
+    const fullText = [
+      existing.title,
+      existing.company,
+      existing.description ?? "",
+      existing.rawJdText ?? "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+    const parseInput =
+      fullText.trim().length >= 80
+        ? fullText
+        : `${existing.title} at ${existing.company}\n${existing.description ?? "Product management role."}`;
+    parsed = await parseJdText(parseInput.slice(0, 24000));
 
-  if (!selectedJobId && customJdText) {
-    const parsed = await parseJdText(customJdText);
+    await prisma.job.update({
+      where: { id: existing.id },
+      data: {
+        parsedSkills: parsed.skills,
+        parsedLevel: parsed.level,
+        parsedDomain: parsed.domain,
+        estimatedInterviewFocus: parsed.estimatedInterviewFocus as Prisma.InputJsonValue,
+        rawJdText: existing.rawJdText ?? parseInput.slice(0, 50000),
+      },
+    });
+  } else {
+    parsed = await parseJdText(customJdText!);
     const pastedJob = await prisma.job.create({
       data: {
         title: "Custom PM Target Role",
@@ -89,7 +118,7 @@ export async function POST(req: Request) {
         location: "Flexible",
         remote: true,
         applyUrl: "https://example.com/custom-jd",
-        description: customJdText.slice(0, 320),
+        description: customJdText!.slice(0, 320),
         tags: parsed.skills,
         source: "pasted",
         isActive: false,
@@ -98,7 +127,7 @@ export async function POST(req: Request) {
         parsedSkills: parsed.skills,
         parsedLevel: parsed.level,
         parsedDomain: parsed.domain,
-        estimatedInterviewFocus: parsed.estimatedInterviewFocus,
+        estimatedInterviewFocus: parsed.estimatedInterviewFocus as Prisma.InputJsonValue,
       },
     });
     selectedJobId = pastedJob.id;
@@ -114,8 +143,36 @@ export async function POST(req: Request) {
     include: { job: true },
   });
 
+  const job = created.job;
+  if (job) {
+    try {
+      const jdExcerpt =
+        customJdText ??
+        job.rawJdText ??
+        job.description ??
+        `${job.title} at ${job.company}`;
+      const ctx = await enrichInterviewPrepContext({
+        roleTitle: job.title,
+        company: job.company,
+        parsed,
+        jdExcerpt: jdExcerpt.slice(0, 12000),
+      });
+      await prisma.userJobTarget.update({
+        where: { id: created.id },
+        data: { interviewPrepContext: ctx as Prisma.InputJsonValue },
+      });
+    } catch (err) {
+      console.error("[job-targets] interviewPrepContext enrich failed:", err);
+    }
+  }
+
+  const target = await prisma.userJobTarget.findUnique({
+    where: { id: created.id },
+    include: { job: true },
+  });
+
   return NextResponse.json({
-    target: created,
+    target,
     daysUntilTarget: estimateDaysUntilTarget(targetDate),
   });
 }

@@ -94,13 +94,23 @@ export default function InterviewPrepPage() {
       <main className="max-w-3xl mx-auto px-4 py-8 pb-24">
         {/* Hero */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <Brain size={20} className="text-blue-400" />
-            <h1 className="text-2xl font-black">AI Interview Prep</h1>
+            <h1 className="text-2xl font-black">Interview Prep</h1>
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/25 text-blue-200 border border-blue-500/40">
+              AI
+            </span>
           </div>
-          <p className="text-white/55 text-sm">5 PM questions + frameworks per session.</p>
+          <p className="text-white/70 text-sm leading-relaxed">
+            This helps you keep your prep relevant to a role you want to apply for — pair it with a job target from{" "}
+            <Link href="/jobs" className="text-[var(--green-primary)] font-black hover:underline">
+              PM Jobs
+            </Link>{" "}
+            (build a plan) so questions and frameworks align with your JD.
+          </p>
+          <p className="text-white/55 text-sm mt-3">Five PM questions + answer frameworks per session.</p>
           <p className="text-[11px] text-white/40 mt-1">
-            <strong className="text-purple-300">5 Credits</strong> per session (free for Pro).
+            <strong className="text-purple-300">1 credit per lesson</strong> (5 lessons per session = 5 credits). Pro: unlimited.
           </p>
         </div>
 
@@ -163,7 +173,7 @@ export default function InterviewPrepPage() {
             {loading ? (
               <><Loader2 size={16} className="animate-spin" /> Generating…</>
             ) : (
-              <><Brain size={16} /> Generate 5 Questions (Use 5 Credits)</>
+              <><Brain size={16} /> Generate 5 questions (5 credits)</>
             )}
           </button>
         </div>
@@ -256,7 +266,7 @@ export default function InterviewPrepPage() {
               disabled={loading}
               className="w-full py-4 rounded-xl border-2 border-[var(--border-color)] bg-[var(--surface-2)] text-xs font-black text-white/70 hover:text-white hover:border-white/10 transition-all active:scale-[0.98] uppercase tracking-widest"
             >
-              Generate new set (Use 5 Credits)
+              Generate new set (5 credits)
             </button>
           </div>
         )}

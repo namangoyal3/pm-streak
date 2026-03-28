@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
 import ShareCard from "@/components/ShareCard";
 import StreakCelebration from "@/components/StreakCelebration";
+import GoalSelectionModal from "@/components/GoalSelectionModal";
 
 interface Category {
   id: string;
@@ -54,6 +55,12 @@ type ReadinessResponse = {
   paywallEligible: boolean;
 };
 
+type JobPrepInsights = {
+  frameworks?: { name: string; summary: string; whenToUse: string }[];
+  companySignals?: { theme: string; whyItMatters: string }[];
+  archetypeQuestions?: { question: string; whatToDemo: string }[];
+};
+
 const streakMessages = [
   "You're on fire.",
   "Unstoppable. Keep it up.",
@@ -83,7 +90,22 @@ export default function DashboardPage() {
   const [showMobileCategoryRail, setShowMobileCategoryRail] = useState(false);
   const [showMobileProgressDetails, setShowMobileProgressDetails] = useState(false);
   const [showMobileUtilities, setShowMobileUtilities] = useState(false);
+  const [jobPrepInsights, setJobPrepInsights] = useState<JobPrepInsights | null>(null);
+  const [showGoalModal, setShowGoalModal] = useState(false);
   const categoryRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  useEffect(() => {
+    if (!user?.onboarded) return;
+    if (user.learningGoal != null && user.learningGoal !== "") return;
+    try {
+      if (typeof window !== "undefined" && localStorage.getItem("pm-streak-goal-modal-dismissed")) {
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+    setShowGoalModal(true);
+  }, [user]);
 
   useEffect(() => {
     async function load() {
@@ -117,6 +139,19 @@ export default function DashboardPage() {
           }
         } catch {
           // best effort
+        }
+
+        try {
+          const jtRes = await fetch("/api/job-targets");
+          if (jtRes.ok) {
+            const jt = await jtRes.json();
+            const raw = jt.target?.interviewPrepContext;
+            if (raw && typeof raw === "object") {
+              setJobPrepInsights(raw as JobPrepInsights);
+            }
+          }
+        } catch {
+          /* ignore */
         }
 
         if (lessonsRes.status === "fulfilled" && lessonsRes.value.ok) {
@@ -674,6 +709,62 @@ export default function DashboardPage() {
                   )}
                 </div>
               )}
+
+              {jobPrepInsights &&
+              ((jobPrepInsights.frameworks?.length ?? 0) > 0 ||
+                (jobPrepInsights.companySignals?.length ?? 0) > 0) ? (
+                <div className="rounded-[var(--ds-radius-lg)] border-2 border-indigo-500/30 bg-indigo-950/40 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles size={14} className="text-indigo-300" />
+                    <span className="text-xs font-black text-white uppercase tracking-wider">Target role prep</span>
+                  </div>
+                  <p className="text-[10px] text-white/55 mb-3">
+                    From your JD: frameworks, what teams often look for, and example question themes.
+                  </p>
+                  {jobPrepInsights.frameworks && jobPrepInsights.frameworks.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] font-black text-indigo-300 uppercase mb-1">Frameworks</p>
+                      <ul className="space-y-1.5">
+                        {jobPrepInsights.frameworks.slice(0, 4).map((f, i) => (
+                          <li key={i} className="text-[10px] text-white/75">
+                            <span className="font-black text-white/90">{f.name}</span>
+                            {" — "}
+                            {f.summary}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {jobPrepInsights.companySignals && jobPrepInsights.companySignals.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] font-black text-indigo-300 uppercase mb-1">Company signals</p>
+                      <ul className="space-y-1">
+                        {jobPrepInsights.companySignals.slice(0, 4).map((s, i) => (
+                          <li key={i} className="text-[10px] text-white/70">
+                            <span className="font-bold">{s.theme}:</span> {s.whyItMatters}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {jobPrepInsights.archetypeQuestions && jobPrepInsights.archetypeQuestions.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black text-indigo-300 uppercase mb-1">Question themes</p>
+                      <ul className="space-y-1">
+                        {jobPrepInsights.archetypeQuestions.slice(0, 3).map((q, i) => (
+                          <li key={i} className="text-[10px] text-white/65">• {q.question}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <Link
+                    href="/interview-prep"
+                    className="mt-3 inline-flex text-[10px] font-black text-indigo-200 hover:underline"
+                  >
+                    Open AI Interview Prep →
+                  </Link>
+                </div>
+              ) : null}
             </div>
 
             <button
@@ -785,9 +876,12 @@ export default function DashboardPage() {
                 </Link>
                 <Link href="/interview-prep" className="flex items-center gap-2 rounded-xl border-2 border-[var(--border-color)] p-3 hover:border-[var(--blue-primary)]/40 transition-colors">
                   <Brain size={14} className="text-[var(--blue-primary)]" />
-                  <div>
-                    <div className="text-[10px] font-black">Interview</div>
-                    <div className="text-[9px] text-[var(--text-secondary)]">5⚡ / session</div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-black">Interview</span>
+                      <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-blue-500/25 text-blue-200">AI</span>
+                    </div>
+                    <div className="text-[9px] text-[var(--text-secondary)]">1⚡ / lesson</div>
                   </div>
                 </Link>
               </div>
@@ -886,6 +980,16 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {showGoalModal && (
+        <GoalSelectionModal
+          onClose={() => setShowGoalModal(false)}
+          onSaved={(goalKey) => {
+            setShowGoalModal(false);
+            setUser((u: any) => (u ? { ...u, learningGoal: goalKey } : u));
+          }}
+        />
+      )}
 
       <ShareCard isOpen={showShare} onClose={() => setShowShare(false)} />
       <StreakCelebration milestone={milestone} streakCount={user.streakCount} perfectStreak={stats?.streak?.perfectStreak ?? 0} onClose={() => setMilestone(null)} />

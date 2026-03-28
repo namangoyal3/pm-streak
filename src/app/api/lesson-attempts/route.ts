@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { normalizeJudgeResponse, judgeAttempt } from "@/lib/ai-judge";
 import { incrementEngagementOnAttempt } from "@/lib/engagement";
 import { ensureCanonicalSkills, ensureSkillRows } from "@/lib/pm-foundations";
+import { spendCredits, CREDIT_COSTS } from "@/lib/credits";
+import { isUserPro } from "@/lib/entitlements";
 
 function toProfileScore(score1to5: number): number {
   return Math.round(((score1to5 - 1) / 4) * 100);
@@ -75,10 +77,30 @@ export async function POST(req: NextRequest) {
       title: true,
       promptText: true,
       type: true,
+      slug: true,
     },
   });
   if (!lesson || !lesson.promptText) {
     return NextResponse.json({ error: "Lesson prompt not found" }, { status: 404 });
+  }
+
+  const isDailyDrill = lesson.slug?.startsWith("daily-drill-") ?? false;
+  if (isDailyDrill) {
+    const pro = await isUserPro(userId);
+    if (!pro) {
+      const ok = await spendCredits(userId, CREDIT_COSTS.daily_drill, "daily_drill", {
+        lessonId: lesson.id,
+      });
+      if (!ok) {
+        return NextResponse.json(
+          {
+            error: "insufficient_credits",
+            needed: CREDIT_COSTS.daily_drill,
+          },
+          { status: 402 }
+        );
+      }
+    }
   }
 
   await ensureSkillRows();

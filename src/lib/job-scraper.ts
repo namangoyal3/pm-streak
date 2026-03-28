@@ -9,7 +9,8 @@
  *   3. We Work Remotely — RSS feed
  *   4. Remote OK      — remote JSON API
  *   5. Indeed         — RSS feed (aggregates LinkedIn + others)
- *   6. LinkedIn       — jsearch via RapidAPI (requires RAPIDAPI_KEY env var)
+ *   6. LinkedIn       — jsearch via RapidAPI (requires RAPIDAPI_KEY env var).
+ *                      Also ingested daily at 6:00 PM IST via /api/cron/linkedin-jobs.
  *   7. YC Work at a Startup — cheerio page scrape
  *   8. Greenhouse boards   — public JSON APIs for PM-heavy companies
  */

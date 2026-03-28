@@ -31,6 +31,7 @@ export async function GET() {
         lostStreakVal: true,
         streakGoal: true,
         onboarded: true,
+        learningGoal: true,
         lastActiveAt: true,
         createdAt: true,
         plan: true,

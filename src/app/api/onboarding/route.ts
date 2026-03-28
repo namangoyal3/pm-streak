@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const { dailyGoal, streakGoal } = await req.json();
+  const { dailyGoal, streakGoal, learningGoal } = await req.json();
 
   await prisma.user.update({
     where: { id: userId },
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
       onboarded: true,
       dailyGoal: dailyGoal ?? 1,
       streakGoal: streakGoal ?? 7,
+      learningGoal: learningGoal ?? "staying_sharp",
     },
   });
 

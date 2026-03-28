@@ -4,17 +4,29 @@ import type { Prisma } from "@prisma/client";
 export const CREDIT_COSTS = {
   lesson_unlock: 5,
   ai_lesson: 2,
-  interview_prep: 5,
+  /** One credit per interview-prep “lesson” (each of the 5 questions). */
+  interview_prep_per_question: 1,
+  interview_prep_questions_per_session: 5,
+  /** Daily interview sprint drill submission (non-Pro). */
+  daily_drill: 1,
   mock_interview: 5,
   deep_review: 3,
   portfolio_artifact: 4,
 } as const;
+
+/** Total credits for one AI Interview Prep session (5 questions). */
+export function interviewPrepSessionCredits(): number {
+  return (
+    CREDIT_COSTS.interview_prep_per_question * CREDIT_COSTS.interview_prep_questions_per_session
+  );
+}
 
 export type CreditReason =
   | "monthly_refresh"
   | "lesson_unlock"
   | "ai_lesson"
   | "interview_prep"
+  | "daily_drill"
   | "admin_grant"
   | "purchase"
   | "bonus"

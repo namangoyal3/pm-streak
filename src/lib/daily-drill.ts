@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { groqCreate } from "@/lib/groq";
+import type { InterviewPrepContext } from "@/lib/interview-research";
 
 export type DailyDrillSelection = {
   dayIndex: number;
@@ -28,6 +30,54 @@ function fallbackPrompt(lessonType: string, skills: string[], targetTitle: strin
   return `You are interviewing for ${targetTitle}. This is a ${lessonType.replace("_", " ")} drill.\n\nPrompt:\nPropose a clear approach to solve a realistic PM problem. Use a structured framework, show explicit trade-offs, and include the top metrics you'd track.\n\nFocus today on: ${focus}.\n\nQuestion: How would you answer this in a 5-10 minute interview response?`;
 }
 
+async function buildDrillPrompt(params: {
+  lessonType: string;
+  skillTags: string[];
+  targetTitle: string;
+  company: string;
+  context: InterviewPrepContext | null;
+}): Promise<string> {
+  const { lessonType, skillTags, targetTitle, company, context } = params;
+  const fw = context?.frameworks?.slice(0, 3).map((f) => `${f.name}: ${f.whenToUse}`).join("\n") ?? "";
+  const sig = context?.companySignals?.slice(0, 3).map((s) => `${s.theme} — ${s.whyItMatters}`).join("\n") ?? "";
+  const arche = context?.archetypeQuestions?.slice(0, 2).map((q) => q.question).join("\n") ?? "";
+
+  try {
+    const result = await groqCreate({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You write ONE realistic PM interview case prompt. Output a single scenario (5-12 sentences) with concrete constraints, stakeholders, and success criteria. No multiple choice. The candidate answers in 5-10 minutes spoken.",
+        },
+        {
+          role: "user",
+          content: [
+            `Role: ${targetTitle} at ${company}.`,
+            `Lesson focus: ${lessonType.replace(/_/g, " ")}.`,
+            `Skills: ${skillTags.join(", ") || "general PM"}.`,
+            fw ? `Frameworks to lean on:\n${fw}` : "",
+            sig ? `What hiring teams often probe:\n${sig}` : "",
+            arche ? `Example question themes (inspire but do not copy verbatim):\n${arche}` : "",
+            "\nWrite one scenario prompt only.",
+          ]
+            .filter(Boolean)
+            .join("\n\n"),
+        },
+      ],
+      temperature: 0.5,
+      max_tokens: 600,
+    });
+    const out = result.choices[0]?.message?.content?.trim();
+    if (out && out.length > 120) return out;
+  } catch {
+    /* ignore */
+  }
+
+  return fallbackPrompt(lessonType, skillTags, targetTitle);
+}
+
 export async function getDailyDrillForUser(userId: string): Promise<DailyDrillSelection | null> {
   const today = dateKey();
 
@@ -51,6 +101,11 @@ export async function getDailyDrillForUser(userId: string): Promise<DailyDrillSe
   const planLesson = latestPlan.planLessons.find((p) => p.dayIndex === planIndex) ?? latestPlan.planLessons[latestPlan.planLessons.length - 1]!;
   const skillTags = toSkillTags(planLesson.skillTags);
   const targetTitle = latestPlan.userJobTarget.job?.title ?? "your target PM role";
+  const company = latestPlan.userJobTarget.job?.company ?? "your target company";
+
+  const rawCtx = latestPlan.userJobTarget.interviewPrepContext;
+  const prepContext =
+    rawCtx && typeof rawCtx === "object" ? (rawCtx as InterviewPrepContext) : null;
 
   let lesson = null as null | {
     id: string;
@@ -69,6 +124,14 @@ export async function getDailyDrillForUser(userId: string): Promise<DailyDrillSe
   }
 
   if (!lesson) {
+    const promptText = await buildDrillPrompt({
+      lessonType: planLesson.lessonType,
+      skillTags,
+      targetTitle,
+      company,
+      context: prepContext,
+    });
+
     const generated = await prisma.lesson.create({
       data: {
         title: `Daily ${planLesson.lessonType.replace("_", " ")} drill`,
@@ -94,7 +157,7 @@ export async function getDailyDrillForUser(userId: string): Promise<DailyDrillSe
         generatedForUserId: userId,
         type: planLesson.lessonType,
         skillTags,
-        promptText: fallbackPrompt(planLesson.lessonType, skillTags, targetTitle),
+        promptText,
       },
       select: { id: true, title: true, promptText: true, type: true, skillTags: true },
     });
