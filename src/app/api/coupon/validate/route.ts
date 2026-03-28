@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     return sanitizeError();
   }
 
-  if (!code || typeof code !== "string" || code.length < 10 || code.length > 50) {
+  if (!code || typeof code !== "string" || code.length < 4 || code.length > 50) {
     await logAttempt(code, ip, null, false, "invalid_format");
     return sanitizeError();
   }
