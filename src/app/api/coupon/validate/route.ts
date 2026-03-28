@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       return sanitizeError();
     }
 
-    const emailMatch = user.email.toLowerCase() === coupon.email.toLowerCase();
+    const emailMatch = coupon.email === "*" || user.email.toLowerCase() === coupon.email.toLowerCase();
     if (!emailMatch) {
       await logAttempt(code, ip, userId, false, "email_mismatch");
       return sanitizeError();

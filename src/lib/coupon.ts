@@ -3,7 +3,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 const COUPON_SECRET = process.env.COUPON_SECRET || process.env.JWT_SECRET || "pm-streak-coupon-secret";
 
 function signCoupon(code: string, email: string, discountPercent: number, expiresAt: number): string {
-  const payload = `${code}:${email.toLowerCase()}:${discountPercent}:${expiresAt}`;
+  const payload = `${code}:${email === "*" ? "*" : email.toLowerCase()}:${discountPercent}:${expiresAt}`;
   return createHmac("sha256", COUPON_SECRET).update(payload).digest("hex");
 }
 
