@@ -8,7 +8,7 @@ import ProBanner from "./ProBanner";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
 import type { LucideIcon } from "lucide-react";
-import { Flame, BookOpen, Trophy, Users, Sparkles, Gem, Lock, Zap, Brain, Briefcase } from "lucide-react";
+import { Flame, BookOpen, Trophy, Users, Sparkles, Gem, Lock, Zap, Brain, Briefcase, MessageCircle } from "lucide-react";
 
 type NavItemConfig = {
   href: string;
@@ -75,6 +75,14 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
       locked: false,
       aiCapsule: true,
       aiCapsuleStagger: true,
+    },
+    {
+      href: "/ask-experts",
+      label: "Ask Experts",
+      icon: MessageCircle,
+      locked: false,
+      aiCapsule: true,
+      compactNavLabel: true,
     },
   ];
 
