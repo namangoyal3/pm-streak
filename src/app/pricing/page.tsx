@@ -278,7 +278,7 @@ async function PricingContent() {
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-white/40 line-through text-2xl">{calculateMRP(isIndia ? "₹499" : "$3", isIndia)}</span>
-                <span className="text-3xl font-black text-green-400">{isIndia ? "₹499" : "$3"} <span className="text-xs align-top">(70% OFF)</span></span>
+                <span className="text-3xl font-black text-green-400 whitespace-nowrap">{isIndia ? "₹499" : "$3"} <span className="text-xs align-top opacity-80">(70% OFF)</span></span>
                 <span className="text-white/50 text-sm">/ month</span>
               </div>
               <p className="text-xs text-purple-300/70 mt-1">
@@ -338,8 +338,8 @@ async function PricingContent() {
                     </span>
                     <span className="text-right flex flex-col items-end">
                       <span className="flex items-center gap-1">
-                        <span className="text-white/40 line-through text-xs">{plan.original}</span>
-                        <span className="font-black text-green-400">{plan.discounted} <span className="text-[10px]">(70% OFF)</span></span>
+                        <span className="text-white/40 line-through text-xs whitespace-nowrap">{plan.original}</span>
+                        <span className="font-black text-green-400 whitespace-nowrap">{plan.discounted} <span className="text-[10px] opacity-80">(70% OFF)</span></span>
                       </span>
                       <span className="text-white/60 text-[10px]">{plan.period}</span>
                     </span>

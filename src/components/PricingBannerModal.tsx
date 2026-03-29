@@ -88,15 +88,15 @@ export default function PricingBannerModal() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-white/70">Monthly</span>
-                  <span><span className="line-through text-white/30">₹1,663</span> <span className="text-green-400 font-black">₹499 <span className="text-[10px]">(70% OFF)</span></span></span>
+                  <span className="whitespace-nowrap"><span className="line-through text-white/30">₹1,663</span> <span className="text-green-400 font-black">₹499 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Quarterly</span>
-                  <span><span className="line-through text-white/30">₹2,997</span> <span className="text-green-400 font-black">₹899 <span className="text-[10px]">(70% OFF)</span></span></span>
+                  <span className="whitespace-nowrap"><span className="line-through text-white/30">₹2,997</span> <span className="text-green-400 font-black">₹899 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Yearly</span>
-                  <span><span className="line-through text-white/30">₹8,997</span> <span className="text-green-400 font-black">₹2,699 <span className="text-[10px]">(70% OFF)</span></span></span>
+                  <span className="whitespace-nowrap"><span className="line-through text-white/30">₹8,997</span> <span className="text-green-400 font-black">₹2,699 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
                 </div>
               </div>
             </div>
