@@ -133,7 +133,7 @@ async function PricingContent() {
   const plans = isIndia
     ? [
         { key: "monthly",   title: "Monthly",   original: increasePrice("₹499", true),   discounted: "₹499",   period: "/ month",     productId: inrMonthlyId },
-        { key: "quarterly", title: "Quarterly", original: increasePrice("₹1,699", true), discounted: "₹510",   period: "/ 3 months",  badge: "Best Value", savings: "Save ₹2,400",  productId: inrQuarterlyId },
+        { key: "quarterly", title: "Quarterly", original: "₹2,999", discounted: "₹899",   period: "/ 3 months",  badge: "Best Value", savings: "Save ₹2,100",  productId: inrQuarterlyId },
         { key: "yearly",    title: "Yearly",    original: increasePrice("₹2,499", true), discounted: "₹750",   period: "/ year",       savings: "Save ₹4,000", productId: inrYearlyId },
       ]
     : [
@@ -247,7 +247,7 @@ async function PricingContent() {
               </div>
               <p className="text-xs text-purple-300/70 mt-1">
                 {isIndia
-                  ? <><span className="line-through text-white/30">₹2,889</span> <span className="text-green-400 font-black">₹510</span> / 3 months · <span className="line-through text-white/30">₹4,249</span> <span className="text-green-400 font-black">₹750</span> / year</>
+                  ? <><span className="line-through text-white/30">₹2,999</span> <span className="text-green-400 font-black">₹899</span> / 3 months · <span className="line-through text-white/30">₹4,249</span> <span className="text-green-400 font-black">₹750</span> / year</>
                   : <><span className="line-through text-white/30">$15</span> <span className="text-green-400 font-black">$3</span> / month · <span className="line-through text-white/30">$41</span> <span className="text-green-400 font-black">$8</span> / 3 months · <span className="line-through text-white/30">$84</span> <span className="text-green-400 font-black">$15</span> / year</>
                 }
               </p>
