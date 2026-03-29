@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
   const isPreDiscounted = Object.values(DISCOUNTED_PRODUCTS).includes(productId);
   if (!isPreDiscounted && (plan || searchParams.has("metadata_plan"))) {
     checkoutUrl.searchParams.set("coupon_code", "FLAT70");
+    checkoutUrl.searchParams.set("coupon", "FLAT70"); // Dodo sometimes uses 'coupon'
   }
 
   checkoutUrl.searchParams.set("quantity", "1");

@@ -419,11 +419,11 @@ async function PricingContent() {
             { q: "Are credits cumulative?", a: "No — they reset on the 1st of each month. Unused credits don't roll over." },
             { q: "Can I cancel anytime?", a: "Yes. Cancel through the customer portal and you keep Pro access until your current period ends." },
             isIndia
-              ? { q: "What's the quarterly plan?", a: `${calculateMRP("₹899", true)} for 3 months — results in ₹899 after FLAT70 discount.` }
-              : { q: "What's the quarterly plan?", a: `${calculateMRP("$8", false)} for 3 months — results in $8 after FLAT70 discount.` },
+              ? { q: "What's the quarterly plan?", a: `${calculateMRP("₹899", true)} for 3 months — results in ₹899 with the applied discount.` }
+              : { q: "What's the quarterly plan?", a: `${calculateMRP("$8", false)} for 3 months — results in $8 with the applied discount.` },
             isIndia
-              ? { q: "What's the yearly plan?", a: `${calculateMRP("₹2,699", true)}/year — results in ₹2,699 after FLAT70 discount.` }
-              : { q: "What's the yearly plan?", a: `${calculateMRP("$15", false)}/year — results in $15 after FLAT70 discount.` },
+              ? { q: "What's the yearly plan?", a: `${calculateMRP("₹2,699", true)}/year — results in ₹2,699 with the applied discount.` }
+              : { q: "What's the yearly plan?", a: `${calculateMRP("$15", false)}/year — results in $15 with the applied discount.` },
             { q: "What payment methods are accepted?", a: isIndia ? "UPI, credit/debit cards, net banking, and more — via Dodo Payments secure checkout." : "Credit/debit cards, PayPal, and more — via Dodo Payments secure checkout." },
           ].map((item) => (
             <div key={item.q} className="rounded-xl border border-white/10 p-4 bg-white/5">
