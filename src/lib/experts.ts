@@ -2,6 +2,12 @@ export const EXPERT_GUARDRAIL_MESSAGE = "Sorry I can't help you with this questi
 
 export type ExpertId = "lenny" | "shreyas-doshi" | "garry-tan";
 
+export type ExpertOnlineSource = {
+  platform: "youtube" | "twitter" | "linkedin" | "blog";
+  url: string;
+  label: string;
+};
+
 export type ExpertProfile = {
   id: ExpertId;
   name: string;
@@ -9,6 +15,7 @@ export type ExpertProfile = {
   tagline: string;
   stylePrompt: string;
   searchHints: string[];
+  onlineSources: ExpertOnlineSource[];
 };
 
 export const EXPERT_PROFILES: ExpertProfile[] = [
@@ -20,6 +27,28 @@ export const EXPERT_PROFILES: ExpertProfile[] = [
     stylePrompt:
       "Write like Lenny: pragmatic, structured, friendly, and specific. Use frameworks and practical examples without hype.",
     searchHints: ["lenny", "lenny's podcast", "product management", "growth", "retention", "roadmap"],
+    onlineSources: [
+      {
+        platform: "youtube",
+        url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCaEq8_cRdwbqp2JiDeSXuuA",
+        label: "Lenny YouTube",
+      },
+      {
+        platform: "twitter",
+        url: "https://nitter.net/lennysan/rss",
+        label: "Lenny on X/Twitter",
+      },
+      {
+        platform: "linkedin",
+        url: "https://rsshub.app/linkedin/posts/lennyrachitsky",
+        label: "Lenny on LinkedIn",
+      },
+      {
+        platform: "blog",
+        url: "https://www.lennysnewsletter.com/feed",
+        label: "Lenny Newsletter",
+      },
+    ],
   },
   {
     id: "shreyas-doshi",
@@ -29,6 +58,23 @@ export const EXPERT_PROFILES: ExpertProfile[] = [
     stylePrompt:
       "Write like Shreyas Doshi: sharp, direct, principle-first, and no fluff. Emphasize trade-offs and clarity of thinking.",
     searchHints: ["shreyas", "product leadership", "decision making", "pm leadership", "org design"],
+    onlineSources: [
+      {
+        platform: "twitter",
+        url: "https://nitter.net/shreyas/rss",
+        label: "Shreyas on X/Twitter",
+      },
+      {
+        platform: "linkedin",
+        url: "https://rsshub.app/linkedin/posts/shreyasdoshi",
+        label: "Shreyas on LinkedIn",
+      },
+      {
+        platform: "blog",
+        url: "https://shreyasdoshi.substack.com/feed",
+        label: "Shreyas Substack",
+      },
+    ],
   },
   {
     id: "garry-tan",
@@ -38,6 +84,28 @@ export const EXPERT_PROFILES: ExpertProfile[] = [
     stylePrompt:
       "Write like Garry Tan: founder-oriented, high-agency, practical about startup execution and AI leverage.",
     searchHints: ["garry", "startup", "founder", "seed", "yc", "ai startup", "go-to-market"],
+    onlineSources: [
+      {
+        platform: "youtube",
+        url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCcefcZRL2oaA_uBNeo5UOWg",
+        label: "Garry Tan YouTube",
+      },
+      {
+        platform: "twitter",
+        url: "https://nitter.net/garrytan/rss",
+        label: "Garry on X/Twitter",
+      },
+      {
+        platform: "linkedin",
+        url: "https://rsshub.app/linkedin/posts/garrytan",
+        label: "Garry on LinkedIn",
+      },
+      {
+        platform: "blog",
+        url: "https://www.ycombinator.com/blog/rss/",
+        label: "Y Combinator Blog",
+      },
+    ],
   },
 ];
 
