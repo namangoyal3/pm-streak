@@ -650,17 +650,11 @@ export default function DashboardPage() {
                 <p className="text-[10px] text-[var(--text-secondary)] mt-2 font-bold uppercase tracking-wider">
                   {totalCompleted} / {totalLessons} lessons done
                 </p>
-                <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="mt-3 grid grid-cols-1 gap-2">
                   <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-1)] px-2.5 py-2">
                     <p className="text-[9px] font-bold uppercase tracking-wide text-[var(--text-secondary)]">Today</p>
                     <p className={cn("text-[11px] font-black mt-1", completedToday ? "text-[var(--green-primary)]" : "text-[var(--orange-primary)]")}>
                       {completedToday ? "Goal complete" : "1 lesson to go"}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-[var(--border-color)] bg-[var(--surface-1)] px-2.5 py-2">
-                    <p className="text-[9px] font-bold uppercase tracking-wide text-[var(--text-secondary)]">Archive</p>
-                    <p className="text-[11px] font-black mt-1 text-[var(--blue-primary)]">
-                      {archiveImportDisplay}/{totalArchive} imported
                     </p>
                   </div>
                 </div>
