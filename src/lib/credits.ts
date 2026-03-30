@@ -85,7 +85,7 @@ export async function spendCredits(
 export async function refreshMonthlyCredits(userId: string): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { plan: true, creditsRefreshedAt: true },
+    select: { plan: true, trialEndsAt: true, creditsRefreshedAt: true },
   });
   if (!user) return;
 
@@ -96,7 +96,8 @@ export async function refreshMonthlyCredits(userId: string): Promise<void> {
     return; // Already refreshed this month
   }
 
-  const newCredits = user.plan === "pro" ? 50 : 10;
+  const isPro = user.plan === "pro" || (user.trialEndsAt != null && user.trialEndsAt > now);
+  const newCredits = isPro ? 50 : 10;
 
   await prisma.$transaction([
     prisma.user.update({

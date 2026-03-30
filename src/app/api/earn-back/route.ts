@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getToday } from "@/lib/utils";
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -16,7 +17,7 @@ export async function GET() {
     return NextResponse.json({ eligible: false });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getToday();
   const todayLesson = await prisma.completedLesson.findFirst({
     where: { userId, completedAt: { gte: new Date(today) } },
   });
@@ -43,7 +44,7 @@ export async function POST() {
     return NextResponse.json({ error: "Window expired" }, { status: 400 });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getToday();
   const todayLessons = await prisma.completedLesson.count({
     where: { userId, completedAt: { gte: new Date(today) } },
   });

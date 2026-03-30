@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       data: {
         gems: { decrement: item.cost },
         streakCount: user.lostStreakVal,
+        longestStreak: Math.max(user.longestStreak, user.lostStreakVal),
         streakLostAt: null,
         lostStreakVal: 0,
       },

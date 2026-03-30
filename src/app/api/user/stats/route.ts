@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { checkAndUpdateStreak } from "@/lib/streak";
+import { getToday } from "@/lib/utils";
 import {
   CORE_LESSON_WHERE,
   getArchiveUnlockProgressForUser,
@@ -42,7 +43,7 @@ export async function GET() {
     },
   });
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getToday();
   const [curriculum, completedToday, archiveUnlockProgress, coreLessonCount] =
     await Promise.all([
       getCoreCurriculumForUser(userId),
@@ -67,11 +68,21 @@ export async function GET() {
   const totalArchive = LENNY_PODCAST_CATALOG_EPISODES;
   const episodesNotYetImported = catalogEpisodesNotYetImported(coreLessonCount);
 
+  // Build last-30-days using the app timezone (IST) so dates align with streakDay records.
+  const APP_TIMEZONE = process.env.NEXT_PUBLIC_APP_TIMEZONE || "Asia/Kolkata";
   const last30Days: string[] = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    last30Days.push(d.toISOString().split("T")[0]);
+    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: APP_TIMEZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(d);
+    const year = parts.find((p) => p.type === "year")?.value ?? "0000";
+    const month = parts.find((p) => p.type === "month")?.value ?? "01";
+    const day = parts.find((p) => p.type === "day")?.value ?? "01";
+    last30Days.push(`${year}-${month}-${day}`);
   }
 
   const streakDays = await prisma.streakDay.findMany({

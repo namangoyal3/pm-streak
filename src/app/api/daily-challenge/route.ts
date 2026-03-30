@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCoreCurriculumForUser, getCoreLessonAccess } from "@/lib/lesson-access";
+import { getToday } from "@/lib/utils";
 
 export async function GET() {
   const userId = await getCurrentUserId();
@@ -9,7 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getToday();
 
   let challenge = await prisma.dailyChallenge.findUnique({
     where: { userId_date: { userId, date: today } },
@@ -38,8 +39,23 @@ export async function GET() {
       .filter((lesson) => !lesson.isLocked);
 
     const uncompletedLessons = availableLessons.filter((lesson) => !lesson.completed);
-    const lessonCandidate =
-      (uncompletedLessons.length > 0 ? uncompletedLessons : availableLessons)[0];
+
+    let lessonCandidate: (typeof availableLessons)[0] | undefined;
+    if (uncompletedLessons.length > 0) {
+      lessonCandidate = uncompletedLessons[0];
+    } else {
+      // All lessons completed — pick the one least recently completed so we cycle
+      const availableIds = availableLessons.map((l) => l.id);
+      const lastCompleted = await prisma.completedLesson.findMany({
+        where: { userId, lessonId: { in: availableIds } },
+        orderBy: { completedAt: "asc" },
+        select: { lessonId: true },
+        take: 1,
+      });
+      const leastRecentId = lastCompleted[0]?.lessonId ?? availableIds[0];
+      lessonCandidate = availableLessons.find((l) => l.id === leastRecentId) ?? availableLessons[0];
+    }
+
     const lesson = lessonCandidate
       ? await prisma.lesson.findUnique({ where: { id: lessonCandidate.id } })
       : null;
@@ -91,6 +107,15 @@ export async function POST(req: Request) {
   }
 
   const { challengeId, score, xpEarned } = await req.json();
+
+  const challenge = await prisma.dailyChallenge.findUnique({
+    where: { id: challengeId },
+    select: { userId: true },
+  });
+
+  if (!challenge || challenge.userId !== userId) {
+    return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
+  }
 
   await prisma.dailyChallenge.update({
     where: { id: challengeId },

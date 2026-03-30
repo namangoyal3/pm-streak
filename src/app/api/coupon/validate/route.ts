@@ -6,23 +6,12 @@ import { verifyCouponSignature } from "@/lib/coupon";
 const MAX_ATTEMPTS_PER_IP = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
-const attemptCounts = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = attemptCounts.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    attemptCounts.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-
-  if (entry.count >= MAX_ATTEMPTS_PER_IP) {
-    return false;
-  }
-
-  entry.count++;
-  return true;
+async function checkRateLimit(ip: string): Promise<boolean> {
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
+  const recentAttempts = await prisma.couponAttempt.count({
+    where: { ip, createdAt: { gte: windowStart } },
+  });
+  return recentAttempts < MAX_ATTEMPTS_PER_IP;
 }
 
 function sanitizeError(): NextResponse {
@@ -44,7 +33,7 @@ export async function POST(req: NextRequest) {
     || req.headers.get("x-real-ip")
     || "unknown";
 
-  if (!checkRateLimit(ip)) {
+  if (!(await checkRateLimit(ip))) {
     return NextResponse.json(
       { error: "Too many requests", valid: false },
       { status: 429 }
