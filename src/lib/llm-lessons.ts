@@ -72,6 +72,7 @@ export interface SearchResult {
 }
 
 export interface GeneratedLessonContent {
+  description: string;
   content: string;
   questions: {
     questionText: string;
@@ -99,7 +100,8 @@ ${context}
 
 REQUIREMENTS:
 1. CONTENT: Extract and synthesize the core, actionable, non-obvious insights. Don't summarize who said what; instead, frame the insights as mental models or execution frameworks the PM can use IMMEDIATELY. Avoid generic advice (e.g., "talk to users"). Focus on "How" and "Why" based on the specific transcript content.
-2. FORMAT: Use clean Markdown. Use bolding for emphasis. Include a "Tactical Application" section at the end with 3 specific actions.
+2. SUMMARY: Provide a compelling, professional 2-3 sentence summary of the lesson in the "description" field. Avoid templated phrases like "In this lesson...". Focus on the value the PM will gain (e.g., "Learn to navigate high-stakes prioritization when engineering capacity is halved...").
+3. FORMAT: Use clean Markdown. Use bolding for emphasis. Include a "Tactical Application" section at the end with 3 specific actions.
 3. QUESTIONS: Generate 3 challenging multiple-choice questions. 
    - These MUST NOT be trivial recall (e.g., "What is the guest's name?").
    - NEVER ask identity questions (guest name, who said this, which expert featured).
@@ -118,6 +120,7 @@ CRITICAL QUALITY GUARDRAILS:
 
 OUTPUT FORMAT: Return a valid JSON object only.
 {
+  "description": "2-3 sentence professional summary here...",
   "content": "Markdown content string here...",
   "questions": [
     {
@@ -140,11 +143,14 @@ OUTPUT FORMAT: Return a valid JSON object only.
   const rawResult = completion.choices[0]?.message?.content;
   if (!rawResult) throw new Error("No response from Groq");
   const parsed = parseModelJSON<GeneratedLessonContent>(rawResult);
-  // Normalize content to string in case the model wraps it in an object
+  // Normalize content and description to string in case the model wraps them in objects
   if (typeof parsed.content !== "string") {
     parsed.content = typeof parsed.content === "object"
       ? JSON.stringify(parsed.content)
       : String(parsed.content ?? "");
+  }
+  if (typeof parsed.description !== "string") {
+    parsed.description = String(parsed.description ?? "");
   }
   if (!isGenericLessonContent(parsed.content) && !isWeakQuestionSet(parsed.questions)) return parsed;
 
@@ -167,7 +173,8 @@ Rules:
 - At least 2 questions must contain explicit tradeoff language.
 - Explanations must mention why the top option outperforms at least two plausible alternatives.
 - Keep "Tactical Application" with exactly 3 concrete actions.
-- Keep output as JSON object with keys: content, questions.
+- Generate a new, non-repetitive "description" (2-3 sentences) that highlights the unique value of this specific lesson.
+- Keep output as JSON object with keys: description, content, questions.
 `;
 
   const retry = await groqCreate({
@@ -186,6 +193,9 @@ Rules:
     retryParsed.content = typeof retryParsed.content === "object"
       ? JSON.stringify(retryParsed.content)
       : String(retryParsed.content ?? "");
+  }
+  if (typeof retryParsed.description !== "string") {
+    retryParsed.description = String(retryParsed.description ?? "");
   }
   if (isGenericLessonContent(retryParsed.content) || isWeakQuestionSet(retryParsed.questions)) {
     throw new Error("Could not generate high-quality PM lesson content.");
@@ -254,5 +264,67 @@ Requirements:
   if (!Array.isArray(parsed.questions) || parsed.questions.length < 3) {
     throw new Error("Leader lesson questions missing");
   }
+  return parsed;
+}
+
+export interface GeneratedSeoArticle {
+  title: string;
+  description: string;
+  body: string;
+  primaryKeyword: string;
+}
+
+export async function generateSeoArticle(
+  topic: string,
+  results: SearchResult[]
+): Promise<GeneratedSeoArticle> {
+  const context = results
+    .map((r, i) => `[Excerpt ${i + 1}] Guest: ${r.guest}\nEpisode: ${r.episodeTitle ?? "N/A"}\nContent: ${r.snippet}`)
+    .join("\n\n");
+
+  const prompt = `Act as an expert PM content strategist and SEO specialist. Create a comprehensive, high-value PM article (800+ words) based on the provided search results from Lenny's Podcast.
+
+TOPIC: ${topic}
+
+TRANSCRIPT HIGHLIGHTS:
+${context}
+
+SEO REQUIREMENTS:
+1. WORD COUNT: The article MUST be at least 800 words. Expand on nuances, examples, and frameworks.
+2. STRUCTURE: Use a clear H1 title. Use multiple ## H2 subheadings and at least one ### H3 section.
+3. KEYWORDS: Choose a primary keyword related to "${topic}". Include it in the title, first 100 words, and naturally throughout the text.
+4. DESCRIPTION: Provide a meta-description between 120-160 characters.
+5. INTERNAL LINKS: Include markdown links to internal pages where natural: (/pricing), (/interview-prep), (/dashboard).
+6. EXTERNAL LINKS: Include at least one link to a relevant external resource (e.g., Lenny's newsletter or a PM framework site).
+
+CONTENT REQUIREMENTS:
+- Synthetic Insights: Don't just list what guests said. Synthesize them into a cohesive "Ultimate Guide" style article.
+- Practicality: Include sections on "Common Pitfalls", "Advanced Tactics", and "Success Metrics".
+- Tone: Professional, authoritative, yet accessible.
+
+OUTPUT FORMAT: Return a valid JSON object only.
+{
+  "title": "SEO Optimized Title...",
+  "description": "120-160 char meta description...",
+  "primaryKeyword": "...",
+  "body": "Full markdown article content (800+ words) here..."
+}
+`;
+
+  const completion = await groqCreate({
+    messages: [{ role: "user", content: prompt }],
+    model: "llama-3.3-70b-versatile",
+    response_format: { type: "json_object" },
+    temperature: 0.4,
+  });
+
+  const raw = completion.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from Groq for SEO article");
+
+  const parsed = parseModelJSON<GeneratedSeoArticle>(raw);
+  if (!parsed.title || !parsed.body || parsed.body.length < 1500) {
+    throw new Error("Generated SEO article is too thin or missing title.");
+  }
+
   return parsed;
 }

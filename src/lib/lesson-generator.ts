@@ -153,7 +153,7 @@ function hasStrongEvidence(result: SearchResult) {
   return Boolean(result.guest) && snippet.length >= 180;
 }
 
-async function searchLennyTranscripts(query: string): Promise<SearchResult[]> {
+export async function searchLennyTranscripts(query: string): Promise<SearchResult[]> {
   try {
     const sessionId = await initializeMcpSession();
     const content = await callMcpTool(sessionId, "search_transcripts", {
@@ -274,12 +274,14 @@ export async function generateLesson({
       : `${normalizedTopic.charAt(0).toUpperCase() + normalizedTopic.slice(1)} — Custom Lesson`;
 
   const slug = `ai-${slugifyTopic(normalizedTopic).slice(0, 40)}-${generationMode}-${Date.now()}`;
-  const description =
-    generationMode === "deep_dive"
-      ? `A deeper follow-up lesson on ${normalizedTopic}`
-      : `Custom lesson on ${normalizedTopic} from Lenny's Podcast insights`;
 
   const llmResult = await generateActionablePMLesson(normalizedTopic, searchResults);
+  const description =
+    llmResult.description ||
+    (generationMode === "deep_dive"
+      ? `A deeper follow-up lesson on ${normalizedTopic}`
+      : `Insights on ${normalizedTopic} synthesized from Lenny's Podcast transcripts.`);
+
   const content = llmResult.content;
   const questions = llmResult.questions;
   const sourceTranscript = buildSourceTranscript(normalizedTopic, searchResults);
