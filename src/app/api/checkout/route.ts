@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 const DODO_ENV =
   (process.env.DODO_PAYMENTS_ENVIRONMENT as "test_mode" | "live_mode" | undefined) ??
@@ -51,8 +52,22 @@ export async function GET(req: NextRequest) {
   if (email) checkoutUrl.searchParams.set("email", email);
 
   for (const [key, value] of searchParams.entries()) {
-    if (key.startsWith("metadata_") || key === "discount_code") {
+    if (key.startsWith("metadata_")) {
       checkoutUrl.searchParams.set(key, value);
+    }
+    if (key === "discount_code") {
+      const coupon = await prisma.coupon.findUnique({ where: { code: value } });
+      if (coupon) {
+        const isGlobal = coupon.email === "*";
+        const emailMatch = email && coupon.email.toLowerCase() === email.toLowerCase();
+        
+        if (isGlobal || emailMatch) {
+          checkoutUrl.searchParams.set(key, value);
+        }
+        // If not global and not email match, we skip adding it to checkoutUrl
+      } else {
+        // If coupon not found in our DB, we don't pass it (it might be a deleted/disabled coupon)
+      }
     }
   }
 

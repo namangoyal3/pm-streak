@@ -58,6 +58,16 @@ interface EmailRow {
   createdAt: string;
 }
 
+interface CouponRow {
+  code: string;
+  email: string;
+  discountPercent: number;
+  maxUses: number;
+  usesCount: number;
+  expiresAt: string;
+  createdAt: string;
+}
+
 interface EmailStats {
   total: number;
   sent: number;
@@ -115,6 +125,9 @@ export default function AdminPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "users" | "emails" | "pro-grants" | "coupons">("overview");
 
+  const [coupons, setCoupons] = useState<CouponRow[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
+
   // Pro grants state
   const [grantEmail, setGrantEmail] = useState("");
   const [grantInterval, setGrantInterval] = useState<"month" | "quarter" | "year">("month");
@@ -127,6 +140,7 @@ export default function AdminPage() {
   const [couponDiscount, setCouponDiscount] = useState(70);
   const [couponExpiry, setCouponExpiry] = useState(60 * 24); // 1 day
   const [couponLimit, setCouponLimit] = useState(1);
+  const [couponCustomCode, setCouponCustomCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponResult, setCouponResult] = useState<{ ok: boolean; message: string; code?: string } | null>(null);
 
@@ -202,6 +216,34 @@ export default function AdminPage() {
       setEmailLoading(false);
     }
   }, []);
+
+  const fetchCoupons = useCallback(async () => {
+    setCouponsLoading(true);
+    try {
+      const res = await fetch("/api/admin/coupon");
+      if (res.ok) {
+        const data = await res.json();
+        setCoupons(data.coupons);
+      }
+    } finally {
+      setCouponsLoading(false);
+    }
+  }, []);
+
+  const disableCoupon = useCallback(async (code: string) => {
+    if (!confirm(`Are you sure you want to delete ${code}? It will no longer work on checkout.`)) return;
+    try {
+      const res = await fetch(`/api/admin/coupon?code=${code}`, { method: "DELETE" });
+      if (res.ok) {
+        await fetchCoupons();
+      } else {
+        alert("Failed to delete coupon.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting coupon.");
+    }
+  }, [fetchCoupons]);
 
   const runCleanupPreview = useCallback(async () => {
     setCleanupLoading(true);
@@ -311,6 +353,7 @@ export default function AdminPage() {
           discountPercent: couponDiscount,
           expiresInMinutes: couponExpiry,
           maxUses: couponLimit,
+          customCode: couponCustomCode.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -350,6 +393,10 @@ export default function AdminPage() {
   useEffect(() => {
     if (activeTab === "emails") fetchEmails(emailPage);
   }, [activeTab, emailPage, fetchEmails]);
+
+  useEffect(() => {
+    if (activeTab === "coupons") fetchCoupons();
+  }, [activeTab, fetchCoupons]);
 
   if (loading) {
     return (
@@ -997,6 +1044,19 @@ export default function AdminPage() {
                 )}
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="col-span-2">
+                    <label className="text-xs font-black uppercase tracking-wide block mb-1" style={{ color: "var(--text-secondary)" }}>
+                      Personalized Code (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. WELCOME70"
+                      value={couponCustomCode}
+                      onChange={(e) => setCouponCustomCode(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl text-sm font-mono uppercase"
+                      style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+                    />
+                  </div>
                   <div>
                     <label className="text-xs font-black uppercase tracking-wide block mb-1" style={{ color: "var(--text-secondary)" }}>
                       Discount (%)
@@ -1025,8 +1085,10 @@ export default function AdminPage() {
                       style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
                     />
                   </div>
+                </div>
 
-                  <div className="col-span-2">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
                     <label className="text-xs font-black uppercase tracking-wide block mb-1" style={{ color: "var(--text-secondary)" }}>
                       Time Expiry
                     </label>
@@ -1081,6 +1143,65 @@ export default function AdminPage() {
                   )}
                 </div>
               )}
+
+              {/* Existing Coupons List */}
+              <div className="mt-8 border-t border-white/10 pt-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>Existing Coupons</h3>
+                  <button onClick={fetchCoupons} className="text-xs p-1 hover:rotate-180 transition-all duration-500">
+                    <RefreshCw size={14} style={{ color: "var(--text-secondary)" }} />
+                  </button>
+                </div>
+                
+                {couponsLoading ? (
+                  <div className="text-center py-8 text-xs italic" style={{ color: "var(--text-secondary)" }}>Loading coupons...</div>
+                ) : coupons.length === 0 ? (
+                  <div className="text-center py-8 text-xs italic" style={{ color: "var(--text-secondary)" }}>No coupons found.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
+                          {["Code", "Type / Email", "Disc", "Used", "Expires", "Action"].map((h) => (
+                            <th key={h} className="py-2 px-2 text-left font-black uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {coupons.map((c) => (
+                          <tr key={c.code} style={{ borderBottom: "1px solid var(--border-color)" }} className="hover:bg-white/3">
+                            <td className="py-3 px-2 font-black tracking-wider text-sm">{c.code}</td>
+                            <td className="py-3 px-2">
+                              {c.email === "*" ? (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 font-bold">GLOBAL</span>
+                              ) : (
+                                <div className="max-w-[150px] truncate" title={c.email}>{c.email}</div>
+                              )}
+                            </td>
+                            <td className="py-3 px-2 font-bold text-green-400">{c.discountPercent}%</td>
+                            <td className="py-3 px-2 tabular-nums">
+                              <span className={c.usesCount >= c.maxUses ? "text-red-400" : "text-[var(--text-primary)]"}>
+                                {c.usesCount} / {c.maxUses}
+                              </span>
+                            </td>
+                            <td className="py-3 px-2 whitespace-nowrap" style={{ color: new Date(c.expiresAt) < new Date() ? "#ff4b4b" : "var(--text-secondary)" }}>
+                              {formatDateTime(c.expiresAt)}
+                            </td>
+                            <td className="py-3 px-2">
+                              <button 
+                                onClick={() => disableCoupon(c.code)}
+                                className="px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           </Section>
         )}

@@ -10,6 +10,24 @@ function isAdmin(email: string | null): boolean {
   return email === ADMIN_EMAIL;
 }
 
+export async function GET(req: NextRequest) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !isAdmin(user.email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const coupons = await prisma.coupon.findMany({
+      orderBy: { createdAt: "desc" }
+    });
+
+    return NextResponse.json({ coupons });
+  } catch (err) {
+    console.error("Failed to list coupons:", err);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const userId = await getCurrentUserId();
@@ -23,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { email, discountPercent, expiresInMinutes = 5, isGlobal = false, maxUses = 1 } = body;
+    const { email, discountPercent, expiresInMinutes = 5, isGlobal = false, maxUses = 1, customCode } = body;
 
     let targetEmail = email;
     if (isGlobal) {
@@ -49,7 +67,11 @@ export async function POST(req: NextRequest) {
 
     const validMaxUses = typeof maxUses === "number" ? Math.max(1, maxUses) : 1;
 
-    const { code, expiresAt, signature } = createCouponData(targetEmail, discount, expiryMinutes);
+    let { code, expiresAt, signature } = createCouponData(targetEmail, discount, expiryMinutes);
+
+    if (customCode && typeof customCode === "string" && customCode.trim().length > 2) {
+      code = customCode.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+    }
 
     // Sync to Dodo Payments
     try {
@@ -94,6 +116,43 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Coupon creation error:", error);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const userId = await getCurrentUserId();
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !isAdmin(user.email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { searchParams } = new URL(req.url);
+    const code = searchParams.get("code");
+    if (!code) return NextResponse.json({ error: "Code required" }, { status: 400 });
+
+    // Delete from Dodo first (best effort)
+    try {
+      const dodo = new DodoPayments({
+        bearerToken: process.env.DODO_PAYMENTS_API_KEY,
+        environment:
+          process.env.DODO_PAYMENTS_ENVIRONMENT === "test_mode" ? "test_mode" : "live_mode",
+      });
+      
+      // Dodo doesn't always have a direct 'delete by code', but we find it first
+      const discount = await dodo.discounts.retrieveByCode(code);
+      if (discount && discount.discount_id) {
+        await dodo.discounts.delete(discount.discount_id);
+      }
+    } catch (dodoErr) {
+      console.warn("Failed to delete from Dodo (might not exist):", dodoErr);
+    }
+
+    await prisma.coupon.delete({ where: { code } });
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Failed to delete coupon:", err);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
