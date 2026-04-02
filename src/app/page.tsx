@@ -196,29 +196,29 @@ export default async function Home() {
             <li><span className="text-white font-black">2.</span> Answer 3 quiz questions</li>
             <li><span className="text-white font-black">3.</span> Keep your streak alive daily</li>
           </ul>
-          <details className="mt-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/40">
-            <summary className="cursor-pointer list-none px-3 py-2.5 text-xs font-black text-white">
+          <div className="mt-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/40 p-3">
+            <div className="text-xs font-black text-white mb-2">
               What you&apos;ll learn
-            </summary>
-            <div className="px-3 pb-3 text-xs text-[var(--text-secondary)] space-y-2">
+            </div>
+            <div className="text-xs text-[var(--text-secondary)] space-y-2">
               <div className="flex flex-wrap gap-1.5">
                 {["Strategy", "Growth", "Metrics", "Hiring", "Roadmaps", "Pricing"].map(t => (
-                  <span key={t} className="px-2 py-0.5 rounded bg-white/5 text-[9px]">{t}</span>
+                  <span key={t} className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px]">{t}</span>
                 ))}
               </div>
             </div>
-          </details>
-          <details className="mt-2 rounded-xl border border-[var(--purple-primary)]/30 bg-[var(--purple-primary)]/5">
-            <summary className="cursor-pointer list-none px-3 py-2.5 text-xs font-black text-[var(--purple-primary)]">
+          </div>
+          <div className="mt-2 rounded-xl border border-[var(--purple-primary)]/30 bg-[var(--purple-primary)]/10 p-3">
+            <div className="text-xs font-black text-[var(--purple-primary)] mb-1.5">
               ⚡ Go Pro — Unlock everything
-            </summary>
-            <div className="px-3 pb-3 text-xs text-[var(--text-secondary)] space-y-1.5">
+            </div>
+            <div className="text-xs text-[var(--text-secondary)] space-y-1.5 leading-relaxed">
               <p>292+ Archive Lessons, Unlimited AI Lessons, AI Interview Prep, PM Jobs Board, WhatsApp Community.</p>
               <BrowserLink href="/pricing" className="inline-block mt-2 px-3 py-1.5 rounded-lg bg-[var(--purple-primary)] text-white text-[9px] font-black">
                 View Pricing →
               </BrowserLink>
             </div>
-          </details>
+          </div>
         </div>
       </section>
 
