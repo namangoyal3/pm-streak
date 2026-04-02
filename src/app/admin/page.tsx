@@ -940,6 +940,28 @@ export default function AdminPage() {
                 Generate discount codes valid on checkout. Enable &quot;Global&quot; to allow anyone to use it up to the selected limit.
               </p>
 
+              <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4 text-xs">
+                <p className="font-bold text-purple-300 mb-2">Current Base Checkout Prices (Before New Coupons)</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="font-bold text-white mb-1">🇮🇳 India (INR)</p>
+                    <ul className="text-white/60 space-y-1 font-mono">
+                      <li>Monthly: ₹499</li>
+                      <li>Quarterly: ₹899</li>
+                      <li>Yearly: ₹2,699</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-bold text-white mb-1">🌍 International (USD)</p>
+                    <ul className="text-white/60 space-y-1 font-mono">
+                      <li>Monthly: $3</li>
+                      <li>Quarterly: $8</li>
+                      <li>Yearly: $15</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-4 p-4 rounded-xl" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
                 <div className="flex items-center gap-3">
                   <input
