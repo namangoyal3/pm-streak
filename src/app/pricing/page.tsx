@@ -122,20 +122,20 @@ async function PricingContent() {
     if (user && isProEffective(user)) userPlan = "pro";
   }
 
-  // INR product IDs (Now assigned to the higher tier, previously assigned to India)
-  const highTierMonthlyId = process.env.NEXT_PUBLIC_DODO_MONTHLY_PRODUCT_ID ?? "";
-  const highTierQuarterlyId = process.env.NEXT_PUBLIC_DODO_QUARTERLY_PRODUCT_ID ?? "";
-  const highTierYearlyId = process.env.NEXT_PUBLIC_DODO_YEARLY_PRODUCT_ID ?? "";
+  // INR product IDs (Native Indian Tier)
+  const inrMonthlyId = process.env.NEXT_PUBLIC_DODO_MONTHLY_PRODUCT_ID ?? "";
+  const inrQuarterlyId = process.env.NEXT_PUBLIC_DODO_QUARTERLY_PRODUCT_ID ?? "";
+  const inrYearlyId = process.env.NEXT_PUBLIC_DODO_YEARLY_PRODUCT_ID ?? "";
 
-  // USD product IDs (Now assigned to the lower tier, previously assigned to International)
-  const lowTierMonthlyId = process.env.NEXT_PUBLIC_DODO_USD_MONTHLY_PRODUCT_ID ?? "";
-  const lowTierQuarterlyId = process.env.NEXT_PUBLIC_DODO_USD_QUARTERLY_PRODUCT_ID ?? "";
-  const lowTierYearlyId = process.env.NEXT_PUBLIC_DODO_USD_YEARLY_PRODUCT_ID ?? "";
+  // USD product IDs (Native International Tier)
+  const usdMonthlyId = process.env.NEXT_PUBLIC_DODO_USD_MONTHLY_PRODUCT_ID ?? "";
+  const usdQuarterlyId = process.env.NEXT_PUBLIC_DODO_USD_QUARTERLY_PRODUCT_ID ?? "";
+  const usdYearlyId = process.env.NEXT_PUBLIC_DODO_USD_YEARLY_PRODUCT_ID ?? "";
 
   const plans = isIndia
     ? [
         // India gets the LOWER tier ($3 -> ~₹249, $8 -> ~₹669, $15 -> ~₹1249)
-        { key: "monthly",   title: "Monthly",   original: calculateMRP("₹249", true),   discounted: "₹249",   period: "/ month",     productId: lowTierMonthlyId },
+        { key: "monthly",   title: "Monthly",   original: calculateMRP("₹249", true),   discounted: "₹249",   period: "/ month",     productId: inrMonthlyId },
         { 
           key: "quarterly", 
           title: "Quarterly", 
@@ -144,7 +144,7 @@ async function PricingContent() {
           period: "/ 3 months",  
           badge: "Best Value", 
           savings: `Save ₹${(Math.round(669/0.3) - 669).toLocaleString("en-IN")}`,  
-          productId: lowTierQuarterlyId 
+          productId: inrQuarterlyId 
         },
         { 
           key: "yearly",    
@@ -153,12 +153,13 @@ async function PricingContent() {
           discounted: "₹1,249", 
           period: "/ year",       
           savings: `Save ₹${(Math.round(1249/0.3) - 1249).toLocaleString("en-IN")}`, 
-          productId: lowTierYearlyId 
+          desc: "All features + interview prep included",
+          productId: inrYearlyId 
         },
       ]
     : [
         // International gets the HIGHER tier (₹499 -> ~$6, ₹899 -> ~$11, ₹2699 -> ~$32)
-        { key: "monthly",   title: "Monthly",   original: calculateMRP("$6", false),     discounted: "$6",      period: "/ month",     productId: highTierMonthlyId },
+        { key: "monthly",   title: "Monthly",   original: calculateMRP("$6", false),     discounted: "$6",      period: "/ month",     productId: usdMonthlyId },
         { 
           key: "quarterly", 
           title: "Quarterly", 
@@ -167,7 +168,7 @@ async function PricingContent() {
           period: "/ 3 months",  
           badge: "Best Value", 
           savings: `Save $${Math.round(11/0.3) - 11}`,     
-          productId: highTierQuarterlyId 
+          productId: usdQuarterlyId 
         },
         { 
           key: "yearly",    
@@ -176,7 +177,8 @@ async function PricingContent() {
           discounted: "$32",     
           period: "/ year",       
           savings: `Save $${Math.round(32/0.3) - 32}`, 
-          productId: highTierYearlyId 
+          desc: "All features + interview prep included",
+          productId: usdYearlyId 
         },
       ];
 
@@ -330,13 +332,16 @@ async function PricingContent() {
                         : "bg-white/10 hover:bg-white/20 text-white border border-white/20"
                     } ${!plan.productId ? "opacity-50 pointer-events-none" : ""}`}
                   >
-                    <span className="flex items-center gap-2">
-                      {plan.badge && (
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/20">
-                          {plan.badge}
-                        </span>
-                      )}
-                      Subscribe {plan.title}
+                    <span className="flex flex-col items-start gap-0.5">
+                      <span className="flex items-center gap-2">
+                        {plan.badge && (
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/20">
+                            {plan.badge}
+                          </span>
+                        )}
+                        Subscribe {plan.title}
+                      </span>
+                      {(plan as any).desc && <span className="text-[10px] text-white/50 font-bold block leading-tight">{(plan as any).desc}</span>}
                     </span>
                     <span className="text-right flex flex-col items-end shrink-0 ml-2">
                       <span className="flex items-center gap-1 flex-nowrap">
