@@ -122,59 +122,61 @@ async function PricingContent() {
     if (user && isProEffective(user)) userPlan = "pro";
   }
 
-  // INR product IDs (India)
-  const inrMonthlyId = process.env.NEXT_PUBLIC_DODO_MONTHLY_PRODUCT_ID ?? "";
-  const inrQuarterlyId = process.env.NEXT_PUBLIC_DODO_QUARTERLY_PRODUCT_ID ?? "";
-  const inrYearlyId = process.env.NEXT_PUBLIC_DODO_YEARLY_PRODUCT_ID ?? "";
+  // INR product IDs (Now assigned to the higher tier, previously assigned to India)
+  const highTierMonthlyId = process.env.NEXT_PUBLIC_DODO_MONTHLY_PRODUCT_ID ?? "";
+  const highTierQuarterlyId = process.env.NEXT_PUBLIC_DODO_QUARTERLY_PRODUCT_ID ?? "";
+  const highTierYearlyId = process.env.NEXT_PUBLIC_DODO_YEARLY_PRODUCT_ID ?? "";
 
-  // USD product IDs (International)
-  const usdMonthlyId = process.env.NEXT_PUBLIC_DODO_USD_MONTHLY_PRODUCT_ID ?? "";
-  const usdQuarterlyId = process.env.NEXT_PUBLIC_DODO_USD_QUARTERLY_PRODUCT_ID ?? "";
-  const usdYearlyId = process.env.NEXT_PUBLIC_DODO_USD_YEARLY_PRODUCT_ID ?? "";
+  // USD product IDs (Now assigned to the lower tier, previously assigned to International)
+  const lowTierMonthlyId = process.env.NEXT_PUBLIC_DODO_USD_MONTHLY_PRODUCT_ID ?? "";
+  const lowTierQuarterlyId = process.env.NEXT_PUBLIC_DODO_USD_QUARTERLY_PRODUCT_ID ?? "";
+  const lowTierYearlyId = process.env.NEXT_PUBLIC_DODO_USD_YEARLY_PRODUCT_ID ?? "";
 
   const plans = isIndia
     ? [
-        { key: "monthly",   title: "Monthly",   original: calculateMRP("₹499", true),   discounted: "₹499",   period: "/ month",     productId: inrMonthlyId },
+        // India gets the LOWER tier ($3 -> ~₹249, $8 -> ~₹669, $15 -> ~₹1249)
+        { key: "monthly",   title: "Monthly",   original: calculateMRP("₹249", true),   discounted: "₹249",   period: "/ month",     productId: lowTierMonthlyId },
         { 
           key: "quarterly", 
           title: "Quarterly", 
-          original: calculateMRP("₹899", true),   
-          discounted: "₹899",   
+          original: calculateMRP("₹669", true),   
+          discounted: "₹669",   
           period: "/ 3 months",  
           badge: "Best Value", 
-          savings: `Save ₹${(Math.round(899/0.3) - 899).toLocaleString("en-IN")}`,  
-          productId: inrQuarterlyId 
+          savings: `Save ₹${(Math.round(669/0.3) - 669).toLocaleString("en-IN")}`,  
+          productId: lowTierQuarterlyId 
         },
         { 
           key: "yearly",    
           title: "Yearly",    
-          original: calculateMRP("₹2,699", true), 
-          discounted: "₹2,699", 
+          original: calculateMRP("₹1,249", true), 
+          discounted: "₹1,249", 
           period: "/ year",       
-          savings: `Save ₹${(Math.round(2699/0.3) - 2699).toLocaleString("en-IN")}`, 
-          productId: inrYearlyId 
+          savings: `Save ₹${(Math.round(1249/0.3) - 1249).toLocaleString("en-IN")}`, 
+          productId: lowTierYearlyId 
         },
       ]
     : [
-        { key: "monthly",   title: "Monthly",   original: calculateMRP("$3", false),     discounted: "$3",      period: "/ month",     productId: usdMonthlyId },
+        // International gets the HIGHER tier (₹499 -> ~$6, ₹899 -> ~$11, ₹2699 -> ~$32)
+        { key: "monthly",   title: "Monthly",   original: calculateMRP("$6", false),     discounted: "$6",      period: "/ month",     productId: highTierMonthlyId },
         { 
           key: "quarterly", 
           title: "Quarterly", 
-          original: calculateMRP("$8", false),     
-          discounted: "$8",      
+          original: calculateMRP("$11", false),     
+          discounted: "$11",      
           period: "/ 3 months",  
           badge: "Best Value", 
-          savings: `Save $${Math.round(8/0.3) - 8}`,     
-          productId: usdQuarterlyId 
+          savings: `Save $${Math.round(11/0.3) - 11}`,     
+          productId: highTierQuarterlyId 
         },
         { 
           key: "yearly",    
           title: "Yearly",    
-          original: calculateMRP("$15", false),    
-          discounted: "$15",     
+          original: calculateMRP("$32", false),    
+          discounted: "$32",     
           period: "/ year",       
-          savings: `Save $${Math.round(15/0.3) - 15}`, 
-          productId: usdYearlyId 
+          savings: `Save $${Math.round(32/0.3) - 32}`, 
+          productId: highTierYearlyId 
         },
       ];
 
@@ -277,14 +279,14 @@ async function PricingContent() {
                 </span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-white/40 line-through text-2xl whitespace-nowrap">{calculateMRP(isIndia ? "₹499" : "$3", isIndia)}</span>
-                <span className="text-3xl font-black text-green-400 whitespace-nowrap">{isIndia ? "₹499" : "$3"} <span className="text-[10px] align-top opacity-80">(70% OFF)</span></span>
+                <span className="text-white/40 line-through text-2xl whitespace-nowrap">{calculateMRP(isIndia ? "₹249" : "$6", isIndia)}</span>
+                <span className="text-3xl font-black text-green-400 whitespace-nowrap">{isIndia ? "₹249" : "$6"} <span className="text-[10px] align-top opacity-80">(70% OFF)</span></span>
                 <span className="text-white/50 text-sm whitespace-nowrap">/ month</span>
               </div>
               <p className="text-xs text-purple-300/70 mt-1">
                 {isIndia
-                  ? <><span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("₹899", true)}</span> <span className="text-green-400 font-black whitespace-nowrap">₹899 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / 3 months · <span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("₹2,699", true)}</span> <span className="text-green-400 font-black whitespace-nowrap">₹2,699 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / year</>
-                  : <><span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("$8", false)}</span> <span className="text-green-400 font-black whitespace-nowrap">$8 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / 3 months · <span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("$15", false)}</span> <span className="text-green-400 font-black whitespace-nowrap">$15 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / year</>
+                  ? <><span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("₹669", true)}</span> <span className="text-green-400 font-black whitespace-nowrap">₹669 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / 3 months · <span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("₹1,249", true)}</span> <span className="text-green-400 font-black whitespace-nowrap">₹1,249 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / year</>
+                  : <><span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("$11", false)}</span> <span className="text-green-400 font-black whitespace-nowrap">$11 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / 3 months · <span className="line-through text-white/30 whitespace-nowrap">{calculateMRP("$32", false)}</span> <span className="text-green-400 font-black whitespace-nowrap">$32 <span className="text-[8px] opacity-70">(70% OFF)</span></span> / year</>
                 }
               </p>
             </div>
@@ -419,11 +421,11 @@ async function PricingContent() {
             { q: "Are credits cumulative?", a: "No — they reset on the 1st of each month. Unused credits don't roll over." },
             { q: "Can I cancel anytime?", a: "Yes. Cancel through the customer portal and you keep Pro access until your current period ends." },
             isIndia
-              ? { q: "What's the quarterly plan?", a: `${calculateMRP("₹899", true)} for 3 months — results in ₹899 with the applied discount.` }
-              : { q: "What's the quarterly plan?", a: `${calculateMRP("$8", false)} for 3 months — results in $8 with the applied discount.` },
+              ? { q: "What's the quarterly plan?", a: `${calculateMRP("₹669", true)} for 3 months — results in ₹669 with the applied discount.` }
+              : { q: "What's the quarterly plan?", a: `${calculateMRP("$11", false)} for 3 months — results in $11 with the applied discount.` },
             isIndia
-              ? { q: "What's the yearly plan?", a: `${calculateMRP("₹2,699", true)}/year — results in ₹2,699 with the applied discount.` }
-              : { q: "What's the yearly plan?", a: `${calculateMRP("$15", false)}/year — results in $15 with the applied discount.` },
+              ? { q: "What's the yearly plan?", a: `${calculateMRP("₹1,249", true)}/year — results in ₹1,249 with the applied discount.` }
+              : { q: "What's the yearly plan?", a: `${calculateMRP("$32", false)}/year — results in $32 with the applied discount.` },
             { q: "What payment methods are accepted?", a: isIndia ? "UPI, credit/debit cards, net banking, and more — via Dodo Payments secure checkout." : "Credit/debit cards, PayPal, and more — via Dodo Payments secure checkout." },
           ].map((item) => (
             <div key={item.q} className="rounded-xl border border-white/10 p-4 bg-white/5">

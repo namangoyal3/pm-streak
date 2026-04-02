@@ -946,17 +946,17 @@ export default function AdminPage() {
                   <div>
                     <p className="font-bold text-white mb-1">🇮🇳 India (INR)</p>
                     <ul className="text-white/60 space-y-1 font-mono">
-                      <li>Monthly: ₹499</li>
-                      <li>Quarterly: ₹899</li>
-                      <li>Yearly: ₹2,699</li>
+                      <li>Monthly: ₹249</li>
+                      <li>Quarterly: ₹669</li>
+                      <li>Yearly: ₹1,249</li>
                     </ul>
                   </div>
                   <div>
                     <p className="font-bold text-white mb-1">🌍 International (USD)</p>
                     <ul className="text-white/60 space-y-1 font-mono">
-                      <li>Monthly: $3</li>
-                      <li>Quarterly: $8</li>
-                      <li>Yearly: $15</li>
+                      <li>Monthly: $6</li>
+                      <li>Quarterly: $11</li>
+                      <li>Yearly: $32</li>
                     </ul>
                   </div>
                 </div>

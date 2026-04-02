@@ -28,8 +28,11 @@ function Confetti() {
 
 export default function PricingBannerModal() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isIndia, setIsIndia] = useState(true);
 
   useEffect(() => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setIsIndia(tz === "Asia/Calcutta" || tz === "Asia/Kolkata");
     const timer = setTimeout(() => setIsVisible(true), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -88,15 +91,27 @@ export default function PricingBannerModal() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-white/70">Monthly</span>
-                  <span className="whitespace-nowrap"><span className="line-through text-white/30">₹1,663</span> <span className="text-green-400 font-black">₹499 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  {isIndia ? (
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹830</span> <span className="text-green-400 font-black">₹249 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  ) : (
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$20</span> <span className="text-green-400 font-black">$6 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Quarterly</span>
-                  <span className="whitespace-nowrap"><span className="line-through text-white/30">₹2,997</span> <span className="text-green-400 font-black">₹899 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  {isIndia ? (
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹2,230</span> <span className="text-green-400 font-black">₹669 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  ) : (
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$36</span> <span className="text-green-400 font-black">$11 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Yearly</span>
-                  <span className="whitespace-nowrap"><span className="line-through text-white/30">₹8,997</span> <span className="text-green-400 font-black">₹2,699 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  {isIndia ? (
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹4,163</span> <span className="text-green-400 font-black">₹1,249 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  ) : (
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$106</span> <span className="text-green-400 font-black">$32 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                  )}
                 </div>
               </div>
             </div>
