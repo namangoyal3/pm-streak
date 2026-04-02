@@ -18,8 +18,8 @@ function calculateMRP(discountedPrice: string, isIndia: boolean): string {
   if (!numMatch) return discountedPrice;
   
   const num = parseFloat(numMatch[0].replace(/,/g, ""));
-  // To get the MRP such that a 70% discount results in 'num', we do num / 0.3
-  const mrp = Math.round(num / 0.3);
+  // Increase by 70% as requested (num * 1.7)
+  const mrp = Math.round(num * 1.7);
   
   if (isIndia) {
     return `₹${mrp.toLocaleString("en-IN")}`;
@@ -85,6 +85,7 @@ function buildCheckoutUrl(opts: {
   if (opts.email) params.set("email", opts.email);
   if (opts.userId) params.set("metadata_userId", opts.userId);
   if (opts.plan) params.set("metadata_plan", opts.plan);
+  
   return `${base}?${params.toString()}`;
 }
 
@@ -282,7 +283,7 @@ async function PricingContent() {
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-white/40 line-through text-2xl whitespace-nowrap">{calculateMRP(isIndia ? "₹249" : "$6", isIndia)}</span>
-                <span className="text-3xl font-black text-green-400 whitespace-nowrap">{isIndia ? "₹249" : "$6"} <span className="text-[10px] align-top opacity-80">(70% OFF)</span></span>
+                <span className="text-3xl font-black text-green-400 whitespace-nowrap">{isIndia ? "₹249" : "$6"} <span className="text-[10px] align-top opacity-80">(SPECIAL PRICE)</span></span>
                 <span className="text-white/50 text-sm whitespace-nowrap">/ month</span>
               </div>
               <p className="text-xs text-purple-300/70 mt-1">

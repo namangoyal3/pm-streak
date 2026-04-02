@@ -72,7 +72,7 @@ export default function PricingBannerModal() {
             </div>
             
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-2">
-              🎉 70% OFF!
+              🎉 SPECIAL OFFER
             </h2>
             <p className="text-purple-200 text-sm mb-6">
               Exclusive Founder&apos;s Discount is <span className="text-green-400 font-black italic underline decoration-green-400/30">already applied</span> to your account.
@@ -83,7 +83,7 @@ export default function PricingBannerModal() {
                 <Check size={24} className="text-green-400" />
                 <span className="text-xl font-black tracking-wider text-green-400 uppercase">Discount Applied</span>
               </div>
-              <p className="text-white/40 text-[10px] mt-2">Prices below reflect your 70% exclusive discount</p>
+              <p className="text-white/40 text-[10px] mt-2">Prices below reflect your exclusive launch discount</p>
             </div>
 
             <div className="bg-white/5 rounded-xl p-4 mb-6">
@@ -92,25 +92,25 @@ export default function PricingBannerModal() {
                 <div className="flex justify-between">
                   <span className="text-white/70">Monthly</span>
                   {isIndia ? (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹830</span> <span className="text-green-400 font-black">₹249 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹423</span> <span className="text-green-400 font-black">₹249 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   ) : (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$20</span> <span className="text-green-400 font-black">$6 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$10</span> <span className="text-green-400 font-black">$6 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Quarterly</span>
                   {isIndia ? (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹2,230</span> <span className="text-green-400 font-black">₹669 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹1,137</span> <span className="text-green-400 font-black">₹669 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   ) : (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$36</span> <span className="text-green-400 font-black">$11 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$19</span> <span className="text-green-400 font-black">$11 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Yearly</span>
                   {isIndia ? (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹4,163</span> <span className="text-green-400 font-black">₹1,249 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹2,123</span> <span className="text-green-400 font-black">₹1,249 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   ) : (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$106</span> <span className="text-green-400 font-black">$32 <span className="text-[10px] opacity-80">(70% OFF)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$54</span> <span className="text-green-400 font-black">$32 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   )}
                 </div>
               </div>
