@@ -11,6 +11,12 @@
     },
     "src/app/api/job-targets/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/cron/intent-mapper/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/cron/performance-refiner/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
@@ -41,6 +47,14 @@
     {
       "path": "/api/cron/seo-indexnow",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/cron/intent-mapper",
+      "schedule": "0 2 * * 1"
+    },
+    {
+      "path": "/api/cron/performance-refiner",
+      "schedule": "0 4 * * 0"
     }
   ]
 }

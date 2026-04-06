@@ -14,24 +14,24 @@ export async function GET(req: Request) {
   }
 
   try {
-    // 1. Pick a topic that hasn't been turned into an article recently
-    // We'll prioritize the seed topics first
-    const seedTopics = [...EXPLORE_SEED_TOPICS];
-    const existingArticles = await prisma.article.findMany({
-      select: { title: true },
+    // 1. Pick highest priority pending keyword
+    const targetKeywordRow = await prisma.seoKeyword.findFirst({
+      where: { status: "pending" },
+      orderBy: { priority: "desc" },
     });
-    
-    const existingTitles = existingArticles.map(a => a.title.toLowerCase());
-    
-    // Find a seed topic not already covered
-    let targetTopic = seedTopics.find(t => 
-      !existingTitles.some(et => et.includes(t.toLowerCase()))
-    );
 
-    // Fallback: pick a random seed topic if all are covered
-    if (!targetTopic) {
-      targetTopic = seedTopics[Math.floor(Math.random() * seedTopics.length)];
+    if (!targetKeywordRow) {
+      return NextResponse.json({ ok: false, reason: "No pending keywords in queue." });
     }
+
+    const targetTopic = targetKeywordRow.keyword;
+    const pageType = targetKeywordRow.pageType;
+
+    // Mark as mapping
+    await prisma.seoKeyword.update({
+      where: { id: targetKeywordRow.id },
+      data: { status: "mapping" },
+    });
 
     console.log(`[cron/generate-seo] Generating article for topic: ${targetTopic}`);
 
@@ -54,6 +54,10 @@ export async function GET(req: Request) {
 
     if (seoScore < ARTICLE_PUBLISH_THRESHOLD) {
       console.warn(`[cron/generate-seo] Article score too low: ${seoScore}. Skipping.`);
+      await prisma.seoKeyword.update({
+        where: { id: targetKeywordRow.id },
+        data: { status: "failed" },
+      });
       return NextResponse.json({ 
         ok: false, 
         reason: "SEO score below threshold", 
@@ -76,12 +80,19 @@ export async function GET(req: Request) {
         body: articleData.body,
         vertical: "pm",
         tags: [targetTopic, "lenny-podcast-insights"],
+        pageType: pageType,
+        keywordId: targetKeywordRow.id,
         seoScore,
         published: true,
         publishedAt: new Date(),
         wordCount: articleData.body.split(/\s+/).length,
         sourceUrls: [],
       },
+    });
+
+    await prisma.seoKeyword.update({
+      where: { id: targetKeywordRow.id },
+      data: { status: "generated" },
     });
 
     return NextResponse.json({ 

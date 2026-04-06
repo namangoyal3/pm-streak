@@ -113,17 +113,19 @@ export default async function ArticlePage({ params }: Props) {
           </nav>
 
           {/* Header */}
-          <header className="mb-8">
+          <header className={`mb-8 pb-6 border-b ${article.pageType === "framework" ? "border-blue-500/20" : article.pageType === "interview_guide" ? "border-purple-500/20" : "border-white/10"}`}>
             <p className="text-xs font-bold text-[var(--green-primary)] uppercase tracking-wider mb-3">
-              {VERTICAL_LABELS[vertical] ?? vertical} &middot; {readTime} min read
+              {VERTICAL_LABELS[vertical] ?? vertical} 
+              {article.pageType !== "blog" && ` · ${article.pageType.replace("_", " ")}`}
+              &middot; {readTime} min read
               {publishedDate && ` · ${publishedDate}`}
             </p>
-            <h1 className="text-2xl font-black leading-tight mb-3">{article.title}</h1>
-            <p className="text-[var(--text-secondary)] text-base leading-relaxed">{article.description}</p>
+            <h1 className="text-3xl font-black leading-tight mb-3 tracking-tight">{article.title}</h1>
+            <p className="text-[var(--text-secondary)] text-lg leading-relaxed">{article.description}</p>
           </header>
 
           {/* Article body */}
-          <article className="prose-article">
+          <article className={`prose-article ${article.pageType === "framework" ? "prose-framework" : ""}`}>
             <ReactMarkdown
               components={{
                 h2: ({ children }) => (
