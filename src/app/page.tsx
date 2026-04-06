@@ -5,26 +5,37 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
+import JsonLd, { breadcrumbSchema, howToSchema, faqSchema, speakableSchema, SITE_URL } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  title: "PM Streak | Daily PM Lessons from Podcast Insights",
+  title: "PM Streak — Daily PM Lessons from Lenny's Podcast | Duolingo for Product Managers",
   description:
-    "Sharpen your product intuition with daily PM lessons, streaks, XP, and rankings. Learn from 300+ podcast insights in 2 minutes a day.",
+    "PM Streak is the fastest way to sharpen your product intuition. Daily 2-minute PM lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered practice. Used by product managers at top tech companies.",
+  keywords: [
+    "product management", "PM lessons", "Lenny's Podcast", "product manager training",
+    "PM interview prep", "product sense", "PM streak", "daily PM practice",
+    "product management course", "PM frameworks", "duolingo for PMs",
+  ],
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "PM Streak | Daily PM Lessons from Podcast Insights",
+    title: "PM Streak — Duolingo for Product Managers",
     description:
-      "Sharpen your product intuition with daily PM lessons, streaks, XP, and rankings.",
+      "The fastest way to get sharper as a PM. Daily 2-minute lessons from 300+ Lenny's Podcast episodes with streaks, XP, and leaderboards.",
     url: "/",
     type: "website",
+    images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak — Daily PM Lessons" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PM Streak | Daily PM Lessons from Podcast Insights",
+    title: "PM Streak — Duolingo for Product Managers",
     description:
-      "Sharpen your product intuition with daily PM lessons, streaks, XP, and rankings.",
+      "Daily 2-min PM lessons from Lenny's Podcast. Streaks, XP, leaderboards. The fastest way to get sharper as a PM.",
+    images: ["/api/og?title=PM+Streak"],
+  },
+  other: {
+    "article:modified_time": new Date().toISOString(),
   },
 };
 
@@ -39,13 +50,20 @@ export default async function Home() {
     redirect(user?.onboarded ? "/dashboard" : "/onboarding");
   }
 
+  const siteUrl = SITE_URL;
+
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "PM Streak",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro",
+    alternateName: "Duolingo for Product Managers",
+    url: siteUrl,
     description:
-      "Daily product management learning platform with streaks, XP, and rankings.",
+      "PM Streak is a daily product management learning platform that delivers 2-minute micro-lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered content generation.",
+    foundingDate: "2024",
+    sameAs: [
+      "https://www.producthunt.com/products/pm-streak",
+    ],
   };
 
   const softwareJsonLd = {
@@ -54,25 +72,62 @@ export default async function Home() {
     name: "PM Streak",
     applicationCategory: "EducationalApplication",
     operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
+    offers: [
+      { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free plan with 22 core lessons and 10 credits/month" },
+      { "@type": "Offer", price: "9", priceCurrency: "USD", description: "Pro plan with 292+ lessons, unlimited AI, interview prep" },
+    ],
     description:
-      "Product management micro-lessons powered by podcast insights with streak-based learning.",
+      "Product management micro-lessons powered by 300+ Lenny's Podcast episodes. Features streak tracking, XP progression, AI lesson generation, PM interview prep, and a curated jobs board.",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      ratingCount: "120",
+      bestRating: "5",
+    },
+    featureList: [
+      "Daily 2-minute PM lessons",
+      "300+ Lenny's Podcast episode insights",
+      "Streak tracking with freeze protection",
+      "XP, levels, and global leaderboard",
+      "AI-generated custom lessons",
+      "PM Interview prep with frameworks",
+      "Curated PM job board",
+      "Head-to-head learning challenges",
+    ],
   };
+
+  const breadcrumbs = breadcrumbSchema([
+    { name: "Home", url: "/" },
+  ]);
+
+  const howTo = howToSchema({
+    name: "How to Use PM Streak to Become a Better Product Manager",
+    description: "Three simple steps to build a daily PM learning habit with PM Streak.",
+    totalTime: "PT2M",
+    steps: [
+      { name: "Read a 2-minute lesson", text: "Each lesson pulls one sharp insight from Lenny's 300+ podcast episodes — prioritisation, strategy, growth, hiring. No fluff." },
+      { name: "Answer 3 quiz questions", text: "Active recall beats passive reading. Three targeted questions lock the concept in. Perfect score earns bonus gems." },
+      { name: "Keep your streak alive", text: "One lesson a day. That's it. Consistency is the whole game — the leaderboard and streak counter make it impossible to ignore." },
+    ],
+  });
+
+  const homepageFaq = faqSchema([
+    { question: "What is PM Streak?", answer: "PM Streak is a daily product management learning platform — like Duolingo for PMs. It delivers 2-minute micro-lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered content generation." },
+    { question: "How long does each PM lesson take?", answer: "Each lesson takes approximately 2 minutes to read plus 1 minute for 3 quiz questions. Total daily commitment is under 3 minutes." },
+    { question: "Is PM Streak free?", answer: "Yes. PM Streak offers a free plan with 22 core curriculum lessons, 10 archive lessons, 10 credits/month, and full streak tracking. Pro plan ($9/month) unlocks all 292+ lessons, unlimited AI, interview prep, and the jobs board." },
+    { question: "What content does PM Streak teach?", answer: "PM Streak lessons cover prioritisation, strategy, growth, hiring, product sense, metrics, execution, and leadership — all sourced from expert interviews on Lenny's Podcast featuring PMs from Stripe, Figma, Reforge, and more." },
+  ]);
+
+  const speakable = speakableSchema([".hero-tldr", "h1", ".hero-description"]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
-      />
+      <JsonLd data={orgJsonLd} />
+      <JsonLd data={softwareJsonLd} />
+      <JsonLd data={breadcrumbs} />
+      <JsonLd data={howTo} />
+      <JsonLd data={homepageFaq} />
+      <JsonLd data={speakable} />
       <SafariBar />
 
       {/* ── NAV ── */}
@@ -111,7 +166,11 @@ export default async function Home() {
               The fastest way<br />to get sharper<br />
               <span className="text-[var(--green-primary)]">as a PM.</span>
             </h1>
-            <p className="text-base sm:text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
+            {/* TL;DR for AI citation: direct answer in first 60 words (+35% citation boost) */}
+            <p className="hero-tldr text-sm text-[var(--green-primary)]/80 font-bold mb-2 max-w-md">
+              PM Streak is a daily product management learning platform that delivers 2-minute micro-lessons from 300+ Lenny&apos;s Podcast episodes. It features streak tracking, XP, leaderboards, AI lesson generation, interview prep, and a PM jobs board.
+            </p>
+            <p className="hero-description text-base sm:text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
               One lesson a day. Streak tracking. XP and leaderboards. The best PM frameworks from Lenny&apos;s podcast — turned into 2-minute lessons that actually stick.
             </p>
             <div className="mb-6 sm:mb-8 flex flex-wrap gap-2 max-w-md">

@@ -9,17 +9,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${siteUrl}/learn`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
-    { url: `${siteUrl}/login`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${siteUrl}/explore`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
-    { url: `${siteUrl}/leaderboard`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
-    { url: `${siteUrl}/social`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
-    { url: `${siteUrl}/daily-challenge`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${siteUrl}/pricing`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${siteUrl}/explore`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteUrl}/interview-prep`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteUrl}/jobs`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${siteUrl}/daily-challenge`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${siteUrl}/leaderboard`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
+    { url: `${siteUrl}/social`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
     { url: `${siteUrl}/role-roadmaps`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${siteUrl}/interview-sprint`, lastModified: now, changeFrequency: "daily", priority: 0.6 },
     { url: `${siteUrl}/invite`, lastModified: now, changeFrequency: "weekly", priority: 0.5 },
-    { url: `${siteUrl}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${siteUrl}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteUrl}/login`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${siteUrl}/signup`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${siteUrl}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${siteUrl}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
   let articleRoutes: MetadataRoute.Sitemap = [];

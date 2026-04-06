@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 import {
   Flame, Check, X, Zap, Star, BookOpen, Brain, Target,
   Users, Sparkles, MessageSquare, ChevronRight,
@@ -10,6 +11,7 @@ import { isProEffective } from "@/lib/entitlements";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import PricingBannerModal from "@/components/PricingBannerModal";
+import JsonLd, { faqSchema, breadcrumbSchema } from "@/components/JsonLd";
 
 const PRICE_INCREASE_PERCENT = 70;
 
@@ -26,6 +28,26 @@ function calculateMRP(discountedPrice: string, isIndia: boolean): string {
   }
   return `$${mrp}`;
 }
+
+export const metadata: Metadata = {
+  title: "PM Streak Pro Pricing — Plans & Features | PM Streak",
+  description:
+    "Compare PM Streak Free vs Pro plans. Pro unlocks all 292+ Lenny's Podcast lessons, unlimited AI Explore, interview prep, PM Jobs board, and WhatsApp community. Starting at $9/month or ₹499/month in India.",
+  alternates: { canonical: "/pricing" },
+  openGraph: {
+    title: "PM Streak Pro Pricing | Plans & Features",
+    description:
+      "Unlock 292+ PM lessons, unlimited AI, interview prep & jobs board. From $9/month.",
+    url: "/pricing",
+    images: [{ url: "/api/og?title=PM+Streak+Pricing", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PM Streak Pro Pricing | PM Streak",
+    description: "Free vs Pro plans. Full Lenny's Podcast library, AI lessons, interview prep. From $9/month.",
+    images: ["/api/og?title=PM+Streak+Pricing"],
+  },
+};
 
 // Countries billed in INR (India)
 const INR_COUNTRIES = new Set(["IN"]);
@@ -182,9 +204,23 @@ async function PricingContent() {
           productId: usdYearlyId 
         },
       ];
+  const pricingFaq = faqSchema([
+    { question: "When will my Pro access activate?", answer: "Instantly after payment — Dodo Payments processes your subscription and your Pro access is activated automatically." },
+    { question: "Are credits cumulative?", answer: "No — credits reset on the 1st of each month. Unused credits don't roll over." },
+    { question: "Can I cancel anytime?", answer: "Yes. Cancel through the customer portal and you keep Pro access until your current period ends." },
+    { question: "What payment methods are accepted?", answer: "UPI, credit/debit cards, net banking (India), PayPal (international) — via Dodo Payments secure checkout." },
+    { question: "What's the difference between Free and Pro?", answer: "Free includes 22 core lessons, 10 archive lessons, and 10 credits/month. Pro unlocks all 292+ lessons, unlimited AI Explore, interview prep, PM jobs board, and WhatsApp community." },
+  ]);
+
+  const pricingBreadcrumbs = breadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Pricing", url: "/pricing" },
+  ]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-white">
+      <JsonLd data={pricingFaq} />
+      <JsonLd data={pricingBreadcrumbs} />
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--bg-primary)]/90 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">

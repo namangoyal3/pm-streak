@@ -1,22 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import type { Metadata } from "next";
+import JsonLd, { breadcrumbSchema, courseSchema } from "@/components/JsonLd";
 
 // Always server-render — content is added continuously by the SEO agent
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Learn Product Management — Free PM Articles | PM Streak",
-  description: "Free articles on product management, PM interviews, roadmaps, metrics, and career growth. New content added weekly by AI research.",
+  title: "Learn Product Management — Free PM Articles & Guides | PM Streak",
+  description:
+    "Free in-depth articles on product management, PM interviews, roadmaps, metrics, career growth, and leadership. New expert-level content added weekly by AI research.",
+  alternates: { canonical: "/learn" },
   openGraph: {
     title: "Learn Product Management — Free PM Articles | PM Streak",
     description: "Free articles on product management, PM interviews, roadmaps, metrics, and career growth.",
+    url: "/learn",
     images: [{ url: "/api/og?title=Learn+Product+Management", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Learn Product Management — Free PM Articles | PM Streak",
-    description: "Free articles on product management, PM interviews, roadmaps, metrics, and career growth.",
+    description: "Free PM articles on strategy, metrics, roadmaps, and career growth. Updated weekly.",
     images: ["/api/og?title=Learn+Product+Management"],
   },
 };
@@ -63,8 +67,23 @@ export default async function LearnPage() {
     );
   }
 
+  const learnBreadcrumbs = breadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Learn", url: "/learn" },
+  ]);
+
+  const pmCourse = courseSchema({
+    name: "Product Management Fundamentals",
+    description:
+      "Free articles and guides covering product management, PM interviews, roadmaps, metrics, career growth, and leadership.",
+    provider: "PM Streak",
+    url: "/learn",
+  });
+
   return (
     <main className="min-h-screen bg-[var(--bg-primary)] text-white px-4 py-12 max-w-4xl mx-auto">
+      <JsonLd data={learnBreadcrumbs} />
+      <JsonLd data={pmCourse} />
       <div className="mb-10">
         <h1 className="text-3xl font-black mb-2">Learn</h1>
         <p className="text-[var(--text-secondary)] text-base">

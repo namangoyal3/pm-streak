@@ -7,8 +7,13 @@ import { Suspense } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PM Streak - Duolingo for Product Managers",
-  description: "Daily product wisdom with streaks, XP, and leaderboards. Learn PM skills in 2-3 minutes a day.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro"),
+  title: {
+    default: "PM Streak — Duolingo for Product Managers",
+    template: "%s | PM Streak",
+  },
+  description:
+    "PM Streak delivers daily 2-minute product management lessons from 300+ Lenny's Podcast episodes. Build your PM intuition with streak tracking, XP, leaderboards, AI-powered lessons, interview prep, and a curated jobs board.",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -21,18 +26,29 @@ export const metadata: Metadata = {
     google: "85fab4e21763c3a7",
   },
   openGraph: {
-    title: "PM Streak - Duolingo for Product Managers",
-    description: "Daily product wisdom with streaks, XP, and leaderboards. Learn PM skills in 2-3 minutes a day.",
+    title: "PM Streak — Duolingo for Product Managers",
+    description:
+      "Daily 2-minute PM lessons from 300+ Lenny's Podcast episodes with streaks, XP, and leaderboards.",
     siteName: "PM Streak",
-    images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak" }],
+    images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak — Daily PM Lessons" }],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PM Streak - Duolingo for Product Managers",
-    description: "Daily product wisdom with streaks, XP, and leaderboards.",
+    title: "PM Streak — Duolingo for Product Managers",
+    description:
+      "Daily 2-min PM lessons from Lenny's Podcast. Streaks, XP, leaderboards. The fastest way to get sharper as a PM.",
     images: ["/api/og?title=PM+Streak"],
+    creator: "@pmstreak",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  other: {
+    "article:modified_time": new Date().toISOString(),
   },
 };
 
