@@ -940,7 +940,7 @@ export default function AdminPage() {
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {([
-                      { key: "month", label: "Monthly", amount: "₹499" },
+                      { key: "month", label: "Monthly", amount: "₹249" },
                       { key: "quarter", label: "Quarterly", amount: "₹1,699" },
                       { key: "year", label: "Yearly", amount: "₹1,899" },
                     ] as const).map((plan) => (

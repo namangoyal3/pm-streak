@@ -114,7 +114,7 @@ export default async function Home() {
   const homepageFaq = faqSchema([
     { question: "What is PM Streak?", answer: "PM Streak is a daily product management learning platform — like Duolingo for PMs. It delivers 2-minute micro-lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered content generation." },
     { question: "How long does each PM lesson take?", answer: "Each lesson takes approximately 2 minutes to read plus 1 minute for 3 quiz questions. Total daily commitment is under 3 minutes." },
-    { question: "Is PM Streak free?", answer: "Yes. PM Streak offers a free plan with 22 core curriculum lessons, 10 archive lessons, 10 credits/month, and full streak tracking. Pro plan ($9/month) unlocks all 292+ lessons, unlimited AI, interview prep, and the jobs board." },
+    { question: "Is PM Streak free?", answer: "Yes. PM Streak offers a free plan with 22 core curriculum lessons, 10 archive lessons, 10 credits/month, and full streak tracking. Pro plan ($6/month) unlocks all 292+ lessons, unlimited AI, interview prep, and the jobs board." },
     { question: "What content does PM Streak teach?", answer: "PM Streak lessons cover prioritisation, strategy, growth, hiring, product sense, metrics, execution, and leadership — all sourced from expert interviews on Lenny's Podcast featuring PMs from Stripe, Figma, Reforge, and more." },
   ]);
 

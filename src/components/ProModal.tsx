@@ -84,10 +84,12 @@ export default function ProModal({ isOpen, onClose, reason }: ProModalProps) {
             {loading ? "Loading..." : "See Pro Plans →"}
           </button>
           
-          <p className="text-center mt-4 text-[10px] text-[var(--text-secondary)]/50 font-black uppercase tracking-widest">
-            From ₹499/month · $9/month
-          </p>
-        </div>
+          <p className="mt-5 text-[11px] font-bold text-[var(--text-secondary)]">
+          Cancel anytime. Unlocks all 292+ lessons.
+          <br />
+          <span className="opacity-80 font-medium">From ₹249/month · $6/month</span>
+        </p>
+      </div>
       </div>
     </div>
   );

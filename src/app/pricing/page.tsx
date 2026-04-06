@@ -32,19 +32,19 @@ function calculateMRP(discountedPrice: string, isIndia: boolean): string {
 export const metadata: Metadata = {
   title: "PM Streak Pro Pricing — Plans & Features | PM Streak",
   description:
-    "Compare PM Streak Free vs Pro plans. Pro unlocks all 292+ Lenny's Podcast lessons, unlimited AI Explore, interview prep, PM Jobs board, and WhatsApp community. Starting at $9/month or ₹499/month in India.",
+    "Compare PM Streak Free vs Pro plans. Pro unlocks all 292+ Lenny's Podcast lessons, unlimited AI Explore, interview prep, PM Jobs board, and WhatsApp community. Starting at $6/month or ₹249/month in India.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "PM Streak Pro Pricing | Plans & Features",
     description:
-      "Unlock 292+ PM lessons, unlimited AI, interview prep & jobs board. From $9/month.",
+      "Unlock 292+ PM lessons, unlimited AI, interview prep & jobs board. From $6/month.",
     url: "/pricing",
     images: [{ url: "/api/og?title=PM+Streak+Pricing", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "PM Streak Pro Pricing | PM Streak",
-    description: "Free vs Pro plans. Full Lenny's Podcast library, AI lessons, interview prep. From $9/month.",
+    description: "Free vs Pro plans. Full Lenny's Podcast library, AI lessons, interview prep. From $6/month.",
     images: ["/api/og?title=PM+Streak+Pricing"],
   },
 };
