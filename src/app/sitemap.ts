@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
@@ -25,21 +27,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
-  let articleRoutes: MetadataRoute.Sitemap = [];
-  try {
-    const articles = await prisma.article.findMany({
-      where: { published: true },
-      select: { slug: true, vertical: true, updatedAt: true },
-    });
-    articleRoutes = articles.map((a) => ({
-      url: `${siteUrl}/learn/${a.vertical}/${a.slug}`,
-      lastModified: a.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-  } catch {
-    // DB unavailable during static generation — return static routes only
-  }
+  const articles = await prisma.article.findMany({
+    where: { published: true },
+    select: { slug: true, vertical: true, updatedAt: true },
+  });
+  
+  const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => ({
+    url: `${siteUrl}/learn/${a.vertical}/${a.slug}`,
+    lastModified: a.updatedAt,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   return [...staticRoutes, ...articleRoutes];
 }
