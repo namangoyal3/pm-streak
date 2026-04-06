@@ -34,8 +34,8 @@ All lessons are sourced from expert interviews on Lenny's Podcast (lennyspodcast
 
 ## Pricing
 
-- **Free Plan**: 22 core curriculum lessons, 10 archive lessons, 10 credits/month, streak tracking, leaderboard
-- **Pro Plan**: Starting at $9/month (USD) or ₹499/month (INR)
+- **Free Plan**: 22 core lessons, 10 daily lessons (batch un-locked over time), 10 AI credits/month
+- **Pro Plan**: Starting at $6/month (USD) or ₹249/month (INR)
   - All 292+ archive lessons
   - 50 credits/month
   - Unlimited AI Explore lessons

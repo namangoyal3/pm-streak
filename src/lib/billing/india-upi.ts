@@ -17,7 +17,7 @@ const BUNDLED = {
   },
   monthly: {
     path: "/india-upi-monthly.png",
-    amount: "₹499 / month",
+    amount: "₹249 / month",
     title: "Monthly Pro",
   },
 } as const;

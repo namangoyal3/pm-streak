@@ -61,11 +61,11 @@ export function ProNudgeEmail({
       <Text style={body}>
         {is14
           ? `You have ${creditsLeft} free credits left this month. Pro gives you 50. That's 25 AI-generated lessons on exactly what you need — instead of whatever the algorithm serves you next.`
-          : `₹499/month. That's less than a Starbucks order. Less than one Udemy course. And it compounds — every lesson you generate stays in your account.`}
+          : `₹249/month. That's less than a Starbucks order. Less than one Udemy course. And it compounds — every lesson you generate stays in your account.`}
       </Text>
 
       <PrimaryButton
-        text={is14 ? "Go Pro for ₹499/mo →" : "Unlock Pro features →"}
+        text={is14 ? "Go Pro for ₹249/mo →" : "Unlock Pro features →"}
         href={`${APP_URL}/pricing`}
         color="#7c3aed"
       />

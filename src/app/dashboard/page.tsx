@@ -830,7 +830,7 @@ export default function DashboardPage() {
                     href="/pricing"
                     className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-purple-500 text-white text-xs font-black uppercase tracking-wider hover:bg-purple-400 transition-colors"
                   >
-                    <Star size={12} /> Upgrade to Pro ₹499/mo
+                    <Star size={12} /> Upgrade to Pro ₹249/mo
                   </Link>
                 </div>
               ) : (
