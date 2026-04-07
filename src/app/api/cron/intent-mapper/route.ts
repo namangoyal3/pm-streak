@@ -5,8 +5,6 @@ import Groq from "groq-sdk";
 export const maxDuration = 60; // 1 min timeout
 export const dynamic = "force-dynamic";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 export async function GET(req: Request) {
   // 1. Verify cron secret
   const authHeader = req.headers.get("authorization");
@@ -15,6 +13,8 @@ export async function GET(req: Request) {
   if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy" });
 
   try {
     // 2. Fetch existing keywords to tell the LLM what NOT to generate
