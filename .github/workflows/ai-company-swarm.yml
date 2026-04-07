@@ -1,0 +1,38 @@
+name: AI Virtual Company (Board Meeting)
+
+on:
+  workflow_dispatch:
+    inputs:
+      directive:
+        description: "The directive or goal for the virtual C-suite to execute"
+        required: true
+        type: string
+        default: "Review our recent metrics and deploy a new A/B test to improve Pro conversion rates."
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run-swarm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PM Streak Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install AI Dependencies
+        run: pip install -r scripts/virtual-company/requirements.txt
+
+      - name: Execute Board Meeting & Deploy Code
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BOARD_DIRECTIVE: ${{ github.event.inputs.directive }}
+          GA4_PROPERTY_ID: "529697573"
+        run: python scripts/virtual-company/run_board_meeting.py
