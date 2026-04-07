@@ -42,7 +42,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         userId,
         dodoSubscriptionId: sub.subscription_id,
         productId: sub.product_id,
-        nextBillingDate: sub.next_billing_date,
+        nextBillingDate: new Date(sub.next_billing_date),
         customerId: sub.customer.customer_id,
       });
       console.log("[dodo-webhook] Pro granted for", sub.customer.email, "until", sub.next_billing_date);
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         userId,
         dodoSubscriptionId: sub.subscription_id,
         productId: sub.product_id,
-        nextBillingDate: sub.next_billing_date,
+        nextBillingDate: new Date(sub.next_billing_date),
         customerId: sub.customer.customer_id,
       });
       console.log("[dodo-webhook] Pro renewed for", sub.customer.email, "until", sub.next_billing_date);
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       await setDodoSubscriptionCancelling({
         userId,
         dodoSubscriptionId: sub.subscription_id,
-        cancelsAt: sub.next_billing_date,
+        cancelsAt: new Date(sub.next_billing_date),
       });
       console.log("[dodo-webhook] Cancellation scheduled for", sub.customer.email);
     },

@@ -1,6 +1,9 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 
-const COUPON_SECRET = process.env.COUPON_SECRET || process.env.JWT_SECRET || "pm-streak-coupon-secret";
+const COUPON_SECRET = (process.env.COUPON_SECRET || process.env.JWT_SECRET) as string;
+if (!COUPON_SECRET) {
+  throw new Error("COUPON_SECRET (or JWT_SECRET) env var is required but not set");
+}
 
 function signCoupon(code: string, email: string, discountPercent: number, expiresAt: number): string {
   const payload = `${code}:${email === "*" ? "*" : email.toLowerCase()}:${discountPercent}:${expiresAt}`;

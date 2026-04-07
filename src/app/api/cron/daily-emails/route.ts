@@ -35,14 +35,15 @@ export async function GET(req: NextRequest) {
   const isMonday = now.getUTCDay() === 1;
 
   const cutoff30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const cutoff3d = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
 
   const users = await prisma.user.findMany({
     where: {
       emailOptOut: false,
       OR: [
+        // Active users: seen in the last 30 days
         { lastActiveAt: { gte: cutoff30d } },
-        { createdAt: { gte: cutoff3d } },
+        // Cold leads: signed up in the last 30 days and never opened the app
+        { lastActiveAt: null, createdAt: { gte: cutoff30d } },
       ],
     },
     select: {
@@ -95,12 +96,12 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 4. Re-engagement
-    if (hasEverDoneLesson && daysInactive === 3) {
+    // 4. Re-engagement (also targets cold leads who never did a lesson)
+    if (daysInactive === 3) {
       const sent = await sendReengagementEmail({ userId: user.id, toEmail: user.email, toName: user.name, streakCount: user.streakCount, daysInactive, variant: "3day" }).catch(() => false);
       if (sent) { results.reengagement3d++; continue; }
     }
-    if (hasEverDoneLesson && daysInactive === 7) {
+    if (daysInactive === 7) {
       const sent = await sendReengagementEmail({ userId: user.id, toEmail: user.email, toName: user.name, streakCount: user.streakCount, daysInactive, variant: "7day" }).catch(() => false);
       if (sent) { results.reengagement7d++; continue; }
     }

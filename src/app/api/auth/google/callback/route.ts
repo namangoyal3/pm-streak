@@ -85,7 +85,9 @@ export async function GET(req: NextRequest) {
         },
       });
       // Fire-and-forget welcome email
-      sendWelcomeEmail({ userId: user.id, toEmail: email, toName: user.name }).catch(() => {});
+      sendWelcomeEmail({ userId: user.id, toEmail: email, toName: user.name }).catch((err) => {
+        console.error("[google-callback] Failed to send welcome email to", email, err);
+      });
     } else {
       // Existing user — link Google and sync name + avatar from Google
       user = await prisma.user.update({

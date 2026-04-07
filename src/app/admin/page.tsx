@@ -389,6 +389,7 @@ export default function AdminPage() {
       if (res.ok) {
         setCouponResult({ ok: true, message: "Coupon created!", code: data.code });
         setCouponEmail("");
+        setCouponCustomCode("");
       } else {
         setCouponResult({ ok: false, message: data.error || "Generation failed" });
       }
@@ -397,7 +398,7 @@ export default function AdminPage() {
     } finally {
       setCouponLoading(false);
     }
-  }, [couponEmail, couponGlobal, couponDiscount, couponExpiry, couponLimit]);
+  }, [couponEmail, couponGlobal, couponDiscount, couponExpiry, couponLimit, couponCustomCode]);
 
   useEffect(() => {
     async function init() {

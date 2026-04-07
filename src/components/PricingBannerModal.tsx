@@ -26,6 +26,10 @@ function Confetti() {
   );
 }
 
+function mrp(price: number): number {
+  return Math.round(price * 1.7);
+}
+
 export default function PricingBannerModal() {
   const [isVisible, setIsVisible] = useState(false);
   const [isIndia, setIsIndia] = useState(true);
@@ -92,25 +96,25 @@ export default function PricingBannerModal() {
                 <div className="flex justify-between">
                   <span className="text-white/70">Monthly</span>
                   {isIndia ? (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹423</span> <span className="text-green-400 font-black">₹249 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹{mrp(249).toLocaleString("en-IN")}</span> <span className="text-green-400 font-black">₹249 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   ) : (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$10</span> <span className="text-green-400 font-black">$6 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">${mrp(6)}</span> <span className="text-green-400 font-black">$6 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Quarterly</span>
                   {isIndia ? (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹1,137</span> <span className="text-green-400 font-black">₹669 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹{mrp(669).toLocaleString("en-IN")}</span> <span className="text-green-400 font-black">₹669 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   ) : (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$19</span> <span className="text-green-400 font-black">$11 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">${mrp(11)}</span> <span className="text-green-400 font-black">$11 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Yearly</span>
                   {isIndia ? (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹2,123</span> <span className="text-green-400 font-black">₹1,249 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">₹{mrp(1249).toLocaleString("en-IN")}</span> <span className="text-green-400 font-black">₹1,249 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   ) : (
-                    <span className="whitespace-nowrap"><span className="line-through text-white/30">$54</span> <span className="text-green-400 font-black">$32 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
+                    <span className="whitespace-nowrap"><span className="line-through text-white/30">${mrp(32)}</span> <span className="text-green-400 font-black">$32 <span className="text-[10px] opacity-80">(SPECIAL)</span></span></span>
                   )}
                 </div>
               </div>

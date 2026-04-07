@@ -130,6 +130,7 @@ async function getTemplates() {
     { ProWinbackEmail },
     { ChallengeReceivedEmail },
     { ChallengeAcceptedEmail },
+    { Marketing70OffEmail },
   ] = await Promise.all([
     import("@/emails/welcome"),
     import("@/emails/day2-nudge"),
@@ -141,11 +142,12 @@ async function getTemplates() {
     import("@/emails/pro-winback"),
     import("@/emails/challenge-received"),
     import("@/emails/challenge-accepted"),
+    import("@/emails/marketing-70-off"),
   ]);
   return {
     WelcomeEmail, Day2NudgeEmail, StreakAtRiskEmail, ProNudgeEmail,
     ReengagementEmail, WeeklyDigestEmail, MilestoneEmail, ProWinbackEmail,
-    ChallengeReceivedEmail, ChallengeAcceptedEmail,
+    ChallengeReceivedEmail, ChallengeAcceptedEmail, Marketing70OffEmail,
   };
 }
 
@@ -326,6 +328,20 @@ export async function sendChallengeAcceptedEmail({
     reactElement: React.createElement(ChallengeAcceptedEmail, {
       firstName: first, fromName, unsubscribeUrl,
     }),
+    cooldownHours: 0,
+  });
+}
+
+export async function sendMarketing70OffEmail({
+  userId, toEmail, toName,
+}: { userId: string; toEmail: string; toName: string }) {
+  const { Marketing70OffEmail } = await getTemplates();
+  const first = toName.split(" ")[0];
+  const unsubscribeUrl = `${APP_URL}/api/unsubscribe?token=${generateUnsubscribeToken(userId)}&userId=${userId}`;
+  return sendEmail({
+    userId, emailType: "marketing_70_off", toEmail,
+    subject: `🚀 70% OFF: Become a 10X AI-First Product Manager`,
+    reactElement: React.createElement(Marketing70OffEmail as any, { firstName: first, unsubscribeUrl }),
     cooldownHours: 0,
   });
 }

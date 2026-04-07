@@ -4,7 +4,7 @@ import { JOB_SOURCES, isPMJob, type NormJob } from "@/lib/job-scraper";
 
 /**
  * PM job scraper cron endpoint.
- * Runs every 6 hours via Vercel Cron (4× daily).
+ * Runs 4× daily at 02:00, 08:00, 14:00, 20:00 UTC via Vercel Cron.
  * Also callable manually: GET /api/cron/scrape-jobs
  *   with Authorization: Bearer {CRON_SECRET}
  *

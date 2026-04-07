@@ -358,19 +358,17 @@ async function processLeader(leader: Leader, summary: Record<string, { fetched: 
         categoryId: category.id,
         guestName: `${leader.name} (${leader.credential})`,
         episodeTitle: title,
-        youtubeId: null,
         sourceTranscript,
         aiGenerated: false,
-        generatedForUserId: null,
         topicKey: `leader:${leader.slug}:${slug}`,
         isLocked: false,
-      } as any,
+      },
     });
 
     // Create quiz questions
     for (let i = 0; i < lessonResult.questions.length; i++) {
       const q = lessonResult.questions[i]!;
-      await (prisma as any).question.create({
+      await prisma.question.create({
         data: {
           lessonId: lesson.id,
           questionText: q.questionText,

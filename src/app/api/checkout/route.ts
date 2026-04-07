@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUserId } from "@/lib/auth";
 
 const DODO_ENV =
   (process.env.DODO_PAYMENTS_ENVIRONMENT as "test_mode" | "live_mode" | undefined) ??
@@ -40,6 +41,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "productId is required" }, { status: 400 });
   }
 
+  if (productId.trim() === "") {
+    console.error("[checkout] productId resolved to empty string — check DODO product ID env vars");
+    return NextResponse.json({ error: "Checkout is misconfigured. Please contact support." }, { status: 500 });
+  }
+
   // Construct the checkout URL
   const checkoutUrl = new URL(
     `${DODO_BASE.replace("live.dodopayments.com", "checkout.dodopayments.com").replace("test.dodopayments.com", "test.checkout.dodopayments.com")}/buy/${productId}`
@@ -51,6 +57,14 @@ export async function GET(req: NextRequest) {
   const email = searchParams.get("email");
   if (email) checkoutUrl.searchParams.set("email", email);
 
+  // Resolve the authenticated user's email for coupon ownership checks
+  let sessionEmail: string | null = null;
+  const userId = await getCurrentUserId();
+  if (userId) {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+    sessionEmail = user?.email ?? null;
+  }
+
   for (const [key, value] of searchParams.entries()) {
     if (key.startsWith("metadata_")) {
       checkoutUrl.searchParams.set(key, value);
@@ -59,14 +73,15 @@ export async function GET(req: NextRequest) {
       const coupon = await prisma.coupon.findUnique({ where: { code: value } });
       if (coupon) {
         const isGlobal = coupon.email === "*";
-        const emailMatch = email && coupon.email.toLowerCase() === email.toLowerCase();
-        
-        if (isGlobal || emailMatch) {
+        // Signed-in: validate against session email to prevent coupon theft
+        const emailMatch = sessionEmail && coupon.email.toLowerCase() === sessionEmail.toLowerCase();
+        // Signed-out: allow if the URL carries the matching email (e.g. email link flow).
+        // Dodo will still gate the purchase to that email at payment time.
+        const urlEmailMatch = !sessionEmail && email && coupon.email.toLowerCase() === email.toLowerCase();
+
+        if (isGlobal || emailMatch || urlEmailMatch) {
           checkoutUrl.searchParams.set(key, value);
         }
-        // If not global and not email match, we skip adding it to checkoutUrl
-      } else {
-        // If coupon not found in our DB, we don't pass it (it might be a deleted/disabled coupon)
       }
     }
   }

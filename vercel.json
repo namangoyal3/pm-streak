@@ -9,6 +9,18 @@
     "src/app/api/cron/linkedin-jobs/route.ts": {
       "maxDuration": 120
     },
+    "src/app/api/cron/generate-seo/route.ts": {
+      "maxDuration": 120
+    },
+    "src/app/api/cron/daily-emails/route.ts": {
+      "maxDuration": 120
+    },
+    "src/app/api/cron/refresh-credits/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/cron/scrape-jobs/route.ts": {
+      "maxDuration": 60
+    },
     "src/app/api/job-targets/route.ts": {
       "maxDuration": 60
     },
