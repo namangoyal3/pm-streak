@@ -12,3 +12,5 @@ next-env.d.ts
 .gstack/
 .vercel
 .env*.local
+service_account.json
+scripts/virtual-company/service_account.json

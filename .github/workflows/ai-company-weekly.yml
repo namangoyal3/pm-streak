@@ -1,0 +1,14 @@
+name: AI Virtual Company (Weekly Autonomous Run)
+
+# Runs every Monday at 9:00 AM IST (3:30 AM UTC)
+on:
+  schedule:
+    - cron: '30 3 * * 1'
+  workflow_dispatch:  # allow manual trigger for testing
+
+jobs:
+  weekly-board-meeting:
+    uses: ./.github/workflows/ai-company-swarm.yml
+    with:
+      directive: "Review last week's metrics. Identify the single highest-leverage improvement to Pro conversion or user retention. Ship one focused change. Do not repeat experiments from prior board meetings."
+    secrets: inherit
