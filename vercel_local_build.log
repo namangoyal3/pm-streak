@@ -1,0 +1,176 @@
+WARNING! Build not running on Vercel. System environment variables will not be available.
+Warning: Detected "engines": { "node": ">=20.9.0" } in your `package.json` that will automatically upgrade when a new major Node.js Version is released. Learn More: https://vercel.link/node-version
+WARNING: You should not upload the `.next` directory.
+Installing dependencies...
+
+> duolingo-for-pms@0.1.0 postinstall
+> prisma generate
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+warn Preview feature "driverAdapters" is deprecated. The functionality can be used without specifying it as a preview feature.
+
+✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 160ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+
+changed 1 package in 2s
+
+297 packages are looking for funding
+  run `npm fund` for details
+Detected Next.js version: 15.5.14
+Running "npm run build"
+
+> duolingo-for-pms@0.1.0 build
+> sh -c 'if [ -n "$DATABASE_URL" ] && [ "$VERCEL" != "1" ]; then DIRECT_URL=${DIRECT_URL:-$DATABASE_URL} npx prisma db push; else echo "Skipping prisma db push (Vercel CI or no DATABASE_URL)"; fi && npx prisma generate && next build'
+
+Skipping prisma db push (Vercel CI or no DATABASE_URL)
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+warn Preview feature "driverAdapters" is deprecated. The functionality can be used without specifying it as a preview feature.
+
+✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 171ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+   ▲ Next.js 15.5.14
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 8.2s
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/116) ...
+   Generating static pages (29/116) 
+   Generating static pages (58/116) 
+   Generating static pages (87/116) 
+ ✓ Generating static pages (116/116)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                                                    Size  First Load JS
+┌ ƒ /                                                                                         959 B         103 kB
+├ ○ /_not-found                                                                               997 B         103 kB
+├ ƒ /admin                                                                                    12 kB         114 kB
+├ ƒ /api/admin/ai-company                                                                     335 B         102 kB
+├ ƒ /api/admin/cleanup-weak-ai-lessons                                                        335 B         102 kB
+├ ƒ /api/admin/coupon                                                                         335 B         102 kB
+├ ƒ /api/admin/email-analytics                                                                335 B         102 kB
+├ ƒ /api/admin/grant-upi-pro                                                                  335 B         102 kB
+├ ƒ /api/admin/send-test-emails                                                               335 B         102 kB
+├ ƒ /api/admin/stats                                                                          335 B         102 kB
+├ ƒ /api/admin/users                                                                          335 B         102 kB
+├ ƒ /api/auth/google                                                                          335 B         102 kB
+├ ƒ /api/auth/google/callback                                                                 335 B         102 kB
+├ ƒ /api/auth/login                                                                           335 B         102 kB
+├ ƒ /api/auth/me                                                                              335 B         102 kB
+├ ƒ /api/auth/password-reset/confirm                                                          335 B         102 kB
+├ ƒ /api/auth/password-reset/login                                                            335 B         102 kB
+├ ƒ /api/auth/password-reset/request                                                          335 B         102 kB
+├ ƒ /api/auth/password-reset/verify                                                           335 B         102 kB
+├ ƒ /api/auth/signup                                                                          335 B         102 kB
+├ ƒ /api/billing/me                                                                           335 B         102 kB
+├ ƒ /api/billing/mock-upgrade                                                                 335 B         102 kB
+├ ƒ /api/billing/portal                                                                       335 B         102 kB
+├ ƒ /api/billing/prices                                                                       335 B         102 kB
+├ ƒ /api/billing/sync                                                                         335 B         102 kB
+├ ƒ /api/billing/webhook/revenuecat                                                           335 B         102 kB
+├ ƒ /api/checkout                                                                             335 B         102 kB
+├ ƒ /api/content/publish                                                                      335 B         102 kB
+├ ƒ /api/coupon/validate                                                                      335 B         102 kB
+├ ƒ /api/cron/daily-emails                                                                    335 B         102 kB
+├ ƒ /api/cron/generate-seo                                                                    335 B         102 kB
+├ ƒ /api/cron/ingest-leader-content                                                           335 B         102 kB
+├ ƒ /api/cron/intent-mapper                                                                   335 B         102 kB
+├ ƒ /api/cron/linkedin-jobs                                                                   335 B         102 kB
+├ ƒ /api/cron/performance-refiner                                                             335 B         102 kB
+├ ƒ /api/cron/refresh-credits                                                                 335 B         102 kB
+├ ƒ /api/cron/scrape-jobs                                                                     335 B         102 kB
+├ ƒ /api/cron/seo-indexnow                                                                    335 B         102 kB
+├ ƒ /api/customer-portal                                                                      335 B         102 kB
+├ ƒ /api/daily-challenge                                                                      335 B         102 kB
+├ ƒ /api/daily-drill                                                                          335 B         102 kB
+├ ƒ /api/earn-back                                                                            335 B         102 kB
+├ ƒ /api/explore/available-topics                                                             335 B         102 kB
+├ ƒ /api/explore/ready-topics                                                                 335 B         102 kB
+├ ƒ /api/generate-lesson                                                                      335 B         102 kB
+├ ƒ /api/generated-lessons                                                                    335 B         102 kB
+├ ƒ /api/indexnow                                                                             335 B         102 kB
+├ ƒ /api/interview-prep                                                                       335 B         102 kB
+├ ƒ /api/invite                                                                               335 B         102 kB
+├ ƒ /api/job-targets                                                                          335 B         102 kB
+├ ƒ /api/jobs                                                                                 335 B         102 kB
+├ ƒ /api/leaderboard                                                                          335 B         102 kB
+├ ƒ /api/learning-plans                                                                       335 B         102 kB
+├ ƒ /api/lesson-attempts                                                                      335 B         102 kB
+├ ƒ /api/lessons                                                                              335 B         102 kB
+├ ƒ /api/lessons/[id]                                                                         335 B         102 kB
+├ ƒ /api/lessons/[id]/complete                                                                335 B         102 kB
+├ ƒ /api/notifications                                                                        335 B         102 kB
+├ ƒ /api/og                                                                                   335 B         102 kB
+├ ƒ /api/onboarding                                                                           335 B         102 kB
+├ ƒ /api/paywall/state                                                                        335 B         102 kB
+├ ƒ /api/readiness                                                                            335 B         102 kB
+├ ƒ /api/share                                                                                335 B         102 kB
+├ ƒ /api/shop                                                                                 335 B         102 kB
+├ ƒ /api/social/challenges                                                                    335 B         102 kB
+├ ƒ /api/social/feed                                                                          335 B         102 kB
+├ ƒ /api/social/follow                                                                        335 B         102 kB
+├ ƒ /api/social/search                                                                        335 B         102 kB
+├ ƒ /api/unsubscribe                                                                          335 B         102 kB
+├ ƒ /api/user/learning-goal                                                                   335 B         102 kB
+├ ƒ /api/user/stats                                                                           335 B         102 kB
+├ ƒ /api/user/streak                                                                          335 B         102 kB
+├ ƒ /api/user/streak-freeze                                                                   335 B         102 kB
+├ ƒ /api/webhooks/dodo-payments                                                               335 B         102 kB
+├ ƒ /api/webhooks/resend                                                                      335 B         102 kB
+├ ○ /daily-challenge                                                                        1.48 kB         158 kB
+├ ○ /dashboard                                                                                13 kB         175 kB
+├ ○ /explore                                                                                3.56 kB         126 kB
+├ ○ /icon.svg                                                                                   0 B            0 B
+├ ○ /interview-prep                                                                         3.38 kB         126 kB
+├ ○ /interview-sprint                                                                       3.09 kB         109 kB
+├ ○ /invite                                                                                 1.99 kB         115 kB
+├ ○ /jobs                                                                                   4.73 kB         127 kB
+├ ○ /leaderboard                                                                            1.93 kB         124 kB
+├ ƒ /learn                                                                                    178 B         106 kB
+├ ● /learn/[vertical]/[slug]                                                                  178 B         106 kB
+├   ├ /learn/pm/rice-prioritization-framework-the-pms-guide-to-killing-roadmap-arguments
+├   ├ /learn/pm/how-to-become-an-associate-product-manager-the-complete-apm-guide
+├   ├ /learn/pm/pm-interview-questions-the-40-most-common-questions-and-how-to-answer-them
+├   └ [+21 more paths]
+├ ƒ /lesson/[id]                                                                            1.31 kB         158 kB
+├ ƒ /llms.txt                                                                                 335 B         102 kB
+├ ○ /login                                                                                  2.75 kB         105 kB
+├ ○ /manifest.webmanifest                                                                     335 B         102 kB
+├ ○ /onboarding                                                                             2.99 kB         150 kB
+├ ƒ /pricing                                                                                2.66 kB         108 kB
+├ ○ /privacy                                                                                  178 B         106 kB
+├ ○ /reset-password                                                                         1.37 kB         104 kB
+├ ○ /robots.txt                                                                               335 B         102 kB
+├ ○ /role-roadmaps                                                                            178 B         106 kB
+├ ○ /signup                                                                                 2.41 kB         108 kB
+├ ƒ /sitemap.xml                                                                              335 B         102 kB
+├ ○ /social                                                                                 2.81 kB         128 kB
+└ ○ /terms                                                                                    178 B         106 kB
++ First Load JS shared by all                                                                102 kB
+  ├ chunks/1255-aadf393aa3a56bfa.js                                                           46 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js                                                     54.2 kB
+  └ other shared chunks (total)                                                             1.93 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+Traced Next.js server files in: 35.991ms
+WARNING: Unable to find source file for page /manifest.webmanifest/route with extensions: tsx, ts, jsx, js, this can cause functions config from `vercel.json` to not be applied
+Created all serverless functions in: 447.318ms
+Collected static files (public/, static/, .next/static): 7.123ms
+Build Completed in .vercel/output [33s]

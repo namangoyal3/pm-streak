@@ -161,13 +161,67 @@ export default function AdminPage() {
       });
       const data = await res.json();
       setAiResult({ ok: res.ok, message: data.message || data.error });
-      if (res.ok) setAiDirective("");
+      if (res.ok) {
+        setAiDirective("");
+        loadAiRuns(); // Refresh local list after dispatching
+      }
     } catch (e: any) {
       setAiResult({ ok: false, message: e.message || "Request failed" });
     } finally {
       setAiLoading(false);
     }
   }, [aiDirective]);
+
+  const [aiRuns, setAiRuns] = useState<any[]>([]);
+  const [aiRunsLoading, setAiRunsLoading] = useState(false);
+  const [expandedRunId, setExpandedRunId] = useState<number | null>(null);
+  const [runLogs, setRunLogs] = useState<Record<number, string>>({});
+  const [runLogsLoading, setRunLogsLoading] = useState<Record<number, boolean>>({});
+
+  const loadAiRuns = useCallback(async () => {
+    setAiRunsLoading(true);
+    try {
+      const res = await fetch("/api/admin/ai-company/runs");
+      if (res.ok) {
+        const data = await res.json();
+        setAiRuns(data.runs || []);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setAiRunsLoading(false);
+    }
+  }, []);
+
+  const toggleRunLogs = useCallback(async (runId: number) => {
+    if (expandedRunId === runId) {
+      setExpandedRunId(null);
+      return;
+    }
+    setExpandedRunId(runId);
+    if (runLogs[runId]) return;
+
+    setRunLogsLoading(prev => ({ ...prev, [runId]: true }));
+    try {
+      const res = await fetch(`/api/admin/ai-company/logs?runId=${runId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setRunLogs(prev => ({ ...prev, [runId]: data.logs }));
+      } else {
+        setRunLogs(prev => ({ ...prev, [runId]: "Error loading logs" }));
+      }
+    } catch (e) {
+      setRunLogs(prev => ({ ...prev, [runId]: "Error loading logs" }));
+    } finally {
+      setRunLogsLoading(prev => ({ ...prev, [runId]: false }));
+    }
+  }, [expandedRunId, runLogs]);
+
+  useEffect(() => {
+    if (activeTab === "ai-company") {
+      loadAiRuns();
+    }
+  }, [activeTab, loadAiRuns]);
 
   // Users table state
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -1282,6 +1336,56 @@ export default function AdminPage() {
                     }}
                   >
                     {aiResult.message}
+                  </div>
+                )}
+              </div>
+
+              {/* MISSION LOGS HISTORY */}
+              <div className="mt-8 border-t border-white/10 pt-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-black uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>Board Meetings History</h3>
+                  <button onClick={loadAiRuns} disabled={aiRunsLoading} className="text-xs p-1 hover:rotate-180 transition-all duration-500 disabled:opacity-50 tracking-wider font-bold">
+                    <RefreshCw size={14} style={{ color: "var(--text-secondary)" }} className={aiRunsLoading ? "animate-spin" : ""} />
+                  </button>
+                </div>
+
+                {aiRunsLoading && aiRuns.length === 0 ? (
+                  <div className="text-center py-8 text-xs italic" style={{ color: "var(--text-secondary)" }}>Syncing with Board Room...</div>
+                ) : aiRuns.length === 0 ? (
+                  <div className="text-center py-8 text-xs italic" style={{ color: "var(--text-secondary)" }}>No board meetings have occurred yet.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {aiRuns.map((run) => (
+                      <div key={run.id} className="rounded-xl border transition-colors overflow-hidden" style={{ borderColor: expandedRunId === run.id ? '#1cb0f6' : 'var(--border-color)', background: 'var(--bg-card)' }}>
+                        <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors" onClick={() => toggleRunLogs(run.id)}>
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2.5 h-2.5 rounded-full ${run.status === 'in_progress' || run.status === 'queued' ? 'bg-blue-400 animate-pulse' : run.conclusion === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+                            <div>
+                              <div className="text-sm font-bold truncate">Mission #{run.id}</div>
+                              <div className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: 'var(--text-secondary)' }}>{new Date(run.createdAt).toLocaleString()}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs uppercase font-black tracking-wider" style={{ color: 'var(--text-secondary)' }}>{run.status === 'completed' ? run.conclusion : run.status}</span>
+                            {expandedRunId === run.id ? <ChevronLeft size={16} className="-rotate-90" /> : <ChevronRight size={16} />}
+                          </div>
+                        </div>
+                        {expandedRunId === run.id && (
+                          <div className="p-4 border-t" style={{ borderColor: 'var(--border-color)', background: 'black' }}>
+                            {runLogsLoading[run.id] ? (
+                              <div className="text-xs text-center py-6 font-bold flex flex-col items-center gap-3 w-full" style={{ color: '#1cb0f6' }}>
+                                <RefreshCw size={24} className="animate-spin" />
+                                <span>Establishing secure connection to Board Room logs...</span>
+                              </div>
+                            ) : (
+                              <pre className="text-[10px] font-mono whitespace-pre-wrap max-h-96 overflow-y-auto w-full p-2 custom-scrollbar" style={{ color: '#a8b0c0' }}>
+                                {runLogs[run.id] || "No logs available."}
+                              </pre>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
