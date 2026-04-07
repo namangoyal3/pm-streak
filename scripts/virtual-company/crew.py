@@ -130,6 +130,12 @@ def execute_company_mission(directive: str, ga4_property_id: Optional[str] = Non
         backstory="You are a CDO who built the data infrastructure at two unicorns. You live in dashboards and can spot a conversion anomaly before anyone else in the room.",
         tools=[ga4_tool], llm=llm, verbose=True,
     )
+    chief_design_officer = Agent(
+        role="Chief Design Officer",
+        goal="Own the UI/UX architecture and brand aesthetic. Translate product requirements into visually stunning, high-converting Figma-like design specifications and Tailwind CSS tokens.",
+        backstory="You are a world-class UI/UX designer who previously led design at Apple and Airbnb. You obsess over whitespace, typography, and micro-interactions.",
+        llm=llm, verbose=True,
+    )
     cpo = Agent(
         role="CPO (Chief Product Officer)",
         goal="Own the product roadmap. Convert data insights and CEO strategy into concrete PRDs with user stories and success metrics.",
@@ -187,10 +193,15 @@ def execute_company_mission(directive: str, ga4_property_id: Optional[str] = Non
         expected_output="Structured PRD with User Stories, Tech Specs, and QA criteria.",
         agent=cpo, context=[task_analysis],
     )
+    task_design = Task(
+        description="Chief Design Officer: Take the CPO's PRD and create a detailed UI/UX specification. Define the layout, color tokens, typography, and interactive responsive behaviors required.",
+        expected_output="A UI/UX Design Specification with exact CSS/Tailwind classes and layout structure to be implemented.",
+        agent=chief_design_officer, context=[task_prd],
+    )
     task_coding = Task(
-        description="CTO: Implement production-ready code for the CPO's PRD. You MUST open a Pull Request using the github_pr_creator tool to deploy this feature to 'namangoyal3/pm-streak'. Provide the PR URL when done.",
+        description="CTO: Implement production-ready code based on the CPO's PRD and the Chief Design Officer's UI/UX specification. You MUST open a Pull Request using the github_pr_creator tool to deploy this feature to 'namangoyal3/pm-streak'. Provide the PR URL when done.",
         expected_output="A successful PR URL with the implemented features.",
-        agent=cto, context=[task_prd],
+        agent=cto, context=[task_prd, task_design],
     )
     task_qa = Task(
         description="CQO: Review the CTO's implementation/PR. Design a rigorous A/B testing plan. Define success criteria to ensure that only successful features are kept.",
@@ -204,9 +215,10 @@ def execute_company_mission(directive: str, ga4_property_id: Optional[str] = Non
     )
 
     corp = Crew(
-        agents=[ceo, cdo, cpo, cto, cqo, cmo, cro, cco],
-        tasks=[task_strategy, task_analysis, task_prd, task_coding, task_qa, task_marketing],
+        agents=[ceo, cdo, chief_design_officer, cpo, cto, cqo, cmo, cro, cco],
+        tasks=[task_strategy, task_analysis, task_prd, task_design, task_coding, task_qa, task_marketing],
         process=Process.sequential, verbose=True,
     )
     result = corp.kickoff()
     return str(result)
+
