@@ -148,15 +148,34 @@ def make_github_read_tool():
                 import base64
                 g = Github(token)
                 repo = g.get_repo(repo_name)
-                contents = repo.get_contents(file_path, ref="main")
+                try:
+                    contents = repo.get_contents(file_path, ref="main")
+                except Exception as e:
+                    if "404" in str(e):
+                        # File not found — list the directory to help CTO pick a valid file
+                        parent = "/".join(file_path.split("/")[:-1]) or ""
+                        try:
+                            items = repo.get_contents(parent or "src/components", ref="main")
+                            names = [c.path for c in items if c.type == "file"][:20]
+                            return (
+                                f"FILE NOT FOUND: {file_path}\n"
+                                f"Files available in '{parent or 'src/components'}':\n"
+                                + "\n".join(f"  - {n}" for n in names)
+                                + "\n\nChoose one of these existing files, OR create a new file with a fresh name."
+                            )
+                        except Exception:
+                            return (
+                                f"FILE NOT FOUND: {file_path}\n"
+                                "Suggestion: create a new component file at src/components/ProUpgradeBanner.tsx"
+                            )
+                    return f"GitHub Read Error: {e}"
                 code = base64.b64decode(contents.content).decode("utf-8")
                 lines = code.splitlines()
                 if len(lines) > 150:
                     return (
                         f"FILE TOO LARGE: {file_path} has {len(lines)} lines — over the 150-line limit.\n"
                         f"DO NOT attempt to rewrite this file. Instead, create a NEW component file "
-                        f"(e.g. src/components/YourFeature.tsx) with the new functionality and "
-                        f"assume it will be imported into the page separately.\n\n"
+                        f"(e.g. src/components/YourFeature.tsx) with the new functionality.\n\n"
                         f"First 80 lines for context:\n" + "\n".join(lines[:80])
                     )
                 return f"FILE: {file_path} ({len(lines)} lines)\n\n{code}"
@@ -718,8 +737,8 @@ Then give 1 PRODUCT FIX: a specific onboarding or UX change that would prevent t
     # Sleep 40s before CTO task to clear llama-3.3-70b TPM window (12k/min limit).
     # CrewAI sequential process: task_prd completes → sleep → task_coding starts.
     def pre_cto_cooldown(output):
-        print("⏳ Cooling down 40s before CTO to clear llama-3.3-70b TPM window...")
-        time.sleep(40)
+        print("⏳ Cooling down 75s before CTO to clear llama-3.3-70b TPM window...")
+        time.sleep(75)
 
     task_prd.callback = pre_cto_cooldown
 
