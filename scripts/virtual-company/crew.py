@@ -530,28 +530,38 @@ Format: one section per user with their email, inactivity period, diagnosis, and
     )
 
     result = crew.kickoff()
-    result_str = str(result)
 
-    # Extract PR URL and CQO verdict for memory/workflow
+    # crew.kickoff() only returns the last task's output.
+    # Scan ALL task outputs for PR URL and CQO verdict.
+    import re as _re
+
+    all_task_text = ""
+    for task in crew.tasks:
+        try:
+            raw = getattr(task.output, "raw", "") or ""
+            all_task_text += raw + "\n"
+        except Exception:
+            pass
+    # Also include the final result
+    all_task_text += str(result)
+
+    # Extract PR URL (pattern: github.com/.../pull/N)
     pr_url = ""
-    for line in result_str.splitlines():
-        if "github.com" in line and "/pull/" in line:
-            parts = line.split()
-            for part in parts:
-                if "github.com" in part and "/pull/" in part:
-                    pr_url = part.strip(".,")
-                    break
-            if pr_url:
-                break
+    url_match = _re.search(r"https://github\.com/[\w-]+/[\w-]+/pull/\d+", all_task_text)
+    if url_match:
+        pr_url = url_match.group(0)
 
+    # Extract CQO verdict
     cqo_verdict = "UNKNOWN"
-    if "[CQO_VERDICT: APPROVE]" in result_str:
+    if "[CQO_VERDICT: APPROVE]" in all_task_text:
         cqo_verdict = "APPROVE"
-    elif "[CQO_VERDICT: REJECT]" in result_str:
+    elif "[CQO_VERDICT: REJECT]" in all_task_text:
         cqo_verdict = "REJECT"
 
+    print(f"\n📊 Extracted — PR: {pr_url or 'none'} | CQO: {cqo_verdict}")
+
     return {
-        "result": result_str,
+        "result": all_task_text,
         "pr_url": pr_url,
         "cqo_verdict": cqo_verdict,
     }
