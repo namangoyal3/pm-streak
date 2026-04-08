@@ -1,0 +1,7 @@
+{
+  "timestamp": "20260408-050334",
+  "directive": "Analyze the homepage visit-to-signup conversion funnel. Use GA4 to identify exactly where and why visitors are dropping off before signing up. CDO should pull page-level data for the homepage and signup flow. CPO should spec a targeted fix for the highest-drop-off point. CTO should implement it. Goal: increase homepage-to-signup conversion rate by at least 10% in 7 days.",
+  "pr_url": "",
+  "cqo_verdict": "UNKNOWN",
+  "ab_plan": ""
+}
