@@ -60,7 +60,18 @@ class GA4QuerySchema(BaseModel):
     property_id: str = Field(..., description="The GA4 Property ID.")
     metric_name: str = Field("activeUsers", description="Metric to pull.")
     dimension_name: str = Field("pagePath", description="Dimension to group by.")
-    days_back: int = Field(30, description="Days of history.")
+    days_back: int = Field(30, description="Number of days of history (integer, e.g. 30).")
+
+    model_config = {"coerce_numbers_to_str": False}
+
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        if isinstance(obj, dict) and "days_back" in obj:
+            try:
+                obj["days_back"] = int(obj["days_back"])
+            except (ValueError, TypeError):
+                obj["days_back"] = 30
+        return super().model_validate(obj, **kwargs)
 
 
 def make_ga4_tool():
@@ -75,7 +86,11 @@ def make_ga4_tool():
         args_schema: Type[BaseModel] = GA4QuerySchema
 
         def _run(self, property_id: str, metric_name: str = "activeUsers",
-                 dimension_name: str = "pagePath", days_back: int = 30) -> str:
+                 dimension_name: str = "pagePath", days_back=30) -> str:
+            try:
+                days_back = int(days_back)
+            except (ValueError, TypeError):
+                days_back = 30
             from google.analytics.data_v1beta import BetaAnalyticsDataClient
             from google.analytics.data_v1beta.types import (
                 DateRange, Dimension, Metric, RunReportRequest,
