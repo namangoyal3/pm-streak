@@ -108,13 +108,47 @@ def make_ga4_tool():
 
 # ── GitHub PR Tool ───────────────────────────────────────────────
 
+def make_github_read_tool():
+    """Tool for CTO to READ existing file content before modifying it."""
+    from crewai.tools import BaseTool
+
+    class GitHubReadSchema(BaseModel):
+        repo_name: str = Field(..., description="Repository name, e.g. 'namangoyal3/pm-streak'")
+        file_path: str = Field(..., description="Path to the file to read, e.g. 'src/app/page.tsx'")
+
+    class GitHubReadTool(BaseTool):
+        name: str = "github_file_reader"
+        description: str = (
+            "Reads the current content of a file from the namangoyal3/pm-streak GitHub repo (main branch). "
+            "ALWAYS use this BEFORE github_pr_creator to read the existing file so you can make targeted edits."
+        )
+        args_schema: Type[BaseModel] = GitHubReadSchema
+
+        def _run(self, repo_name: str, file_path: str) -> str:
+            token = os.getenv("GITHUB_TOKEN")
+            if not token:
+                return "ERROR: GITHUB_TOKEN not found."
+            try:
+                from github import Github
+                import base64
+                g = Github(token)
+                repo = g.get_repo(repo_name)
+                contents = repo.get_contents(file_path, ref="main")
+                code = base64.b64decode(contents.content).decode("utf-8")
+                return f"FILE: {file_path} ({len(code.splitlines())} lines)\n\n{code}"
+            except Exception as e:
+                return f"GitHub Read Error: {e}"
+
+    return GitHubReadTool()
+
+
 def make_github_pr_tool():
     from crewai.tools import BaseTool
 
     class GitHubPRSchema(BaseModel):
         repo_name: str = Field(..., description="Repository name, e.g. 'namangoyal3/pm-streak'")
         file_path: str = Field(..., description="Path to the file to update, e.g. 'src/app/page.tsx'")
-        new_content: str = Field(..., description="Complete updated code for the file")
+        new_content: str = Field(..., description="Complete updated code for the file — must preserve all existing functionality, only add/modify the specific feature")
         commit_message: str = Field(..., description="Commit message describing the change")
         pr_title: str = Field(..., description="Title for the Pull Request")
         pr_body: str = Field(..., description="Description/PR body explaining the feature")
@@ -123,8 +157,8 @@ def make_github_pr_tool():
         name: str = "github_pr_creator"
         description: str = (
             "Creates a new branch, commits updated code to a file, and opens a Pull Request on GitHub. "
-            "Use this tool when you want to deploy a feature live or push an A/B test. "
-            "Only use this for Next.js/TypeScript files — never commit Python or config files."
+            "IMPORTANT: Always call github_file_reader FIRST to read the existing file, then make targeted edits. "
+            "Never replace the entire file with a stub — preserve all existing code."
         )
         args_schema: Type[BaseModel] = GitHubPRSchema
 
@@ -135,6 +169,9 @@ def make_github_pr_tool():
                 return "ERROR: GITHUB_TOKEN not found in environment."
             if not new_content or len(new_content.strip()) < 20:
                 return "ERROR: new_content is empty or too short — refusing to create PR with blank code."
+            # Sanity check: if new_content is suspiciously short vs a major file, warn
+            if len(new_content.splitlines()) < 10:
+                return "ERROR: new_content has fewer than 10 lines — you likely forgot to read the existing file first. Use github_file_reader first."
 
             try:
                 from github import Github
@@ -304,6 +341,7 @@ def execute_company_mission(
     )
 
     ga4_tool = make_ga4_tool()
+    github_read_tool = make_github_read_tool()
     github_tool = make_github_pr_tool()
     neon_tool = make_neon_db_tool()
 
@@ -342,10 +380,14 @@ You write PRDs that include exact file paths, component names, and API routes fo
         backstory=f"""You are a CTO who has built systems handling 1M+ requests per second.
 You write complete, production-ready Next.js 14 app-router TypeScript code.
 You ALWAYS use the github_pr_creator tool to open a PR on 'namangoyal3/pm-streak'.
-You write the FULL file content — never truncate or use placeholders.
-You follow PM Streak's patterns: async server components, Prisma for DB, JWT auth via src/lib/auth.ts.
+MANDATORY WORKFLOW — do this every time, no exceptions:
+  STEP 1: Call github_file_reader to read the CURRENT file from the repo.
+  STEP 2: Make only the minimal targeted edit described in the PRD.
+  STEP 3: Call github_pr_creator with the COMPLETE file (existing code + your edit).
+You NEVER write a file from scratch — always read first, then edit.
+You preserve all existing imports, metadata, components, and logic. You only add/change what the PRD specifies.
 {PM_STREAK_CONTEXT}""",
-        tools=[github_tool], llm=llm_code, verbose=True,
+        tools=[github_read_tool, github_tool], llm=llm_code, verbose=True,
     )
     cqo = Agent(
         role="CQO (Chief Quality & Testing Officer)",
@@ -434,9 +476,10 @@ Keep it focused — one feature, not five.""",
     task_coding = Task(
         description="""CTO: Implement the feature from the CPO's PRD in ONE file only.
 
-STRICT RULES — follow exactly or the tool call will fail:
-1. Choose the SINGLE highest-impact file to modify (e.g. src/app/page.tsx).
-2. Call github_pr_creator exactly ONCE with these fields:
+MANDATORY STEPS — execute in this exact order:
+1. Call github_file_reader with repo_name='namangoyal3/pm-streak' and the target file path to READ the current code.
+2. Make the minimal targeted edit to the code you just read (add/modify only what the PRD specifies — do not remove anything).
+3. Call github_pr_creator exactly ONCE with these fields:
    - repo_name: "namangoyal3/pm-streak"
    - file_path: the single file path (e.g. "src/app/page.tsx")
    - new_content: the COMPLETE raw TypeScript/TSX source code — NO markdown fences (no ```), no explanations inside the code block, just raw code
