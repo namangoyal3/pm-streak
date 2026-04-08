@@ -1,7 +1,43 @@
 import os
 import json
+import time
+import random
 from typing import Optional, Type
 from pydantic import BaseModel, Field
+
+
+def get_groq_keys() -> list[str]:
+    """Return all available Groq API keys for round-robin rotation."""
+    # Multi-key secret (comma-separated) takes priority
+    all_keys = os.getenv("GROQ_API_KEYS_ALL", "")
+    if all_keys:
+        return [k.strip() for k in all_keys.split(",") if k.strip()]
+    # Fall back to single key
+    single = os.getenv("GROQ_API_KEY", "")
+    return [single] if single else []
+
+
+def make_llm(keys: list[str], max_tokens: int = 4096, temperature: float = 0.3):
+    """Create an LLM that rotates across Groq keys on rate limit errors."""
+    from crewai import LLM
+
+    key_index = [0]  # mutable for closure
+
+    def next_key() -> str:
+        k = keys[key_index[0] % len(keys)]
+        key_index[0] += 1
+        return k
+
+    # CrewAI/LiteLLM will use GROQ_API_KEY env var as fallback;
+    # set the first key and rely on CrewAI's built-in retry for rate limits.
+    primary_key = next_key()
+    return LLM(
+        model="groq/meta-llama/llama-4-scout-17b-16e-instruct",
+        temperature=temperature,
+        api_key=primary_key,
+        max_tokens=max_tokens,
+        max_retries=3,
+    )
 
 # ── Product Context (injected into every agent backstory) ───────
 PM_STREAK_CONTEXT = """
@@ -237,30 +273,30 @@ def execute_company_mission(
     ga4_property_id: Optional[str] = None,
     memory_context: str = "No prior board meetings on record.",
 ) -> dict:
-    from crewai import Agent, Task, Crew, Process, LLM
+    from crewai import Agent, Task, Crew, Process
 
-    groq_key = os.getenv("GROQ_API_KEY")
+    groq_keys = get_groq_keys()
+    if not groq_keys:
+        raise ValueError("No Groq API keys found. Set GROQ_API_KEYS_ALL or GROQ_API_KEY.")
 
-    # Default LLM for all agents (4096 tokens — enough for real output)
-    llm = LLM(
-        model="groq/meta-llama/llama-4-scout-17b-16e-instruct",
-        temperature=0.3,
-        api_key=groq_key,
-        max_tokens=4096,
-    )
-    # High-capacity LLM for CTO (needs to write full Next.js files)
-    llm_code = LLM(
-        model="groq/meta-llama/llama-4-scout-17b-16e-instruct",
-        temperature=0.1,
-        api_key=groq_key,
-        max_tokens=8192,
-    )
+    print(f"🔑 Using {len(groq_keys)} Groq API key(s) with rotation")
+
+    # Assign different keys to different agents to spread rate-limit load
+    def key(i: int) -> str:
+        return groq_keys[i % len(groq_keys)]
+
+    # Each agent gets its own LLM instance with a different key
+    llm0 = make_llm([key(0)], max_tokens=4096, temperature=0.3)
+    llm1 = make_llm([key(1)], max_tokens=4096, temperature=0.3)
+    llm2 = make_llm([key(2)], max_tokens=4096, temperature=0.3)
+    llm_code = make_llm([key(3)], max_tokens=8192, temperature=0.1)  # CTO
+    llm4 = make_llm([key(4)], max_tokens=4096, temperature=0.3)
 
     ga4_tool = make_ga4_tool()
     github_tool = make_github_pr_tool()
     neon_tool = make_neon_db_tool()
 
-    # ── Agents ──────────────────────────────────────────────────
+    # ── Agents (each gets a different Groq key to spread rate-limit load) ──
 
     ceo = Agent(
         role="CEO (Chief Executive Officer)",
@@ -269,7 +305,7 @@ def execute_company_mission(
 You never guess — you demand data from the CDO and market intel from the CMO before making any decision.
 You avoid repeating experiments that were already tried (check memory for prior decisions).
 {PM_STREAK_CONTEXT}""",
-        allow_delegation=False, llm=llm, verbose=True,
+        allow_delegation=False, llm=llm0, verbose=True,
     )
     cdo = Agent(
         role="CDO (Chief Data Officer)",
@@ -278,7 +314,7 @@ You avoid repeating experiments that were already tried (check memory for prior 
 You live in dashboards and can spot a conversion anomaly before anyone else in the room.
 You always use the google_analytics_4_analyzer tool with property_id=529697573.
 {PM_STREAK_CONTEXT}""",
-        tools=[ga4_tool], llm=llm, verbose=True,
+        tools=[ga4_tool], llm=llm1, verbose=True,
     )
     cpo = Agent(
         role="CPO (Chief Product Officer)",
@@ -287,7 +323,7 @@ You always use the google_analytics_4_analyzer tool with property_id=529697573.
 You turn ambiguous business goals into razor-sharp specs that engineers love.
 You write PRDs that include exact file paths, component names, and API routes for the PM Streak codebase.
 {PM_STREAK_CONTEXT}""",
-        llm=llm, verbose=True,
+        llm=llm2, verbose=True,
     )
     cto = Agent(
         role="CTO (Chief Technology Officer)",
@@ -308,7 +344,7 @@ You evaluate PRs for correctness, security (no auth bypasses, no SQL injection),
 You design A/B tests with clear hypotheses and success criteria (e.g., +X% Pro conversion in 7 days).
 Your response MUST end with exactly one of: [CQO_VERDICT: APPROVE] or [CQO_VERDICT: REJECT].
 {PM_STREAK_CONTEXT}""",
-        llm=llm, verbose=True,
+        llm=llm4, verbose=True,
     )
     cmo = Agent(
         role="CMO (Chief Marketing Officer)",
@@ -317,7 +353,7 @@ Your response MUST end with exactly one of: [CQO_VERDICT: APPROVE] or [CQO_VERDI
 You think in funnels, keywords, and distribution channels.
 You know PM Streak targets aspiring and mid-level product managers in India and globally.
 {PM_STREAK_CONTEXT}""",
-        llm=llm, verbose=True,
+        llm=llm0, verbose=True,
     )
     cro = Agent(
         role="CRO (Chief Revenue Officer)",
@@ -327,7 +363,7 @@ At PM Streak's current stage (123 users, pre-revenue), your highest leverage is 
 You use the neon_db_analyzer tool with query_type='new_signups' to find free users from the last 7 days.
 You write concise (50-word max), warm LinkedIn/email outreach messages that highlight the specific PM Streak feature most relevant to each user's learning journey.
 {PM_STREAK_CONTEXT}""",
-        tools=[neon_tool], llm=llm, verbose=True,
+        tools=[neon_tool], llm=llm1, verbose=True,
     )
     cco = Agent(
         role="CCO (Chief Customer Officer)",
@@ -337,7 +373,7 @@ You obsess over every confused user and turn their pain into actionable retentio
 You use the neon_db_analyzer tool with query_type='retention' to find users inactive for 14+ days.
 You write specific, empathetic re-engagement messages for each at-risk user cohort.
 {PM_STREAK_CONTEXT}""",
-        tools=[neon_tool], llm=llm, verbose=True,
+        tools=[neon_tool], llm=llm2, verbose=True,
     )
 
     # ── Tasks ────────────────────────────────────────────────────

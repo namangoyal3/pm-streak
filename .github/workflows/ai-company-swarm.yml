@@ -54,6 +54,7 @@ jobs:
         id: swarm
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEYS_ALL: ${{ secrets.GROQ_API_KEYS_ALL }}
           GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
