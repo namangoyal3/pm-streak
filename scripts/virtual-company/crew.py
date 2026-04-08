@@ -365,12 +365,12 @@ def execute_company_mission(
     def key(i: int) -> str:
         return groq_keys[i % len(groq_keys)]
 
-    # Non-CTO agents: capped at 1024 tokens to preserve TPM budget for CTO.
-    # llama-3.3-70b has a 12k TPM limit; CTO needs ~3k tokens to write+call the PR tool.
-    llm0 = make_llm([key(0)], max_tokens=1024, temperature=0.3)
-    llm1 = make_llm([key(1)], max_tokens=1024, temperature=0.3)
-    llm2 = make_llm([key(2)], max_tokens=2048, temperature=0.3)  # CPO needs more for PRD
-    llm4 = make_llm([key(4)], max_tokens=1024, temperature=0.3)
+    # Non-CTO agents: capped at 512 tokens to preserve the llama-3.3-70b TPM budget for CTO.
+    # Groq free tier shares TPM across keys; CTO needs ~3k tokens uninterrupted.
+    llm0 = make_llm([key(0)], max_tokens=512, temperature=0.3)
+    llm1 = make_llm([key(1)], max_tokens=512, temperature=0.3)
+    llm2 = make_llm([key(2)], max_tokens=800, temperature=0.3)  # CPO needs a bit more for PRD
+    llm4 = make_llm([key(4)], max_tokens=512, temperature=0.3)
 
     # CTO: llama-3.3-70b-versatile — Groq's best model for structured tool calls.
     # Uses its own dedicated key. A 35s pre-task sleep clears the TPM window.
@@ -737,8 +737,8 @@ Then give 1 PRODUCT FIX: a specific onboarding or UX change that would prevent t
     # Sleep 40s before CTO task to clear llama-3.3-70b TPM window (12k/min limit).
     # CrewAI sequential process: task_prd completes → sleep → task_coding starts.
     def pre_cto_cooldown(output):
-        print("⏳ Cooling down 75s before CTO to clear llama-3.3-70b TPM window...")
-        time.sleep(75)
+        print("⏳ Cooling down 120s before CTO to clear llama-3.3-70b TPM window...")
+        time.sleep(120)
 
     task_prd.callback = pre_cto_cooldown
 
