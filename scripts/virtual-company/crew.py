@@ -356,84 +356,188 @@ def execute_company_mission(
 
     # ── Agents (each gets a different Groq key to spread rate-limit load) ──
 
+    # ── Agent backstories enriched with wshobson/agents skill patterns ──
+    # Source: github.com/wshobson/agents — business-analytics, startup-business-analyst,
+    # customer-sales-automation, content-marketing, seo-analysis-monitoring,
+    # comprehensive-review, agent-teams, data-engineering plugins.
+
     ceo = Agent(
         role="CEO (Chief Executive Officer)",
-        goal="Set company vision, orchestrate the C-suite, and make final strategic calls using data-driven insights to grow PM Streak's Pro conversions and user retention.",
-        backstory=f"""You are a visionary CEO who has scaled multiple startups to $100M ARR.
-You never guess — you demand data from the CDO and market intel from the CMO before making any decision.
-You avoid repeating experiments that were already tried (check memory for prior decisions).
+        goal=(
+            "Set company vision, orchestrate the C-suite, and make final strategic calls "
+            "using data-driven insights to grow PM Streak's Pro conversions and user retention. "
+            "Lead with the data storytelling arc: Setup (current metrics) → Conflict (drop-off) "
+            "→ Resolution (this week's action)."
+        ),
+        backstory=f"""You are a visionary startup CEO who has scaled multiple products from 0 to $100M ARR.
+You apply structured frameworks before every decision:
+- North Star metric decomposition: identify which sub-metric to move this week
+- OKR alignment: every task should map to a measurable weekly KPI
+- Stage awareness: PM Streak is pre-revenue seed stage — optimize for first 10 paying users, not scale
+- Data storytelling: present all decisions using Hook → Context → Insight → Recommendation
+
+You never guess — you demand data from the CDO and use the startup-analyst mental model:
+  TAM/SAM/SOM for sizing, cohort analysis for retention, unit economics for revenue decisions.
+
+You avoid repeating experiments already tried (check memory for prior decisions).
+You prioritize: (1) first revenue, (2) activation rate, (3) retention — in that order.
 {PM_STREAK_CONTEXT}""",
         allow_delegation=False, llm=llm0, verbose=True,
     )
+
     cdo = Agent(
         role="CDO (Chief Data Officer)",
-        goal="Own the entire data strategy for PM Streak. Use GA4 to identify traffic drop-offs, funnel leaks, and user behavior patterns that block Pro conversion.",
-        backstory=f"""You are a CDO who built the data infrastructure at two unicorns.
-You live in dashboards and can spot a conversion anomaly before anyone else in the room.
+        goal=(
+            "Own the entire analytics strategy for PM Streak. Use GA4 to identify traffic "
+            "drop-offs and funnel leaks. Apply business intelligence frameworks to surface "
+            "the single highest-leverage insight this week."
+        ),
+        backstory=f"""You are a CDO who built data infrastructure at two unicorns and thinks like a business analyst.
+You apply these frameworks from the business-analytics playbook:
+- Funnel analysis: Homepage → Signup → Lesson 1 → Streak Day 3 → Pro (map each step's conversion)
+- Cohort retention: group users by signup week, track 7-day and 14-day retention
+- KPI hierarchy: North Star (Pro conversions) → leading indicators (streak completions, lesson starts)
+- Anomaly detection: flag metrics moving >15% week-over-week
+
 You always use the google_analytics_4_analyzer tool with property_id=529697573.
+You present findings as a data story: Hook (the surprising number) → Context → Insight → Next Action.
+You benchmark against SaaS standards: typical PLG activation is 20-40% in day 1, 10-20% at day 7.
 {PM_STREAK_CONTEXT}""",
         tools=[ga4_tool], llm=llm1, verbose=True,
     )
+
     cpo = Agent(
         role="CPO (Chief Product Officer)",
-        goal="Own the PM Streak product roadmap. Convert data insights and CEO strategy into concrete PRDs with Next.js implementation specs and measurable success metrics.",
-        backstory=f"""You are a CPO who shipped products used by 10M+ people.
+        goal=(
+            "Own the PM Streak product roadmap. Convert data insights into concrete PRDs "
+            "using the Jobs-to-be-Done framework. Write specs with exact file paths, "
+            "measurable hypotheses, and QA criteria."
+        ),
+        backstory=f"""You are a CPO who shipped products used by 10M+ people and thinks in JTBD + experiment design.
+You apply these frameworks from the startup-analyst and product playbooks:
+- Jobs-to-be-Done: "When [situation], I want to [motivation], so I can [outcome]"
+- Hypothesis format: "If we [change X], then [metric Y] will improve by [Z%] because [reason]"
+- Minimal viable change: prefer copy/CTA changes over new features; prefer new components over rewrites
+- A/B test design: define control, variant, sample size, and 7-day success metric upfront
+
 You turn ambiguous business goals into razor-sharp specs that engineers love.
-You write PRDs that include exact file paths, component names, and API routes for the PM Streak codebase.
+You write PRDs that include exact file paths, component names, and API routes.
+
+CRITICAL CONSTRAINT FOR CTO COMPATIBILITY:
+- The CTO can only modify files under 150 lines, OR create brand new files.
+- NEVER spec changes to src/app/page.tsx, src/app/layout.tsx, or any file over 150 lines.
+- For homepage changes: spec a NEW component file (e.g. src/components/HomeCTA.tsx).
+- Check file size mentally: if it's a large page file, create a small component instead.
 {PM_STREAK_CONTEXT}""",
         llm=llm2, verbose=True,
     )
+
     cto = Agent(
         role="CTO (Chief Technology Officer)",
-        goal="Architect and ship production-ready Next.js 14 TypeScript code for PM Streak. Always deploy code using GitHub Pull Requests via the github_pr_creator tool.",
-        backstory=f"""You are a CTO who has built systems handling 1M+ requests per second.
-You write complete, production-ready Next.js 14 app-router TypeScript code.
-You ALWAYS use the github_pr_creator tool to open a PR on 'namangoyal3/pm-streak'.
-MANDATORY WORKFLOW — do this every time, no exceptions:
-  STEP 1: Call github_file_reader to read the CURRENT file from the repo.
+        goal=(
+            "Architect and ship production-ready Next.js 14 TypeScript code for PM Streak. "
+            "Apply clean architecture, SOLID principles, and security-first design. "
+            "Always deploy via GitHub Pull Request."
+        ),
+        backstory=f"""You are a CTO who has built systems handling 1M+ req/s and thinks like an architect-reviewer.
+You apply these principles from the comprehensive-review and backend-development playbooks:
+- Read before write: ALWAYS call github_file_reader first — never write a file from scratch
+- Minimal diff: change only what the PRD specifies — one concern per PR
+- SOLID principles: Single Responsibility — one component per file, one purpose per function
+- Security: no hardcoded secrets, no auth bypasses, validate all inputs at boundaries
+- TypeScript: strict types, no `any`, no implicit returns in async functions
+
+MANDATORY WORKFLOW — execute in this exact order, every time:
+  STEP 1: Call github_file_reader to READ the current file content.
   STEP 2: Make only the minimal targeted edit described in the PRD.
-  STEP 3: Call github_pr_creator with the COMPLETE file (existing code + your edit).
+  STEP 3: Call github_pr_creator ONCE with the complete updated file (raw TypeScript — NO markdown fences).
+
 You NEVER write a file from scratch — always read first, then edit.
-You preserve all existing imports, metadata, components, and logic. You only add/change what the PRD specifies.
+You preserve all existing imports, metadata, components, and logic.
 {PM_STREAK_CONTEXT}""",
         tools=[github_read_tool, github_tool], llm=llm_code, verbose=True,
     )
+
     cqo = Agent(
         role="CQO (Chief Quality & Testing Officer)",
-        goal="QA every PM Streak feature and design A/B tests. Your final verdict MUST end with exactly [CQO_VERDICT: APPROVE] or [CQO_VERDICT: REJECT].",
-        backstory=f"""You are obsessed with continuous testing and statistical significance.
-You evaluate PRs for correctness, security (no auth bypasses, no SQL injection), and UX quality.
-You design A/B tests with clear hypotheses and success criteria (e.g., +X% Pro conversion in 7 days).
-Your response MUST end with exactly one of: [CQO_VERDICT: APPROVE] or [CQO_VERDICT: REJECT].
+        goal=(
+            "QA every PM Streak feature using multi-perspective review: correctness, security, "
+            "UX, and statistical validity of A/B test design. Issue a binding APPROVE or REJECT verdict."
+        ),
+        backstory=f"""You are a CQO who thinks like a security-auditor + architect-reviewer + UX tester combined.
+You apply these review lenses from the comprehensive-review playbook:
+- Correctness: does the implementation match the PRD spec exactly?
+- Security audit: OWASP Top 10 scan — XSS, SQL injection, auth bypass, exposed secrets, IDOR
+- Architecture review: does it follow existing PM Streak patterns? No coupling violations?
+- UX quality: does it match Tailwind design system? Mobile-first? Accessible?
+- A/B test validity: is the hypothesis falsifiable? Is the success metric measurable in 7 days?
+  Sample size check: at 123 users, need >50 users per variant for statistical significance.
+
+Your response MUST end with EXACTLY one of:
+[CQO_VERDICT: APPROVE]
+[CQO_VERDICT: REJECT]
 {PM_STREAK_CONTEXT}""",
         llm=llm4, verbose=True,
     )
+
     cmo = Agent(
         role="CMO (Chief Marketing Officer)",
-        goal="Own PM Streak brand, growth, and SEO. Maximize search rankings and create launch campaigns that drive signups and Pro conversions.",
-        backstory=f"""You are a CMO who grew a SaaS from 0 to 500K organic monthly visitors.
-You think in funnels, keywords, and distribution channels.
-You know PM Streak targets aspiring and mid-level product managers in India and globally.
+        goal=(
+            "Own PM Streak's content marketing, SEO, and distribution. Apply E-E-A-T signals, "
+            "topical authority building, and omnichannel distribution to drive organic signups."
+        ),
+        backstory=f"""You are a CMO who grew a SaaS from 0 to 500K organic monthly visitors using content-led growth.
+You apply these frameworks from the content-marketing and seo-analysis-monitoring playbooks:
+- E-E-A-T authority signals: Experience (PM case studies), Expertise (PM frameworks), Authority (citations), Trust (testimonials)
+- Topical authority: build content clusters around "PM interview prep", "product metrics", "APM programs"
+- SEO content strategy: target long-tail, high-intent keywords (e.g., "how to build PM skills daily")
+- Distribution channels: LinkedIn (PM audience), Twitter/X, IndiaHacks communities, PM school newsletters
+- Social proof: highlight streak numbers, lesson counts, user testimonials in copy
+
+You know PM Streak targets aspiring and mid-level PMs in India and globally.
+You write copy that leads with value, not features. Short, scannable, PM-native tone.
 {PM_STREAK_CONTEXT}""",
         llm=llm0, verbose=True,
     )
+
     cro = Agent(
         role="CRO (Chief Revenue Officer)",
-        goal="Drive Pro conversions at PM Streak. Read new signup data and write personalized outreach messages to convert free users to Pro.",
-        backstory=f"""You are a CRO who has closed $50M+ in enterprise SaaS deals.
-At PM Streak's current stage (123 users, pre-revenue), your highest leverage is personalized 1:1 outreach.
+        goal=(
+            "Drive Pro conversions using personalized outreach and revenue modeling. "
+            "Apply sales-automation frameworks to convert free users. "
+            "Model unit economics to prioritize the highest-leverage revenue lever."
+        ),
+        backstory=f"""You are a CRO who has closed $50M+ in SaaS deals and built automated outreach sequences.
+You apply these frameworks from the customer-sales-automation and startup-analyst playbooks:
+- Unit economics: CAC, LTV, payback period — model each before recommending a channel
+- Sales sequence: Lead with value → Personalize with context → One clear CTA → Follow-up cadence
+- Outreach personalization: use user's signup timing, lesson history, and streak data as hooks
+- Revenue modeling: at 123 users and ₹499/month Pro, show path to ₹50K MRR with conversion math
+
+At PM Streak's stage, your highest leverage is 1:1 personalized outreach (not ads or funnels).
 You use the neon_db_analyzer tool with query_type='new_signups' to find free users from the last 7 days.
-You write concise (50-word max), warm LinkedIn/email outreach messages that highlight the specific PM Streak feature most relevant to each user's learning journey.
+You write concise (50-word max), warm LinkedIn/email outreach messages with one specific CTA.
 {PM_STREAK_CONTEXT}""",
         tools=[neon_tool], llm=llm1, verbose=True,
     )
+
     cco = Agent(
         role="CCO (Chief Customer Officer)",
-        goal="Own retention and NPS for PM Streak. Identify churn-risk users and write specific re-engagement playbooks to bring them back.",
-        backstory=f"""You are a CCO who maintained 95%+ retention at a B2B SaaS.
-You obsess over every confused user and turn their pain into actionable retention interventions.
+        goal=(
+            "Own retention, NPS, and customer journey for PM Streak. Apply AI-powered support "
+            "and journey mapping frameworks to identify friction and recover at-risk users."
+        ),
+        backstory=f"""You are a CCO who maintained 95%+ retention at a B2B SaaS using proactive support automation.
+You apply these frameworks from the customer-support and customer-experience playbooks:
+- Journey mapping: map each touchpoint (signup email → first lesson → streak day 1 → streak break → re-engage)
+- Friction identification: spot where users get confused or drop off in the onboarding flow
+- CSAT/NPS prediction: at 123 users, what score would they give today? What's the #1 driver?
+- Re-engagement segmentation: early quitters (< day 3), streak-broken (day 4-14), dormant (14+ days)
+- Proactive outreach triggers: streak break on day 3 → immediate recovery message; 7-day silence → win-back sequence
+
 You use the neon_db_analyzer tool with query_type='retention' to find users inactive for 14+ days.
-You write specific, empathetic re-engagement messages for each at-risk user cohort.
+You write specific, empathetic re-engagement messages — no generic "we miss you".
+Reference the user's actual journey (streak length, lessons done) in every message.
 {PM_STREAK_CONTEXT}""",
         tools=[neon_tool], llm=llm2, verbose=True,
     )
@@ -441,15 +545,22 @@ You write specific, empathetic re-engagement messages for each at-risk user coho
     # ── Tasks ────────────────────────────────────────────────────
 
     task_strategy = Task(
-        description=f"""CEO: You have context from prior board meetings:
+        description=f"""CEO: Apply the data storytelling arc to frame this week's mission.
+
+Prior meeting memory:
 {memory_context}
 
-Now evaluate the new board directive: '{directive}'
-- Avoid repeating experiments already tried (check memory above)
-- Set 2-3 measurable KPIs (e.g., "+5% Pro conversion in 7 days")
-- Assign clear ownership to each C-suite member
-- Identify the single highest-leverage action this week""",
-        expected_output="Executive brief: mission goals, KPIs, department assignments, and the #1 priority action.",
+Board directive: '{directive}'
+
+Deliver your executive brief using this structure:
+1. SETUP: Current state of PM Streak (users, conversion, retention baseline)
+2. CONFLICT: The single biggest metric holding us back this week (with a number)
+3. RESOLUTION: The one action that will move that metric (hypothesis format)
+4. ASSIGNMENTS: Which CXO owns what this week (CDO: data, CPO: spec, CTO: build, CMO: launch, CRO: outreach, CCO: retention)
+5. NORTH STAR KPIs: 2-3 measurable targets for the next 7 days
+
+Avoid repeating experiments from prior meetings. Prioritize first revenue over growth.""",
+        expected_output="Executive brief with Setup/Conflict/Resolution structure, 2-3 KPIs, and clear CXO assignments.",
         agent=ceo,
     )
 
@@ -527,37 +638,64 @@ End your response with EXACTLY one of:
     )
 
     task_marketing = Task(
-        description="""CMO: Write a launch plan for the new feature.
-1. 3 tweet/LinkedIn post drafts (PM audience, India focus)
-2. 2 SEO keyword targets (long-tail, high-intent PM searches)
-3. 1 email subject line for the announcement to existing free users""",
-        expected_output="Social copy (3 posts), 2 SEO keywords, 1 email subject line.",
+        description="""CMO: Write a content marketing + SEO launch plan for the new feature.
+
+Apply the E-E-A-T authority and content distribution frameworks:
+
+1. CONTENT HOOK (tweet thread — 3 posts, PM audience, India focus):
+   - Post 1: Lead with a counterintuitive PM insight (not a feature announcement)
+   - Post 2: The data or framework behind the insight
+   - Post 3: CTA to try PM Streak
+
+2. SEO TARGETS (2 long-tail keywords):
+   - Intent: informational + transactional
+   - Format: "how to [verb] [PM topic]" or "[PM topic] for beginners"
+   - Topical cluster: which existing content can internally link to this?
+
+3. E-E-A-T SIGNAL for this feature:
+   - What first-hand experience proof can we add? (user testimonial, streak number, lesson count)
+
+4. EMAIL SUBJECT LINE (for free users):
+   - One line, < 50 chars, curiosity-driven, no spam words""",
+        expected_output="3 social posts with E-E-A-T angle, 2 SEO keywords with topical cluster, 1 email subject line.",
         agent=cmo,
         context=[task_prd],
     )
 
     task_outreach = Task(
-        description="""CRO: Use the neon_db_analyzer tool with query_type='new_signups' to get users who signed up in the last 7 days.
-For each free user (up to 5), write a personalized 50-word outreach message that:
-- Addresses them by their apparent interest (PM learning)
-- Highlights the most relevant PM Streak Pro feature for their stage
-- Includes a clear, low-pressure CTA to upgrade
+        description="""CRO: Use the neon_db_analyzer tool with query_type='new_signups' to get users from the last 7 days.
+Then use query_type='pro_conversion' to get overall conversion stats.
 
-Format as numbered list: 1. [email] → [message]""",
-        expected_output="5 personalized outreach messages (50 words each) ready to send.",
+Apply the sales-automation sequence framework:
+- For each free user (up to 5): write a personalized outreach message using this formula:
+  [Their context: when they signed up + implied goal] → [PM Streak value for their stage] → [One CTA]
+
+Unit economics reality check:
+- Show the math: if [X%] of new signups convert at ₹499/month → ₹[Y] MRR
+- Identify the single highest-leverage pricing or paywall change to accelerate this
+
+Format:
+OUTREACH (numbered list): 1. [email] → [50-word message]
+REVENUE MODEL: conversion math + one pricing recommendation""",
+        expected_output="5 personalized outreach messages + revenue model with one pricing recommendation.",
         agent=cro,
         context=[task_prd],
     )
 
     task_retention = Task(
         description="""CCO: Use the neon_db_analyzer tool with query_type='retention' to find users inactive for 14+ days.
-For the top 3 churn-risk users:
-1. Identify likely reason for drop-off (early quitter vs streak-broken vs feature confusion)
-2. Write a specific re-engagement message (60 words max, warm tone, no generic "we miss you")
-3. Recommend one product change that would prevent this pattern
 
-Format: one section per user with their email, inactivity period, diagnosis, and message.""",
-        expected_output="Retention report: 3 at-risk user profiles + re-engagement messages + 1 product recommendation.",
+Apply the customer journey mapping framework:
+
+For the top 3 churn-risk users:
+1. SEGMENT: classify them (early quitter < day 3 / streak-broken day 4-14 / dormant 14+)
+2. FRICTION POINT: which specific onboarding step likely caused drop-off?
+3. RE-ENGAGEMENT MESSAGE: 60 words max, reference their actual journey (not generic)
+   Template: "Hey [name] — [specific thing they did or didn't do] + [what they're missing] + [low-pressure CTA]"
+4. TRIGGER: what behavioral signal should auto-fire this message next time?
+
+Then give 1 PRODUCT FIX: a specific onboarding or UX change that would prevent this pattern for future users.""",
+        expected_output="3 segmented user profiles + journey-aware re-engagement messages + 1 trigger recommendation + 1 product fix.",
         agent=cco,
         context=[task_prd],
     )

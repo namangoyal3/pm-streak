@@ -50,13 +50,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Install Claude CLI
-        run: npm install -g @anthropic-ai/claude-code
-
       - name: Execute Board Meeting
         id: swarm
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_API_KEYS_ALL: ${{ secrets.GROQ_API_KEYS_ALL }}
           GOOGLE_SA_JSON: ${{ secrets.GOOGLE_SA_JSON }}

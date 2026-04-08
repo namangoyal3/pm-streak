@@ -1,19 +1,11 @@
 import os
 import sys
-import shutil
 
 # Add the current directory to python path
 sys.path.append(os.path.dirname(__file__))
 
+from crew import execute_company_mission
 from memory import load_recent_memory, save_meeting_summary
-
-# Use Claude-native swarm if `claude` CLI is available, else fall back to CrewAI/Groq
-if shutil.which("claude"):
-    from claude_crew import execute_company_mission
-    print("🧠 Using Claude-native agent swarm (.claude/agents/)")
-else:
-    from crew import execute_company_mission
-    print("⚙️  Using CrewAI/Groq swarm (claude CLI not found)")
 
 
 def sanitize_directive(directive: str, max_length: int = 500) -> str:
