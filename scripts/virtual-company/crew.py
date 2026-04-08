@@ -135,7 +135,16 @@ def make_github_read_tool():
                 repo = g.get_repo(repo_name)
                 contents = repo.get_contents(file_path, ref="main")
                 code = base64.b64decode(contents.content).decode("utf-8")
-                return f"FILE: {file_path} ({len(code.splitlines())} lines)\n\n{code}"
+                lines = code.splitlines()
+                if len(lines) > 150:
+                    return (
+                        f"FILE TOO LARGE: {file_path} has {len(lines)} lines — over the 150-line limit.\n"
+                        f"DO NOT attempt to rewrite this file. Instead, create a NEW component file "
+                        f"(e.g. src/components/YourFeature.tsx) with the new functionality and "
+                        f"assume it will be imported into the page separately.\n\n"
+                        f"First 80 lines for context:\n" + "\n".join(lines[:80])
+                    )
+                return f"FILE: {file_path} ({len(lines)} lines)\n\n{code}"
             except Exception as e:
                 return f"GitHub Read Error: {e}"
 
@@ -467,7 +476,12 @@ Include:
 3. Exact technical spec: which Next.js file(s) to modify, what changes to make
 4. Success metric (measurable, 7-day target)
 5. QA criteria for the CQO
-Keep it focused — one feature, not five.""",
+CRITICAL CONSTRAINT FOR CTO COMPATIBILITY:
+- The CTO can only modify files that are under 150 lines, OR create brand new files.
+- NEVER spec a change to src/app/page.tsx, src/app/layout.tsx, or any file over 150 lines.
+- For homepage changes: spec a NEW component file (e.g. src/components/HomeCTA.tsx) that gets imported — not a rewrite of page.tsx.
+- Check the file size mentally: if it's a large page file, create a component instead.
+Keep it focused — one feature, one small file.""",
         expected_output="Structured 1-page PRD with file paths, user story, tech spec, and success metric.",
         agent=cpo,
         context=[task_analysis],
