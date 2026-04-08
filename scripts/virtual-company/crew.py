@@ -285,20 +285,23 @@ def execute_company_mission(
     def key(i: int) -> str:
         return groq_keys[i % len(groq_keys)]
 
-    # Each agent gets its own LLM instance with a different key
-    llm0 = make_llm([key(0)], max_tokens=4096, temperature=0.3)
-    llm1 = make_llm([key(1)], max_tokens=4096, temperature=0.3)
-    llm2 = make_llm([key(2)], max_tokens=4096, temperature=0.3)
-    # CTO uses llama-3.3-70b — much better at structured tool calls (github_pr_creator)
+    # Non-CTO agents: capped at 1024 tokens to preserve TPM budget for CTO.
+    # llama-3.3-70b has a 12k TPM limit; CTO needs ~3k tokens to write+call the PR tool.
+    llm0 = make_llm([key(0)], max_tokens=1024, temperature=0.3)
+    llm1 = make_llm([key(1)], max_tokens=1024, temperature=0.3)
+    llm2 = make_llm([key(2)], max_tokens=2048, temperature=0.3)  # CPO needs more for PRD
+    llm4 = make_llm([key(4)], max_tokens=1024, temperature=0.3)
+
+    # CTO: llama-3.3-70b-versatile — Groq's best model for structured tool calls.
+    # Uses its own dedicated key. A 35s pre-task sleep clears the TPM window.
     from crewai import LLM as _LLM
     llm_code = _LLM(
         model="groq/llama-3.3-70b-versatile",
         temperature=0.1,
         api_key=key(3),
-        max_tokens=4096,
-        max_retries=3,
+        max_tokens=3000,
+        max_retries=5,
     )
-    llm4 = make_llm([key(4)], max_tokens=4096, temperature=0.3)
 
     ga4_tool = make_ga4_tool()
     github_tool = make_github_pr_tool()
@@ -436,12 +439,13 @@ STRICT RULES — follow exactly or the tool call will fail:
 2. Call github_pr_creator exactly ONCE with these fields:
    - repo_name: "namangoyal3/pm-streak"
    - file_path: the single file path (e.g. "src/app/page.tsx")
-   - new_content: the COMPLETE raw TypeScript/TSX source code — no markdown fences, no explanations, just code
-   - commit_message: short imperative sentence
-   - pr_title: short feature title
-   - pr_body: 2-3 sentences describing the change
-3. Keep new_content under 200 lines to avoid tool call size limits.
-4. If multi-file changes are needed, implement only the most impactful file; list others as PR body follow-ups.
+   - new_content: the COMPLETE raw TypeScript/TSX source code — NO markdown fences (no ```), no explanations inside the code block, just raw code
+   - commit_message: short imperative sentence (max 72 chars)
+   - pr_title: short feature title (max 60 chars)
+   - pr_body: 2-3 sentences describing the change and what to test
+3. Keep new_content under 150 lines to avoid size limits.
+4. If multi-file changes are needed, implement only the most impactful file and note others in pr_body as follow-ups.
+5. Do NOT include any text after calling the tool — just make the tool call and stop.
 
 Output the PR URL at the end.""",
         expected_output="PR URL (https://github.com/namangoyal3/pm-streak/pull/N) and one sentence on what changed.",
@@ -500,6 +504,14 @@ Format: one section per user with their email, inactivity period, diagnosis, and
         agent=cco,
         context=[task_prd],
     )
+
+    # Sleep 40s before CTO task to clear llama-3.3-70b TPM window (12k/min limit).
+    # CrewAI sequential process: task_prd completes → sleep → task_coding starts.
+    def pre_cto_cooldown(output):
+        print("⏳ Cooling down 40s before CTO to clear llama-3.3-70b TPM window...")
+        time.sleep(40)
+
+    task_prd.callback = pre_cto_cooldown
 
     crew = Crew(
         agents=[ceo, cdo, cpo, cto, cqo, cmo, cro, cco],
