@@ -148,9 +148,12 @@ export default async function Home() {
         <div className="max-w-5xl mx-auto px-4 sm:px-5 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🔥</span>
-            <div className="font-black text-lg sm:text-xl tracking-tight flex items-center gap-1">
-              <span className="text-[var(--green-primary)]">PM</span>
-              <span className="text-white">Streak</span>
+            <div className="flex flex-col leading-none">
+              <div className="font-black text-lg sm:text-xl tracking-tight flex items-center gap-1">
+                <span className="text-[var(--green-primary)]">PM</span>
+                <span className="text-white">Streak</span>
+              </div>
+              <span className="text-[9px] font-bold text-white/40 tracking-wide">by learnanything.pro</span>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
