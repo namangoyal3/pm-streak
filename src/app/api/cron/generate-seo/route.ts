@@ -6,6 +6,7 @@ import { EXPLORE_SEED_TOPICS } from "@/lib/explore-topics";
 import { scoreSEO } from "@/lib/seo-score";
 
 const ARTICLE_PUBLISH_THRESHOLD = 70;
+const ARTICLES_PER_RUN = 5;
 
 export async function GET(req: Request) {
   const auth = req.headers.get("authorization");
@@ -13,7 +14,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  try {
+  const results: any[] = [];
+  
+  for (let i = 0; i < ARTICLES_PER_RUN; i++) {
     // 1. Pick highest priority pending keyword
     const targetKeywordRow = await prisma.seoKeyword.findFirst({
       where: { status: "pending" },
@@ -21,7 +24,8 @@ export async function GET(req: Request) {
     });
 
     if (!targetKeywordRow) {
-      return NextResponse.json({ ok: false, reason: "No pending keywords in queue." });
+      console.log(`[cron/generate-seo] No more pending keywords. Generated ${results.length} articles this run.`);
+      break;
     }
 
     const targetTopic = targetKeywordRow.keyword;
@@ -33,12 +37,18 @@ export async function GET(req: Request) {
       data: { status: "mapping" },
     });
 
-    console.log(`[cron/generate-seo] Generating article for topic: ${targetTopic}`);
+    console.log(`[cron/generate-seo] Generating article ${i + 1}/${ARTICLES_PER_RUN} for topic: ${targetTopic}`);
 
     // 2. Search for transcript evidence
     const searchResults = await searchLennyTranscripts(targetTopic);
     if (!searchResults || searchResults.length < 2) {
-      return NextResponse.json({ error: "Not enough evidence for this topic" });
+      console.warn(`[cron/generate-seo] Not enough evidence for topic: ${targetTopic}. Skipping.`);
+      await prisma.seoKeyword.update({
+        where: { id: targetKeywordRow.id },
+        data: { status: "failed" },
+      });
+      results.push({ topic: targetTopic, status: "failed", reason: "Not enough evidence" });
+      continue;
     }
 
     // 3. Generate the SEO optimized article
@@ -58,11 +68,8 @@ export async function GET(req: Request) {
         where: { id: targetKeywordRow.id },
         data: { status: "failed" },
       });
-      return NextResponse.json({ 
-        ok: false, 
-        reason: "SEO score below threshold", 
-        score: seoScore 
-      });
+      results.push({ topic: targetTopic, status: "failed", reason: "SEO score below threshold", score: seoScore });
+      continue;
     }
 
     // 5. Create the Article in DB
@@ -97,18 +104,21 @@ export async function GET(req: Request) {
       data: { status: "generated" },
     });
 
-    return NextResponse.json({ 
-      ok: true, 
+    console.log(`[cron/generate-seo] Successfully created article: ${article.slug} (score: ${seoScore})`);
+    results.push({ 
       topic: targetTopic, 
       articleId: article.id, 
       slug: article.slug,
-      score: seoScore 
+      score: seoScore,
+      status: "generated"
     });
-
-  } catch (error) {
-    console.error("[cron/generate-seo] Error:", error);
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : "Generation failed" 
-    }, { status: 500 });
   }
+
+  const successCount = results.filter(r => r.status === "generated").length;
+  return NextResponse.json({ 
+    ok: true, 
+    processed: results.length,
+    generated: successCount,
+    results 
+  });
 }
