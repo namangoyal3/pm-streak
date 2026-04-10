@@ -60,32 +60,37 @@ function getRegion(country: string | null): PricingRegion {
 }
 
 const FREE_FEATURES = [
-  { text: "22 core curriculum lessons", yes: true },
-  { text: "10 archive lessons (batch-unlocked)", yes: true },
-  { text: "10 credits / month", yes: true },
-  { text: "1 AI Explore lesson / day", yes: true },
-  { text: "Streak tracking & gems", yes: true },
+  { text: "7 core curriculum lessons", yes: true },
+  { text: "5 archive lessons (batch-unlocked)", yes: true },
+  { text: "5 credits / month", yes: true },
+  { text: "1 AI Explore lesson / week", yes: true },
+  { text: "Basic streak tracking", yes: true },
 
   { text: "All 292+ archive lessons", yes: false },
-  { text: "50 credits / month", yes: false },
+  { text: "100 credits / month", yes: false },
   { text: "Unlimited AI Explore lessons", yes: false },
-  { text: "PM Leader lessons (Shreyas, Aakash…)", yes: false },
-  { text: "AI Interview prep sessions", yes: false, new: true },
-  { text: "PM Jobs board", yes: false, new: true },
-  { text: "WhatsApp PM community", yes: false },
+  { text: "PM Leader lessons (Shreyas, Aakash, Marty Cagan)", yes: false },
+  { text: "Unlimited AI Interview prep sessions", yes: false, new: true },
+  { text: "Priority PM Jobs board access", yes: false, new: true },
+  { text: "Exclusive WhatsApp PM community", yes: false },
+  { text: "Personalized learning roadmap", yes: false },
+  { text: "Certificate of completion", yes: false },
 ];
 
 const PRO_FEATURES = [
   { text: "Everything in Free", yes: true },
   { text: "All 292+ archive lessons unlocked", yes: true },
-  { text: "50 credits / month", yes: true },
+  { text: "100 credits / month", yes: true },
   { text: "Unlimited AI Explore lessons", yes: true },
   { text: "Unlimited Deeper Dives", yes: true, new: true },
-  { text: "AI Interview prep (unlimited session)", yes: true, new: true },
-  { text: "Full PM Jobs board", yes: true, new: true },
+  { text: "Unlimited AI Interview prep sessions", yes: true, new: true },
+  { text: "Priority PM Jobs board access", yes: true, new: true },
+  { text: "Exclusive WhatsApp PM community", yes: true },
   { text: "Save Notes & Recaps", yes: true },
-  { text: "Role-specific Roadmaps", yes: true },
-  { text: "Priority support", yes: true },
+  { text: "Personalized learning roadmap", yes: true },
+  { text: "Certificate of completion", yes: true },
+  { text: "Priority email support", yes: true },
+  { text: "30-day money-back guarantee", yes: true },
 ];
 
 const CREDIT_COSTS = [
@@ -253,6 +258,21 @@ async function PricingContent() {
           <p className="text-white/60 text-sm max-w-md mx-auto mb-4">
             Unlock all 292+ Lenny&apos;s Podcast lessons, unlimited AI lessons, PM leader content, interview prep, and the job board.
           </p>
+          
+          {/* Social Proof & Urgency */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <div className="flex items-center gap-2 text-xs text-white/70">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-blue-500 border-2 border-[var(--bg-primary)]"></div>
+                ))}
+              </div>
+              <span>Join 500+ PMs already learning</span>
+            </div>
+            <div className="px-3 py-1.5 bg-red-500/20 border border-red-500/30 rounded-full text-xs font-bold text-red-300">
+              ⚡ Limited time: 70% OFF launch pricing
+            </div>
+          </div>
           <a
             href={
               userPlan === "pro"
@@ -275,6 +295,41 @@ async function PricingContent() {
           >
             {userPlan === "pro" ? "Manage Pro" : "Start Pro"}
           </a>
+        </div>
+
+        {/* Value Proposition */}
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl bg-green-500/20">
+              <Zap size={24} className="text-green-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-black mb-2">Why PMs Choose Pro</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-start gap-2">
+                  <div className="w-2 h-2 mt-1.5 rounded-full bg-green-400"></div>
+                  <div>
+                    <div className="font-bold">10x More Content</div>
+                    <div className="text-white/60 text-xs">292+ lessons vs 12 free</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-2 h-2 mt-1.5 rounded-full bg-green-400"></div>
+                  <div>
+                    <div className="font-bold">Interview Ready</div>
+                    <div className="text-white/60 text-xs">Unlimited AI mock interviews</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-2 h-2 mt-1.5 rounded-full bg-green-400"></div>
+                  <div>
+                    <div className="font-bold">Career Boost</div>
+                    <div className="text-white/60 text-xs">Priority job board + community</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Free vs Pro Comparison */}

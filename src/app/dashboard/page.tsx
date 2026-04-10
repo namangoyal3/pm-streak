@@ -305,23 +305,34 @@ export default function DashboardPage() {
     const count = category.proGatedCount;
     return (
       <Link href="/pricing" className="block mt-2.5">
-        <div className="relative overflow-hidden rounded-2xl border-2 border-purple-500/40 bg-gradient-to-br from-purple-950/60 via-indigo-950/40 to-purple-900/30 p-4">
+        <div className="relative overflow-hidden rounded-2xl border-2 border-purple-500/40 bg-gradient-to-br from-purple-950/60 via-indigo-950/40 to-purple-900/30 p-4 hover:border-purple-400/60 transition-all hover:scale-[1.02]">
           {/* Decorative blur glow */}
           <div className="absolute -top-6 -right-6 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
           <div className="relative flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0 border border-purple-500/30">
-              <Lock size={18} className="text-purple-400" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 border border-purple-400/50 shadow-lg shadow-purple-500/20">
+              <Lock size={18} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-purple-200">
-                {count} more lesson{count !== 1 ? "s" : ""} inside
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-xs font-black text-white">
+                  🔒 {count} Premium Lesson{count !== 1 ? "s" : ""}
+                </p>
+                <span className="text-[8px] font-black bg-red-500/30 text-red-300 px-1.5 py-0.5 rounded-full">PRO ONLY</span>
+              </div>
+              <p className="text-[10px] text-purple-300/90 mt-0.5">
+                Unlock expert content from PM leaders like Shreyas Doshi & Marty Cagan
               </p>
-              <p className="text-[10px] text-purple-400/80 mt-0.5">
-                Unlock all lessons with Pro
-              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-[8px] text-white/60">🎯 Interview frameworks</span>
+                <span className="text-[8px] text-white/60">•</span>
+                <span className="text-[8px] text-white/60">📈 Case studies</span>
+                <span className="text-[8px] text-white/60">•</span>
+                <span className="text-[8px] text-white/60">💼 Real PM scenarios</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500 text-white text-[10px] font-black uppercase tracking-wider flex-shrink-0">
-              <Sparkles size={10} /> Pro
+            <div className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-wider flex-shrink-0 shadow-lg shadow-purple-500/30">
+              <Sparkles size={10} />
+              <span>Unlock</span>
             </div>
           </div>
         </div>
@@ -812,26 +823,50 @@ export default function DashboardPage() {
 
               {/* Credits & Upgrade */}
               {user.plan !== "pro" ? (
-                <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-4">
+                <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-purple-800/10 p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Zap size={16} className="text-purple-400" />
-                      <span className="text-sm font-black text-white">Credits</span>
+                      <span className="text-sm font-black text-white">🚀 Level Up to Pro</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-purple-500/20 px-2.5 py-1 rounded-full">
-                      <Zap size={12} className="text-purple-400" aria-hidden />
-                      <span className="text-xs font-black text-purple-400">
-                        {user.credits ?? 10} credits
-                      </span>
+                    <div className="flex items-center gap-1 bg-red-500/20 px-2.5 py-1 rounded-full">
+                      <span className="text-[10px] font-black text-red-300">70% OFF</span>
                     </div>
                   </div>
-                  <p className="text-[10px] text-white/60 mb-3">Use credits to unlock lesson batches, generate AI lessons, and access interview prep.</p>
+                  
+                  <div className="mb-3">
+                    <div className="flex items-baseline gap-1 mb-1">
+                      <span className="text-white/40 line-through text-xs">₹830</span>
+                      <span className="text-lg font-black text-green-400">₹249</span>
+                      <span className="text-white/50 text-xs">/month</span>
+                    </div>
+                    
+                    <div className="space-y-1.5 text-[10px] text-white/70">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        <span>Unlock <span className="font-bold text-white">292+</span> archive lessons</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        <span><span className="font-bold text-white">100</span> credits/month (vs 5 free)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        <span>Unlimited AI interview prep</span>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <Link
                     href="/pricing"
-                    className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-purple-500 text-white text-xs font-black uppercase tracking-wider hover:bg-purple-400 transition-colors"
+                    className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs font-black uppercase tracking-wider hover:from-purple-400 hover:to-purple-500 transition-all shadow-lg shadow-purple-500/20"
                   >
-                    <Star size={12} /> Upgrade to Pro ₹249/mo
+                    <Star size={12} /> Upgrade Now - Limited Time
                   </Link>
+                  
+                  <div className="mt-2 text-center">
+                    <span className="text-[8px] text-white/40">Join 500+ PMs already learning with Pro</span>
+                  </div>
                 </div>
               ) : (
                 <div className="rounded-[var(--ds-radius-lg)] border-2 border-purple-500/30 bg-purple-500/10 p-3 flex items-center justify-between">
