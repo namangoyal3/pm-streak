@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Rebuild sitemap at most once per hour — not on every request
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -30,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await prisma.article.findMany({
     where: { published: true },
     select: { slug: true, vertical: true, updatedAt: true },
+    orderBy: { updatedAt: "desc" },
   });
   
   const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => ({

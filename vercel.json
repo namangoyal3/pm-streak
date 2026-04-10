@@ -10,7 +10,7 @@
       "maxDuration": 120
     },
     "src/app/api/cron/generate-seo/route.ts": {
-      "maxDuration": 120
+      "maxDuration": 300
     },
     "src/app/api/cron/daily-emails/route.ts": {
       "maxDuration": 120
@@ -62,7 +62,7 @@
     },
     {
       "path": "/api/cron/intent-mapper",
-      "schedule": "0 2 * * 1"
+      "schedule": "0 1 * * *"
     },
     {
       "path": "/api/cron/performance-refiner",

@@ -489,7 +489,7 @@ MANDATORY WORKFLOW — execute in this exact order, every time:
 You NEVER write a file from scratch — always read first, then edit.
 You preserve all existing imports, metadata, components, and logic.
 {PM_STREAK_CONTEXT}""",
-        tools=[github_read_tool, github_tool], llm=llm_code, verbose=True,
+        tools=[github_tool], llm=llm_code, verbose=True,
     )
 
     cqo = Agent(
@@ -632,25 +632,53 @@ Keep it focused — one feature, one small file.""",
         context=[task_analysis],
     )
 
+    # Pre-read the CPO's target file in Python (no LLM call needed).
+    # This eliminates the github_file_reader round-trip from the CTO task,
+    # reducing CTO from 3+ LLM calls to exactly 1 (github_pr_creator only).
+    def _prefetch_file(path: str) -> str:
+        token = os.getenv("GITHUB_TOKEN", "")
+        if not token:
+            return "[GITHUB_TOKEN not set — CTO will need to create a new file]"
+        try:
+            from github import Github
+            import base64
+            g = Github(token)
+            repo = g.get_repo("namangoyal3/pm-streak")
+            contents = repo.get_contents(path, ref="main")
+            code = base64.b64decode(contents.content).decode("utf-8")
+            lines = code.splitlines()
+            if len(lines) > 150:
+                return f"[FILE TOO LARGE — {len(lines)} lines. Create a new component instead.]"
+            return f"CURRENT FILE CONTENT ({len(lines)} lines):\n```\n{code}\n```"
+        except Exception:
+            return "[File not found — create it as a new file]"
+
+    # Try to guess a likely component path from the CPO task output (best-effort)
+    cpo_hint_path = "src/components/ProUpgradeBanner.tsx"
+    prefetched = _prefetch_file(cpo_hint_path)
+
     task_coding = Task(
-        description="""CTO: Implement the feature from the CPO's PRD in ONE file only.
+        description=f"""CTO: Implement the CPO's PRD spec in ONE file. Create a PR immediately.
 
-MANDATORY STEPS — execute in this exact order:
-1. Call github_file_reader with repo_name='namangoyal3/pm-streak' and the target file path to READ the current code.
-2. Make the minimal targeted edit to the code you just read (add/modify only what the PRD specifies — do not remove anything).
-3. Call github_pr_creator exactly ONCE with these fields:
-   - repo_name: "namangoyal3/pm-streak"
-   - file_path: the single file path (e.g. "src/app/page.tsx")
-   - new_content: the COMPLETE raw TypeScript/TSX source code — NO markdown fences (no ```), no explanations inside the code block, just raw code
-   - commit_message: short imperative sentence (max 72 chars)
-   - pr_title: short feature title (max 60 chars)
-   - pr_body: 2-3 sentences describing the change and what to test
-3. Keep new_content under 150 lines to avoid size limits.
-4. If multi-file changes are needed, implement only the most impactful file and note others in pr_body as follow-ups.
-5. Do NOT include any text after calling the tool — just make the tool call and stop.
+The CPO wants a new small component. Here is the current file content (pre-loaded for you — no read tool needed):
 
-Output the PR URL at the end.""",
-        expected_output="PR URL (https://github.com/namangoyal3/pm-streak/pull/N) and one sentence on what changed.",
+{prefetched}
+
+YOUR ONLY JOB: Call github_pr_creator ONCE with:
+- repo_name: "namangoyal3/pm-streak"
+- file_path: "src/components/ProUpgradeBanner.tsx" (or the path from CPO's spec)
+- new_content: complete raw TypeScript/TSX — NO markdown fences, NO backticks, just raw code
+- commit_message: short imperative (max 72 chars)
+- pr_title: short feature title (max 60 chars)
+- pr_body: 2-3 sentences: what changed + what to test
+
+Rules:
+- Under 80 lines total
+- No markdown fences in new_content
+- One tool call, then stop — do not narrate
+
+Output only the PR URL line at the end.""",
+        expected_output="PR URL (https://github.com/namangoyal3/pm-streak/pull/N)",
         agent=cto,
         context=[task_prd],
     )

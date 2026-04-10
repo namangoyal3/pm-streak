@@ -267,11 +267,23 @@ Requirements:
   return parsed;
 }
 
+export interface FaqPair {
+  question: string;
+  answer: string;
+}
+
+export interface HowToStep {
+  name: string;
+  text: string;
+}
+
 export interface GeneratedSeoArticle {
   title: string;
   description: string;
   body: string;
   primaryKeyword: string;
+  faqPairs?: FaqPair[];
+  howToSteps?: HowToStep[];
 }
 
 export async function generateSeoArticle(
@@ -282,34 +294,54 @@ export async function generateSeoArticle(
     .map((r, i) => `[Excerpt ${i + 1}] Guest: ${r.guest}\nEpisode: ${r.episodeTitle ?? "N/A"}\nContent: ${r.snippet}`)
     .join("\n\n");
 
-  const prompt = `Act as an expert PM content strategist and SEO specialist. Create a comprehensive, high-value PM article (800+ words) based on the provided search results from Lenny's Podcast.
+  const prompt = `Act as an expert PM content strategist specialising in both SEO (Google search ranking) and GEO (Generative Engine Optimisation — being cited by ChatGPT, Perplexity, Claude, and Google AI Overviews).
 
 TOPIC: ${topic}
 
 TRANSCRIPT HIGHLIGHTS:
 ${context}
 
-SEO REQUIREMENTS:
-1. WORD COUNT: The article MUST be at least 800 words. Expand on nuances, examples, and frameworks.
-2. STRUCTURE: Use a clear H1 title. Use multiple ## H2 subheadings and at least one ### H3 section.
-3. KEYWORDS: Choose a primary keyword related to "${topic}". Include it in the title, first 100 words, and naturally throughout the text.
-4. DESCRIPTION: Provide a meta-description between 120-160 characters.
-5. INTERNAL LINKS: Include markdown links to internal pages where natural: (/pricing), (/interview-prep), (/dashboard).
-6. EXTERNAL LINKS: Include at least one link to a relevant external resource (e.g., Lenny's newsletter or a PM framework site).
+═══ SEO REQUIREMENTS ═══
+1. WORD COUNT: 1000+ words minimum. Be thorough and specific.
+2. STRUCTURE: H1 title → multiple ## H2 sections → at least two ### H3 sub-sections.
+3. KEYWORD DENSITY: Primary keyword in title, first 100 words, and 3–5× naturally in body.
+4. META DESCRIPTION: 120–160 characters, includes primary keyword, action-oriented.
+5. INTERNAL LINKS: Link naturally to (/pricing), (/interview-prep), (/dashboard) where relevant.
+6. EXTERNAL LINKS: At least one authoritative external link (Lenny's newsletter, Nielsen Norman, etc.)
 
-CONTENT REQUIREMENTS:
-- Synthetic Insights: Don't just list what guests said. Synthesize them into a cohesive "Ultimate Guide" style article.
-- 2026 Relevance MUST: explicitly contextualize the advice for the year 2026. Mention how modern AI agents, automated tooling, or the post-2025 landscape shift how PMs execute these frameworks. Make it feel highly contemporary.
-- Practicality: Include sections on "Common Pitfalls", "Advanced Tactics for 2026", and "Success Metrics".
-- Tone: Professional, authoritative, yet accessible.
+═══ GEO REQUIREMENTS (critical for AI citation) ═══
+7. DIRECT ANSWER BLOCK: Start the article with a concise 2–3 sentence "direct answer" paragraph that AI engines can extract as a snippet. Begin it with "**[Topic] is...**" or "**The [topic] framework...**".
+8. EXPERT CITATIONS: At least 3 "According to [Guest Name] on Lenny's Podcast, ..." attribution sentences. AI engines favour attributed quotes.
+9. DEFINITION BOXES: Use blockquotes (>) to define key terms clearly. E.g. "> **RICE Score**: A prioritisation formula that weighs Reach, Impact, Confidence, and Effort."
+10. STRUCTURED LISTS: Use numbered lists for frameworks/steps and bullet lists for examples — AI engines extract these as structured answers.
+11. FAQ SECTION: End the body with a "## Frequently Asked Questions" section with 5 Q&A pairs using ### for each question. These feed schema.org FAQPage markup.
+12. HOW-TO STEPS: If the topic is procedural (how to do X), include a "## Step-by-Step Guide" section with clearly numbered steps. These feed schema.org HowTo markup.
 
-OUTPUT FORMAT: Return a valid JSON object only.
+═══ CONTENT REQUIREMENTS ═══
+- Synthesise guest insights into a cohesive "Ultimate Guide" — don't just quote.
+- Explicitly contextualise for 2026: mention AI agents, LLM-assisted workflows, post-AGI-transition product culture.
+- Include "Common Pitfalls to Avoid" and "Success Metrics" sections.
+- Tone: authoritative, practitioner-level, not generic.
+
+═══ OUTPUT FORMAT ═══
+Return a valid JSON object only — no markdown fences outside the JSON.
 {
-  "title": "SEO Optimized Title...",
-  "description": "120-160 char meta description...",
-  "primaryKeyword": "...",
-  "body": "Full markdown article content (800+ words) here..."
+  "title": "SEO + GEO Optimized Title (60–70 chars, includes primary keyword)...",
+  "description": "120–160 char meta description with primary keyword...",
+  "primaryKeyword": "exact primary keyword phrase",
+  "body": "Full markdown article (1000+ words). Must include FAQ section at the end.",
+  "faqPairs": [
+    { "question": "...", "answer": "2–4 sentence direct answer..." },
+    { "question": "...", "answer": "..." },
+    { "question": "...", "answer": "..." },
+    { "question": "...", "answer": "..." },
+    { "question": "...", "answer": "..." }
+  ],
+  "howToSteps": [
+    { "name": "Step name", "text": "What to do and why." }
+  ]
 }
+Note: howToSteps should only be included if the topic is procedural. Return an empty array [] otherwise.
 `;
 
   const completion = await groqCreate({

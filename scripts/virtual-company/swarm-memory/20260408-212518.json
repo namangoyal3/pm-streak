@@ -1,0 +1,7 @@
+{
+  "timestamp": "20260408-212518",
+  "directive": "Review our recent metrics and identify the single highest-leverage change to improve free-to-Pro conversion. Use DB data to find churn-risk users and new signups. Ship one small targeted change.",
+  "pr_url": "https://github.com/namangoyal3/pm-streak/pull/15",
+  "cqo_verdict": "UNKNOWN",
+  "ab_plan": "- **Hypothesis:** Targeted email campaigns and in-app notifications to users who have shown high engagement (streaks of 7+ days) but have not converted to Pro will increase the free-to-Pro conversion rate by at least 15% within 7 days. - **Rationale:** Users with high engagement are likely to see value in the product and might need a nudge to convert, especially if they are close to exhausting their free credits or have not fully utilized the free features. "
+}

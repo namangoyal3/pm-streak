@@ -13,6 +13,8 @@ import { Suspense } from "react";
 import PricingBannerModal from "@/components/PricingBannerModal";
 import JsonLd, { faqSchema, breadcrumbSchema } from "@/components/JsonLd";
 import PricingBenefits from "@/components/PricingBenefits";
+import PricingPageTrialCTA from "@/components/PricingPageTrialCTA";
+import { getVariant } from "@/lib/ab";
 
 const PRICE_INCREASE_PERCENT = 70;
 
@@ -121,9 +123,10 @@ export default async function PricingPage() {
 }
 
 async function PricingContent() {
-  const [userId, headersList] = await Promise.all([
+  const [userId, headersList, abVariant] = await Promise.all([
     getCurrentUserId(),
     headers(),
+    getVariant("pro_trial_cta_v1"),
   ]);
 
   // Detect country from Vercel geo header (set automatically in production)
@@ -277,6 +280,11 @@ async function PricingContent() {
             {userPlan === "pro" ? "Manage Pro" : "Start Pro"}
           </a>
         </div>
+
+        {/* A/B: Pro trial CTA (treatment only) */}
+        {userPlan !== "pro" && (
+          <PricingPageTrialCTA variant={abVariant} />
+        )}
 
         {/* Free vs Pro Comparison */}
         <div id="comparison" className="grid md:grid-cols-2 gap-6 mb-10 sm:mb-12">

@@ -28,10 +28,14 @@ export async function GET(req: Request) {
     // 1. Find recently published/updated articles (last 48 hours for safety)
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
+    // Include both newly published AND recently refined articles (updatedAt covers both)
     const recentArticles = await prisma.article.findMany({
       where: {
         published: true,
-        publishedAt: { gte: since },
+        OR: [
+          { publishedAt: { gte: since } },
+          { updatedAt: { gte: since } },
+        ],
       },
       select: { slug: true, vertical: true },
     });

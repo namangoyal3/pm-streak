@@ -1,23 +1,30 @@
+/**
+ * Weekly performance refiner — runs Sunday 04:00 UTC.
+ *
+ * For each stale article (not updated in 30+ days):
+ * 1. Rewrites the intro for freshness/CTR signal
+ * 2. Backfills faqPairs if missing (GEO gap fill)
+ * 3. Bumps updatedAt → seo-indexnow picks it up for re-submission to Bing/AI indexes
+ */
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Groq from "groq-sdk";
 
-export const maxDuration = 60; // 1 min timeout
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function GET(req: Request) {
-  // 1. Verify cron secret
   const authHeader = req.headers.get("authorization");
   const CRON_SECRET = process.env.CRON_SECRET;
-  
+
   if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    // 2. Find articles published more than 30 days ago that haven't been touched
+    // Find oldest stale article — prioritise ones missing faqPairs (GEO gap)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -26,56 +33,86 @@ export async function GET(req: Request) {
         published: true,
         updatedAt: { lte: thirtyDaysAgo },
       },
-      orderBy: { updatedAt: "asc" },
+      orderBy: [
+        // Articles missing FAQ come first — highest GEO value
+        { faqPairs: "asc" },
+        { updatedAt: "asc" },
+      ],
     });
 
     if (!oldArticle) {
       return NextResponse.json({ ok: false, reason: "No articles need refining right now." });
     }
 
-    // 3. Ask LLM to rewrite the intro to trigger a freshness boost
-    const systemPrompt = `You are a world-class Product Management SEO editor. 
-Your goal is to optimize the introduction of this article to improve CTR and "freshness signals".
-Rewrite ONLY the first 2 paragraphs to be extremely punchy, hooking the reader immediately. Keep the same overall meaning.
-Do NOT output any conversational filler. Just the polished text.
+    const hasFaq = Array.isArray(oldArticle.faqPairs) && (oldArticle.faqPairs as unknown[]).length > 0;
 
-Original Introduction (first 500 characters):
-${oldArticle.body.substring(0, 500)}...
-`;
+    // Build prompt: rewrite intro + generate FAQ if missing
+    const systemPrompt = `You are a world-class Product Management SEO and GEO editor.
+Your task is to improve an existing PM article for freshness, CTR, and AI citation signals.
+
+Article title: ${oldArticle.title}
+Article body (first 800 chars):
+${oldArticle.body.substring(0, 800)}
+
+${hasFaq ? "Task: Rewrite ONLY the opening paragraph (before the first ## heading) to be punchier and more 2026-relevant. Keep meaning intact." : `Task: Do BOTH:
+1. Rewrite the opening paragraph (before the first ## heading) to be punchier and more 2026-relevant.
+2. Generate 5 FAQ pairs for this article topic that a PM would actually search for.`}
+
+Return a JSON object ONLY:
+{
+  "newIntro": "Rewritten opening paragraph here...",
+  ${hasFaq ? "" : `"faqPairs": [
+    { "question": "...", "answer": "2-4 sentence direct answer..." },
+    { "question": "...", "answer": "..." },
+    { "question": "...", "answer": "..." },
+    { "question": "...", "answer": "..." },
+    { "question": "...", "answer": "..." }
+  ]`}
+}`;
 
     const completion = await groq.chat.completions.create({
-      messages: [{ role: "system", content: systemPrompt }],
-      model: "llama3-70b-8192",
-      temperature: 0.7,
+      messages: [{ role: "user", content: systemPrompt }],
+      model: "llama-3.3-70b-versatile",
+      response_format: { type: "json_object" },
+      temperature: 0.6,
     });
 
-    const rewrite = completion.choices[0].message.content;
-    if (!rewrite) throw new Error("Empty response from LLM");
+    const raw = completion.choices[0]?.message?.content;
+    if (!raw) throw new Error("Empty LLM response");
 
-    // Replace the first 500 characters roughly with the new rewrite
-    // For MVP, we will prepend the new intro and drop the first two paragraphs manually.
-    const bodyParts = oldArticle.body.split("\\n\\n");
-    bodyParts.splice(0, 2, rewrite);
-    const newBody = bodyParts.join("\\n\\n");
+    let parsed: { newIntro?: string; faqPairs?: { question: string; answer: string }[] };
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      throw new Error(`Failed to parse LLM JSON: ${raw.slice(0, 200)}`);
+    }
 
-    // 4. Update the article and bump the updatedAt timestamp
+    if (!parsed.newIntro) throw new Error("LLM did not return newIntro");
+
+    // Splice new intro before the first ## heading — safe even if no \n\n breaks
+    const firstHeadingIdx = oldArticle.body.search(/^## /m);
+    const newBody = firstHeadingIdx > 0
+      ? parsed.newIntro + "\n\n" + oldArticle.body.slice(firstHeadingIdx)
+      : parsed.newIntro + "\n\n" + oldArticle.body;
+
     await prisma.article.update({
       where: { id: oldArticle.id },
       data: {
         body: newBody,
-        seoScore: Math.min(100, oldArticle.seoScore + 2), // Boost score arbitrarily
-        // updatedAt is handled automatically by Prisma
+        ...(!hasFaq && parsed.faqPairs?.length ? { faqPairs: parsed.faqPairs as object[] } : {}),
+        // updatedAt auto-bumped by Prisma → seo-indexnow will pick this up
       },
     });
 
     return NextResponse.json({
       ok: true,
-      refinedArticleId: oldArticle.id,
+      articleId: oldArticle.id,
       slug: oldArticle.slug,
+      faqBackfilled: !hasFaq && !!parsed.faqPairs?.length,
     });
 
   } catch (error: any) {
-    console.error("Performance Refiner Error:", error);
+    console.error("[performance-refiner] Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

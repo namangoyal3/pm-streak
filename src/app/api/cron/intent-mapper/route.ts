@@ -28,7 +28,7 @@ export async function GET(req: Request) {
 
     // 3. Prompt the Architect LLM
     const systemPrompt = `You are a world-class Product Management SEO expert that specializes in identifying "High Intent" search gaps.
-Your goal is to find exactly 5 highly-specific, bottom-of-funnel search queries that product managers actually search for on Google or Perplexity.
+Your goal is to find exactly 10 highly-specific, bottom-of-funnel search queries that product managers actually search for on Google or Perplexity.
 DO NOT generate generic topics like "Agile Framework". 
 DO generate long-tail queries like:
 - "Stripe PM execution interview questions"
@@ -47,7 +47,7 @@ Example format:
 
     const completion = await groq.chat.completions.create({
       messages: [{ role: "system", content: systemPrompt }],
-      model: "llama3-70b-8192",
+      model: "llama-3.3-70b-versatile",
       temperature: 0.7,
       response_format: { type: "json_object" },
     });

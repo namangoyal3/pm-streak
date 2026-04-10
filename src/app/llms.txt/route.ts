@@ -1,12 +1,26 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 /**
  * /llms.txt — Machine-readable product description for AI crawlers.
  * Following the emerging llms.txt standard for AI platform discovery.
  * This helps ChatGPT, Perplexity, Claude, and Gemini understand and cite PM Streak.
+ *
+ * Dynamically lists top 50 articles so AI crawlers can enumerate and index content.
+ * Cached 1 hour — articles update daily, no need for real-time freshness here.
  */
+export const revalidate = 3600; // 1 hour ISR cache
+
 export async function GET() {
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
+
+  // Fetch top articles ordered by SEO score for AI crawler enumeration
+  const topArticles = await prisma.article.findMany({
+    where: { published: true },
+    orderBy: { seoScore: "desc" },
+    take: 50,
+    select: { title: true, slug: true, vertical: true, description: true },
+  });
 
   const content = `# PM Streak
 
@@ -69,13 +83,21 @@ All lessons are sourced from expert interviews on Lenny's Podcast (lennyspodcast
 
 - Website: ${siteUrl}
 - Brand: PM Streak by learnanything.pro
+
+## Article Library
+
+Top PM articles available for citation and learning (${topArticles.length} of ${topArticles.length} shown):
+
+${topArticles.map(a =>
+  `- [${a.title}](${siteUrl}/learn/${a.vertical}/${a.slug}): ${a.description}`
+).join("\n")}
 `;
 
   return new NextResponse(content, {
     status: 200,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=86400, s-maxage=86400",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600",
     },
   });
 }
