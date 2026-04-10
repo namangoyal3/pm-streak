@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import PricingBannerModal from "@/components/PricingBannerModal";
 import JsonLd, { faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import PricingBenefits from "@/components/PricingBenefits";
 
 const PRICE_INCREASE_PERCENT = 70;
 
@@ -437,23 +438,8 @@ async function PricingContent() {
           </div>
         </div>
 
-        {/* Feature Highlights */}
-        <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-10 sm:mb-12">
-          {[
-            { icon: <BookOpen size={20} className="text-green-400" />, title: "292+ Archive Lessons", desc: "Full Lenny's Podcast library — Shreyas, Reforge, Figma, Stripe PMs and more." },
-            { icon: <Brain size={20} className="text-blue-400" />, title: "AI Interview Prep", desc: "5 PM interview questions with frameworks per session — strategy, metrics, execution." },
-            { icon: <Target size={20} className="text-orange-400" />, title: "PM Jobs Board", desc: "Curated PM roles from Wellfound, LinkedIn and Himalayas, updated weekly." },
-            { icon: <Sparkles size={20} className="text-purple-400" />, title: "Unlimited AI Lessons", desc: "Generate lessons on any PM topic — grounded in real podcast transcripts." },
-            { icon: <Users size={20} className="text-pink-400" />, title: "PM Leader Lessons", desc: "Bite-sized lessons from Shreyas Doshi, Aakash Gupta, Marty Cagan and more." },
-            { icon: <MessageSquare size={20} className="text-cyan-400" />, title: "WhatsApp Community", desc: "Private group with active PMs, job referrals, and peer accountability." },
-          ].map((f) => (
-            <div key={f.title} className="rounded-xl border border-white/10 p-4 bg-white/5">
-              <div className="mb-2">{f.icon}</div>
-              <h3 className="text-sm font-black mb-1">{f.title}</h3>
-              <p className="text-[11px] text-white/55">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+        {/* Pricing Benefits Section */}
+        <PricingBenefits />
 
         {/* FAQ */}
         <div className="space-y-3">
