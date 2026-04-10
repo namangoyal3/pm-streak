@@ -264,7 +264,7 @@ export default async function Home() {
           </div>
           <div className="text-center">
             <div className="text-2xl sm:text-3xl font-black text-[var(--orange-primary)] tabular-nums">
-              650+
+              300+
             </div>
             <div className="text-xs text-[var(--text-secondary)] font-medium">PM lessons available</div>
           </div>
