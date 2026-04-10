@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s | PM Streak",
   },
   description:
-    "PM Streak delivers daily 2-minute product management lessons from 300+ Lenny's Podcast episodes. Build your PM intuition with streak tracking, XP, leaderboards, AI-powered lessons, interview prep, and a curated jobs board.",
+    "PM Streak delivers daily 2-minute product management lessons from 300+ expert PM interviews. Build your PM intuition with streak tracking, XP, leaderboards, AI-powered lessons, interview prep, and a curated jobs board.",
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PM Streak — Duolingo for Product Managers",
     description:
-      "Daily 2-minute PM lessons from 300+ Lenny's Podcast episodes with streaks, XP, and leaderboards.",
+      "Daily 2-minute PM lessons from 300+ expert interviews with streaks, XP, and leaderboards.",
     siteName: "PM Streak",
     images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak — Daily PM Lessons" }],
     locale: "en_US",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PM Streak — Duolingo for Product Managers",
     description:
-      "Daily 2-min PM lessons from Lenny's Podcast. Streaks, XP, leaderboards. The fastest way to get sharper as a PM.",
+      "Daily 2-min PM lessons from top PM leaders. Streaks, XP, leaderboards. The fastest way to get sharper as a PM.",
     images: ["/api/og?title=PM+Streak"],
     creator: "@pmstreak",
   },

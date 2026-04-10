@@ -10,11 +10,11 @@ import HomepageTrialButton from "@/components/HomepageTrialButton";
 import { getVariant } from "@/lib/ab";
 
 export const metadata: Metadata = {
-  title: "PM Streak — Daily PM Lessons from Lenny's Podcast | Duolingo for Product Managers",
+  title: "PM Streak — Daily PM Lessons | Duolingo for Product Managers",
   description:
-    "PM Streak is the fastest way to sharpen your product intuition. Daily 2-minute PM lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered practice. Used by product managers at top tech companies.",
+    "PM Streak is the fastest way to sharpen your product intuition. Daily 2-minute PM lessons from 300+ expert interviews with streak tracking, XP, leaderboards, and AI-powered practice. Used by product managers at top tech companies.",
   keywords: [
-    "product management", "PM lessons", "Lenny's Podcast", "product manager training",
+    "product management", "PM lessons", "product manager training",
     "PM interview prep", "product sense", "PM streak", "daily PM practice",
     "product management course", "PM frameworks", "duolingo for PMs",
   ],
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PM Streak — Duolingo for Product Managers",
     description:
-      "The fastest way to get sharper as a PM. Daily 2-minute lessons from 300+ Lenny's Podcast episodes with streaks, XP, and leaderboards.",
+      "The fastest way to get sharper as a PM. Daily 2-minute lessons from 300+ expert PM interviews with streaks, XP, and leaderboards.",
     url: "/",
     type: "website",
     images: [{ url: "/api/og?title=PM+Streak", width: 1200, height: 630, alt: "PM Streak — Daily PM Lessons" }],
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PM Streak — Duolingo for Product Managers",
     description:
-      "Daily 2-min PM lessons from Lenny's Podcast. Streaks, XP, leaderboards. The fastest way to get sharper as a PM.",
+      "Daily 2-min PM lessons from top product leaders. Streaks, XP, leaderboards. The fastest way to get sharper as a PM.",
     images: ["/api/og?title=PM+Streak"],
   },
   other: {
@@ -73,7 +73,7 @@ export default async function Home() {
     alternateName: "Duolingo for Product Managers",
     url: siteUrl,
     description:
-      "PM Streak is a daily product management learning platform that delivers 2-minute micro-lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered content generation.",
+      "PM Streak is a daily product management learning platform that delivers 2-minute micro-lessons from 300+ expert PM lessons with streak tracking, XP, leaderboards, and AI-powered content generation.",
     foundingDate: "2024",
     sameAs: [
       "https://www.producthunt.com/products/pm-streak",
@@ -91,7 +91,7 @@ export default async function Home() {
       { "@type": "Offer", price: "9", priceCurrency: "USD", description: "Pro plan with 292+ lessons, unlimited AI, interview prep" },
     ],
     description:
-      "Product management micro-lessons powered by 300+ Lenny's Podcast episodes. Features streak tracking, XP progression, AI lesson generation, PM interview prep, and a curated jobs board.",
+      "Product management micro-lessons powered by 300+ expert PM lessons. Features streak tracking, XP progression, AI lesson generation, PM interview prep, and a curated jobs board.",
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "4.8",
@@ -126,10 +126,10 @@ export default async function Home() {
   });
 
   const homepageFaq = faqSchema([
-    { question: "What is PM Streak?", answer: "PM Streak is a daily product management learning platform — like Duolingo for PMs. It delivers 2-minute micro-lessons from 300+ Lenny's Podcast episodes with streak tracking, XP, leaderboards, and AI-powered content generation." },
+    { question: "What is PM Streak?", answer: "PM Streak is a daily product management learning platform — like Duolingo for PMs. It delivers 2-minute micro-lessons from 300+ expert PM lessons with streak tracking, XP, leaderboards, and AI-powered content generation." },
     { question: "How long does each PM lesson take?", answer: "Each lesson takes approximately 2 minutes to read plus 1 minute for 3 quiz questions. Total daily commitment is under 3 minutes." },
     { question: "Is PM Streak free?", answer: "Yes. PM Streak offers a free plan with 22 core curriculum lessons, 10 archive lessons, 10 credits/month, and full streak tracking. Pro plan ($6/month) unlocks all 292+ lessons, unlimited AI, interview prep, and the jobs board." },
-    { question: "What content does PM Streak teach?", answer: "PM Streak lessons cover prioritisation, strategy, growth, hiring, product sense, metrics, execution, and leadership — all sourced from expert interviews on Lenny's Podcast featuring PMs from Stripe, Figma, Reforge, and more." },
+    { question: "What content does PM Streak teach?", answer: "PM Streak lessons cover prioritisation, strategy, growth, hiring, product sense, metrics, execution, and leadership — covering prioritisation, strategy, growth, hiring, execution, and leadership from top PMs at Stripe, Figma, Reforge, and more." },
   ]);
 
   const speakable = speakableSchema([".hero-tldr", "h1", ".hero-description"]);
@@ -174,7 +174,7 @@ export default async function Home() {
           {/* Left: text */}
           <div className="flex-1">
             <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-4">
-              Built on Lenny&apos;s Podcast · 300+ episodes
+              Built on 300+ expert PM lessons
             </p>
             <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] mb-4 sm:mb-5">
               The fastest way<br />to get sharper<br />
@@ -189,7 +189,7 @@ export default async function Home() {
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[var(--green-primary)] font-black">✓</span>
-                <span className="text-sm text-[var(--text-secondary)]">300+ Lenny&apos;s Podcast episodes</span>
+                <span className="text-sm text-[var(--text-secondary)]">300+ expert PM lessons</span>
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[var(--green-primary)] font-black">✓</span>
@@ -209,7 +209,7 @@ export default async function Home() {
             </div>
             <div className="mb-6 sm:mb-8 p-4 rounded-2xl bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/20 max-w-md">
               <p className="text-sm text-[var(--green-primary)] font-bold">
-                Built on 300+ episodes of Lenny&apos;s Podcast — the #1 resource for PMs.
+                Built on 300+ lessons from top PM leaders — the fastest way to sharpen your product skills.
               </p>
             </div>
 
@@ -257,22 +257,22 @@ export default async function Home() {
       <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
         <div className="max-w-5xl mx-auto px-4 sm:px-5 py-6 flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-12 gap-y-4">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-black text-[var(--green-primary)] tabular-nums animate-pulse">
-              14,283
+            <div className="text-2xl sm:text-3xl font-black text-[var(--green-primary)] tabular-nums">
+              200+
             </div>
-            <div className="text-xs text-[var(--text-secondary)] font-medium">PMs learning daily</div>
+            <div className="text-xs text-[var(--text-secondary)] font-medium">PMs joined</div>
           </div>
           <div className="text-center">
             <div className="text-2xl sm:text-3xl font-black text-[var(--orange-primary)] tabular-nums">
-              94
+              650+
             </div>
-            <div className="text-xs text-[var(--text-secondary)] font-medium">Avg streak (days)</div>
+            <div className="text-xs text-[var(--text-secondary)] font-medium">PM lessons available</div>
           </div>
           <div className="text-center">
             <div className="text-2xl sm:text-3xl font-black text-[var(--gold-primary)] tabular-nums">
-              4.8
+              2 min
             </div>
-            <div className="text-xs text-[var(--text-secondary)] font-medium">★ Rating (120 reviews)</div>
+            <div className="text-xs text-[var(--text-secondary)] font-medium">per lesson</div>
           </div>
         </div>
       </section>
@@ -440,7 +440,7 @@ export default async function Home() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { icon: "📚", title: "292+ Archive Lessons", desc: "Full Lenny's Podcast library — Shreyas, Reforge, Figma, Stripe PMs and more." },
+              { icon: "📚", title: "292+ Archive Lessons", desc: "300+ lessons from Shreyas Doshi, Reforge, Figma, Stripe PMs and more." },
               { icon: "🤖", title: "Unlimited AI Lessons", desc: "Generate lessons on any PM topic — pricing, retention, roadmaps." },
               { icon: "🎤", title: "AI Interview Prep", desc: "5 PM interview questions with frameworks per session." },
               { icon: "💼", title: "PM Jobs Board", desc: "Curated PM roles from Wellfound, LinkedIn, updated weekly." },
@@ -482,25 +482,28 @@ export default async function Home() {
           <div className="grid sm:grid-cols-3 gap-4">
             {[
               {
-                title: "How Shreyas Doshi Prioritizes Features",
-                description: "The 3-layer framework used by former Google/YouTube PM",
+                title: "How to Prioritize Product Features for an MVP Launch in 2026",
+                description: "The must-have vs nice-to-have framework, Jobs to be Done, and cutting scope without killing product quality.",
                 readTime: "5 min read",
-                category: "Strategy"
+                category: "Strategy",
+                href: "/learn/pm/how-to-prioritize-product-features-for-an-mvp-launch-in-2026-5857"
               },
               {
-                title: "Product-Led Growth: 7 Frameworks",
-                description: "From PLG 101 to advanced retention tactics",
+                title: "How to Prioritize Features for a B2B SaaS Company in 2026",
+                description: "RICE, customer impact, and strategic alignment methods used by top B2B PMs.",
                 readTime: "4 min read",
-                category: "Growth"
+                category: "Growth",
+                href: "/learn/pm/how-to-prioritize-product-features-for-a-b2b-saas-company-in-2026-5240"
               },
               {
-                title: "PM Interview Questions 2026",
-                description: "Top 15 questions with sample answers from FAANG",
+                title: "How to Create a Go-to-Market Strategy for a New SaaS Feature",
+                description: "Positioning, launch tiers, success metrics, and post-launch optimization from real PM playbooks.",
                 readTime: "6 min read",
-                category: "Career"
+                category: "Career",
+                href: "/learn/pm/how-to-create-a-go-to-market-strategy-for-a-new-saas-feature-in-2026-4533"
               },
             ].map((article) => (
-              <div key={article.title} className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-5 hover:border-[var(--blue-primary)]/50 transition-colors hover-lift">
+              <Link key={article.title} href={article.href} className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-5 hover:border-[var(--blue-primary)]/50 transition-colors hover-lift block">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-black uppercase tracking-wide px-2 py-1 rounded bg-[var(--blue-primary)]/10 text-[var(--blue-primary)]">
                     {article.category}
@@ -511,23 +514,20 @@ export default async function Home() {
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
                   {article.description}
                 </p>
-                <a 
-                  href="/blog" 
-                  className="text-xs font-black text-[var(--blue-primary)] hover:underline inline-flex items-center gap-1"
-                >
+                <span className="text-xs font-black text-[var(--blue-primary)] hover:underline inline-flex items-center gap-1">
                   Read article →
-                </a>
-              </div>
+                </span>
+              </Link>
             ))}
           </div>
 
           <div className="mt-8 text-center">
-            <a 
-              href="/blog" 
+            <Link
+              href="/learn"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-sm font-black transition-all"
             >
-              View all articles
-            </a>
+              View all lessons
+            </Link>
           </div>
         </div>
       </section>
@@ -581,7 +581,7 @@ export default async function Home() {
             <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
           </div>
-          <p>Powered by insights from Lenny&apos;s Podcast. Not affiliated with Lenny&apos;s Newsletter.</p>
+          <p>PM content for product managers, by product managers.</p>
         </div>
       </footer>
 

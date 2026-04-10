@@ -4,7 +4,7 @@ import JsonLd, { faqSchema } from "@/components/JsonLd";
 export const metadata: Metadata = {
   title: "AI PM Lesson Generator — Explore Custom Topics | PM Streak",
   description:
-    "Generate personalized product management lessons on any topic using AI. Powered by 300+ Lenny's Podcast transcripts. Earn XP and maintain your streak with custom deep-dive content.",
+    "Generate personalized product management lessons on any topic using AI. Powered by 300+ expert PM lessons. Earn XP and maintain your streak with custom deep-dive content.",
   alternates: { canonical: "/explore" },
   openGraph: {
     title: "AI PM Lesson Generator | PM Streak",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AI PM Lesson Generator | PM Streak",
     description:
-      "Custom PM lessons powered by Lenny's Podcast transcripts. Deep-dive into any product topic.",
+      "Custom PM lessons powered by expert interviews. Deep-dive into any product topic.",
     images: ["/api/og?title=AI+PM+Lessons&vertical=pm"],
   },
 };
@@ -27,7 +27,7 @@ const exploreFaq = faqSchema([
   {
     question: "How does PM Streak's AI lesson generator work?",
     answer:
-      "Choose any PM topic (e.g. user retention, pricing strategy), PM Streak searches 300+ Lenny's Podcast transcripts for the most relevant expert insights, then generates a custom lesson with quiz questions saved permanently to your library.",
+      "Choose any PM topic (e.g. user retention, pricing strategy), PM Streak searches 300+ expert PM lessons for the most relevant insights, then generates a custom lesson with quiz questions saved permanently to your library.",
   },
   {
     question: "Do AI-generated lessons count toward my streak?",
