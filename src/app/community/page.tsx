@@ -81,7 +81,7 @@ export default async function CommunityPage() {
                 Join WhatsApp Community
               </a>
               <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                You'll be redirected to WhatsApp to join the group
+                You&apos;ll be redirected to WhatsApp to join the group
               </p>
             </div>
           </div>
