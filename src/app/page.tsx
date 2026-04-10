@@ -18,6 +18,18 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "/",
+    mobile: "https://learnanything.pro/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   openGraph: {
     title: "PM Streak — Duolingo for Product Managers",
@@ -37,6 +49,8 @@ export const metadata: Metadata = {
   other: {
     "article:modified_time": new Date().toISOString(),
   },
+  sitemap: "https://learnanything.pro/sitemap.xml",
+  manifest: "/manifest.webmanifest",
 };
 
 export default async function Home() {
@@ -140,7 +154,7 @@ export default async function Home() {
                 <span className="text-[var(--green-primary)]">PM</span>
                 <span className="text-white">Streak</span>
               </div>
-              <span className="hidden sm:inline text-[9px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+              <span className="hidden sm:inline text-xs font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -175,7 +189,7 @@ export default async function Home() {
             </p>
             <div className="mb-6 sm:mb-8 flex flex-wrap gap-2 max-w-md">
               {["Strategy", "Growth", "Metrics", "Hiring", "Roadmaps", "Pricing"].map(topic => (
-                <span key={topic} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black text-white/70">
+                <span key={topic} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-black text-white/80">
                   {topic}
                 </span>
               ))}
@@ -198,29 +212,29 @@ export default async function Home() {
               </svg>
               Sign up with Google
             </BrowserLink>
-            <p className="mt-3 text-xs text-[var(--text-secondary)]">No credit card · 30 seconds to set up</p>
+            <p className="mt-3 text-sm text-[var(--text-secondary)]">No credit card · 30 seconds to set up</p>
           </div>
 
           {/* Right: live stat cards */}
           <div className="hidden lg:flex flex-col gap-3 flex-shrink-0 w-60">
             <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-4">
               <div className="text-3xl font-black text-[var(--orange-primary)] tabular-nums">14</div>
-              <div className="text-xs text-[var(--text-secondary)] font-bold mt-1">day streak</div>
+              <div className="text-sm text-[var(--text-secondary)] font-bold mt-1">day streak</div>
               <div className="mt-2 h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
                 <div className="h-full w-[58%] bg-[var(--orange-primary)] rounded-full" />
               </div>
             </div>
             <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-4">
               <div className="text-3xl font-black text-[var(--gold-primary)] tabular-nums">840 XP</div>
-              <div className="text-xs text-[var(--text-secondary)] font-bold mt-1">Senior PM · Level 6</div>
+              <div className="text-sm text-[var(--text-secondary)] font-bold mt-1">Senior PM · Level 6</div>
               <div className="mt-2 h-1.5 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
                 <div className="h-full w-[84%] bg-[var(--gold-primary)] rounded-full" />
               </div>
             </div>
             <div className="bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/25 rounded-2xl p-4">
-              <div className="text-xs font-black text-[var(--green-primary)] uppercase tracking-wide mb-1">Today&apos;s lesson</div>
+              <div className="text-sm font-black text-[var(--green-primary)] uppercase tracking-wide mb-1">Today&apos;s lesson</div>
               <div className="text-sm font-black leading-snug">The Shreyas Doshi Prioritisation Stack</div>
-              <div className="text-xs text-[var(--text-secondary)] mt-1">+20 XP · 2 min</div>
+              <div className="text-sm text-[var(--text-secondary)] mt-1">+20 XP · 2 min</div>
             </div>
           </div>
         </div>
@@ -229,7 +243,7 @@ export default async function Home() {
       {/* ── SOCIAL PROOF STRIP ── */}
       <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
         <div className="max-w-5xl mx-auto px-4 sm:px-5 py-4 flex flex-wrap items-center gap-x-6 sm:gap-x-8 gap-y-3">
-          <span className="text-xs font-black text-[var(--text-secondary)] uppercase tracking-widest">By the numbers</span>
+          <span className="text-sm font-black text-[var(--text-secondary)] uppercase tracking-widest">By the numbers</span>
           <div className="h-4 w-px bg-[var(--border-color)] hidden sm:block" />
           {[
             { value: "300+", label: "Podcast episodes" },
@@ -238,7 +252,7 @@ export default async function Home() {
           ].map(({ value, label }) => (
             <div key={label} className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-white tabular-nums">{value}</span>
-              <span className="text-xs text-[var(--text-secondary)] font-medium">{label}</span>
+              <span className="text-sm text-[var(--text-secondary)] font-medium">{label}</span>
             </div>
           ))}
         </div>
@@ -247,33 +261,33 @@ export default async function Home() {
       {/* Mobile-first condensed guide */}
       <section className="sm:hidden max-w-5xl mx-auto px-4 pt-8">
         <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
-          <p className="text-[10px] font-black uppercase tracking-wider text-[var(--green-primary)] mb-2">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--green-primary)] mb-2">
             Start in 3 steps
           </p>
-          <ul className="space-y-2.5 text-xs text-[var(--text-secondary)]">
+          <ul className="space-y-2.5 text-sm text-[var(--text-secondary)]">
             <li><span className="text-white font-black">1.</span> Read a 2-minute PM lesson</li>
             <li><span className="text-white font-black">2.</span> Answer 3 quiz questions</li>
             <li><span className="text-white font-black">3.</span> Keep your streak alive daily</li>
           </ul>
           <div className="mt-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/40 p-3">
-            <div className="text-xs font-black text-white mb-2">
+            <div className="text-sm font-black text-white mb-2">
               What you&apos;ll learn
             </div>
-            <div className="text-xs text-[var(--text-secondary)] space-y-2">
+            <div className="text-sm text-[var(--text-secondary)] space-y-2">
               <div className="flex flex-wrap gap-1.5">
                 {["Strategy", "Growth", "Metrics", "Hiring", "Roadmaps", "Pricing"].map(t => (
-                  <span key={t} className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px]">{t}</span>
+                  <span key={t} className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-xs">{t}</span>
                 ))}
               </div>
             </div>
           </div>
           <div className="mt-2 rounded-xl border border-[var(--purple-primary)]/30 bg-[var(--purple-primary)]/10 p-3">
-            <div className="text-xs font-black text-[var(--purple-primary)] mb-1.5">
+            <div className="text-sm font-black text-[var(--purple-primary)] mb-1.5">
               ⚡ Go Pro — Unlock everything
             </div>
-            <div className="text-xs text-[var(--text-secondary)] space-y-1.5 leading-relaxed">
+            <div className="text-sm text-[var(--text-secondary)] space-y-1.5 leading-relaxed">
               <p>292+ Archive Lessons, Unlimited AI Lessons, AI Interview Prep, PM Jobs Board, WhatsApp Community.</p>
-              <BrowserLink href="/pricing" className="inline-block mt-2 px-3 py-1.5 rounded-lg bg-[var(--purple-primary)] text-white text-[9px] font-black">
+              <BrowserLink href="/pricing" className="inline-block mt-2 px-3 py-1.5 rounded-lg bg-[var(--purple-primary)] text-white text-xs font-black">
                 View Pricing →
               </BrowserLink>
             </div>
@@ -285,7 +299,7 @@ export default async function Home() {
       <section className="hidden sm:block max-w-5xl mx-auto px-5 py-20">
         <div className="max-w-xs mb-12">
           <p className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-2">How it works</p>
-          <h2 className="text-4xl font-black leading-[1.1] tracking-tight">Three steps.<br />Two minutes.<br />Every day.</h2>
+          <h2 className="text-3xl sm:text-4xl font-black leading-[1.1] tracking-tight">Three steps.<br />Two minutes.<br />Every day.</h2>
         </div>
 
         <div className="space-y-0 divide-y divide-[var(--border-color)] border border-[var(--border-color)] rounded-3xl overflow-hidden">
@@ -319,7 +333,7 @@ export default async function Home() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-4 mb-1.5">
                   <h3 className="text-base font-black leading-snug">{title}</h3>
-                  <span className="text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-lg flex-shrink-0" style={{ background: `color-mix(in srgb, ${color} 12%, transparent)`, color }}>
+                  <span className="text-xs font-black uppercase tracking-wide px-2 py-1 rounded-lg flex-shrink-0" style={{ background: `color-mix(in srgb, ${color} 12%, transparent)`, color }}>
                     {tag}
                   </span>
                 </div>
@@ -345,17 +359,17 @@ export default async function Home() {
               <div className="flex items-center gap-3">
                 <div className="text-center">
                   <div className="text-2xl font-black text-[var(--orange-primary)]">7</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wide">day habit</div>
+                  <div className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-wide">day habit</div>
                 </div>
                 <div className="h-8 w-px bg-[var(--border-color)]" />
                 <div className="text-center">
                   <div className="text-2xl font-black text-[var(--gold-primary)]">5×</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wide">freeze slots</div>
+                  <div className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-wide">freeze slots</div>
                 </div>
                 <div className="h-8 w-px bg-[var(--border-color)]" />
                 <div className="text-center">
                   <div className="text-2xl font-black text-[var(--green-primary)]">∞</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wide">potential</div>
+                  <div className="text-xs text-[var(--text-secondary)] font-bold uppercase tracking-wide">potential</div>
                 </div>
               </div>
             </div>
@@ -370,8 +384,8 @@ export default async function Home() {
                 <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-[var(--gold-primary)] to-[var(--orange-primary)]" />
               </div>
               <div className="flex justify-between mt-1.5">
-                <span className="text-[10px] text-[var(--text-secondary)] font-bold">Senior PM · 620 XP</span>
-                <span className="text-[10px] text-[var(--gold-primary)] font-black">Expert PM at 1000</span>
+                <span className="text-xs text-[var(--text-secondary)] font-bold">Senior PM · 620 XP</span>
+                <span className="text-xs text-[var(--gold-primary)] font-black">Expert PM at 1000</span>
               </div>
             </div>
           </div>
@@ -461,7 +475,7 @@ export default async function Home() {
                 </svg>
                 Sign up with Google
               </BrowserLink>
-              <p className="text-center text-xs text-[var(--text-secondary)]">No password · Takes 30 seconds</p>
+              <p className="text-center text-sm text-[var(--text-secondary)]">No password · Takes 30 seconds</p>
             </div>
           </div>
         </div>
@@ -469,7 +483,7 @@ export default async function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="border-t border-[var(--border-color)] py-6">
-        <div className="max-w-5xl mx-auto px-4 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
           <div className="flex items-center gap-1.5">
             <span>🔥</span>
             <div className="flex flex-col leading-none">
@@ -477,7 +491,7 @@ export default async function Home() {
                 <span className="text-[var(--green-primary)]">PM</span>
                 <span className="text-white">Streak</span>
               </div>
-              <span className="text-[8px] font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
+              <span className="text-xs font-bold text-[var(--text-secondary)] tracking-wide">by learnanything.pro</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
