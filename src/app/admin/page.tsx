@@ -123,7 +123,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "emails" | "pro-grants" | "coupons" | "ai-company">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "emails" | "pro-grants" | "coupons" | "ai-company" | "experiments">("overview");
 
   const [coupons, setCoupons] = useState<CouponRow[]>([]);
   const [couponsLoading, setCouponsLoading] = useState(false);
@@ -523,18 +523,18 @@ export default function AdminPage() {
 
         {/* Tab bar */}
         <div className="max-w-6xl mx-auto mt-3 flex gap-1 flex-wrap">
-          {(["overview", "users", "emails", "pro-grants", "coupons", "ai-company"] as const).map((tab) => (
+          {(["overview", "users", "emails", "pro-grants", "coupons", "ai-company", "experiments"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className="px-4 py-2 rounded-xl text-xs font-black capitalize transition-all"
               style={{
-                background: activeTab === tab ? (tab === "pro-grants" || tab === "coupons" ? "#a855f7" : tab === "ai-company" ? "#1cb0f6" : "#58cc02") : "var(--bg-secondary)",
+                background: activeTab === tab ? (tab === "pro-grants" || tab === "coupons" || tab === "experiments" ? "#a855f7" : tab === "ai-company" ? "#1cb0f6" : "#58cc02") : "var(--bg-secondary)",
                 color: activeTab === tab ? "white" : "var(--text-secondary)",
-                border: "1px solid " + (activeTab === tab ? (tab === "pro-grants" || tab === "coupons" ? "#a855f7" : tab === "ai-company" ? "#1cb0f6" : "#58cc02") : "var(--border-color)"),
+                border: "1px solid " + (activeTab === tab ? (tab === "pro-grants" || tab === "coupons" || tab === "experiments" ? "#a855f7" : tab === "ai-company" ? "#1cb0f6" : "#58cc02") : "var(--border-color)"),
               }}
             >
-              {tab === "users" ? `Users (${stats.totalUsers})` : tab === "emails" ? "Email Analytics" : tab === "pro-grants" ? "Pro Grants" : tab === "coupons" ? "Coupons" : tab === "ai-company" ? "Virtual C-Suite" : "Overview"}
+              {tab === "users" ? `Users (${stats.totalUsers})` : tab === "emails" ? "Email Analytics" : tab === "pro-grants" ? "Pro Grants" : tab === "coupons" ? "Coupons" : tab === "ai-company" ? "Virtual C-Suite" : tab === "experiments" ? "A/B Experiments" : "Overview"}
             </button>
           ))}
         </div>
@@ -1388,6 +1388,155 @@ export default function AdminPage() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          </Section>
+        )}
+
+        {/* ── EXPERIMENTS TAB ── */}
+        {activeTab === "experiments" && (
+          <Section title="A/B Experiment Dashboard">
+            <div className="space-y-6">
+              {/* Experiment Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="rounded-xl p-4 border" style={{ background: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-black uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>Active Experiments</span>
+                    <span className="text-xs font-black px-2 py-1 rounded" style={{ background: "#a855f715", color: "#a855f7" }}>1</span>
+                  </div>
+                  <div className="text-2xl font-black" style={{ color: "#a855f7" }}>pro_trial_cta_v1</div>
+                  <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>3-day trial vs no trial</div>
+                </div>
+
+                <div className="rounded-xl p-4 border" style={{ background: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-black uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>Users in Experiment</span>
+                    <span className="text-xs font-black px-2 py-1 rounded" style={{ background: "#1cb0f615", color: "#1cb0f6" }}>Loading...</span>
+                  </div>
+                  <div className="text-2xl font-black" style={{ color: "#1cb0f6" }}>0</div>
+                  <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>0% of total users</div>
+                </div>
+
+                <div className="rounded-xl p-4 border" style={{ background: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-black uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>Conversion Rate</span>
+                    <span className="text-xs font-black px-2 py-1 rounded" style={{ background: "#58cc0215", color: "#58cc02" }}>0%</span>
+                  </div>
+                  <div className="text-2xl font-black" style={{ color: "#58cc02" }}>0%</div>
+                  <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>Trial → Pro conversion</div>
+                </div>
+              </div>
+
+              {/* Experiment Details */}
+              <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+                <h3 className="text-sm font-black mb-4" style={{ color: "var(--text-primary)" }}>pro_trial_cta_v1 - 3-day Paid Content Trial</h3>
+                
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>Description</span>
+                    <span className="text-xs font-black px-2 py-1 rounded" style={{ background: "#58cc0215", color: "#58cc02" }}>Active</span>
+                  </div>
+                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                    50/50 split test comparing pricing page with 3-day free trial offer vs original pricing page.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Variant Distribution */}
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wide mb-3" style={{ color: "var(--text-secondary)" }}>Variant Distribution</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span style={{ color: "var(--text-secondary)" }}>Control (No Trial)</span>
+                          <span className="font-bold" style={{ color: "#1cb0f6" }}>50%</span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--bg-secondary)" }}>
+                          <div className="h-full rounded-full" style={{ width: "50%", background: "#1cb0f6" }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span style={{ color: "var(--text-secondary)" }}>Treatment (3-day Trial)</span>
+                          <span className="font-bold" style={{ color: "#a855f7" }}>50%</span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--bg-secondary)" }}>
+                          <div className="h-full rounded-full" style={{ width: "50%", background: "#a855f7" }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Conversion Funnel */}
+                  <div>
+                    <h4 className="text-xs font-black uppercase tracking-wide mb-3" style={{ color: "var(--text-secondary)" }}>Conversion Funnel</h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black" style={{ background: "#1cb0f615", color: "#1cb0f6" }}>1</div>
+                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Saw Pricing Page</span>
+                        </div>
+                        <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>0</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black" style={{ background: "#a855f715", color: "#a855f7" }}>2</div>
+                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Clicked Trial CTA</span>
+                        </div>
+                        <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>0</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black" style={{ background: "#58cc0215", color: "#58cc02" }}>3</div>
+                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Started Trial</span>
+                        </div>
+                        <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>0</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black" style={{ background: "#ff6b3515", color: "#ff6b35" }}>4</div>
+                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>Converted to Pro</span>
+                        </div>
+                        <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>0</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex gap-3">
+                  <button 
+                    className="px-4 py-2 rounded-xl text-xs font-black text-white"
+                    style={{ background: "#a855f7" }}
+                    onClick={() => alert("Refreshing experiment data...")}
+                  >
+                    Refresh Data
+                  </button>
+                  <button 
+                    className="px-4 py-2 rounded-xl text-xs font-black"
+                    style={{ background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border-color)" }}
+                    onClick={() => alert("Creating new experiment...")}
+                  >
+                    New Experiment
+                  </button>
+                  <button 
+                    className="px-4 py-2 rounded-xl text-xs font-black"
+                    style={{ background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border-color)" }}
+                    onClick={() => alert("Exporting experiment data...")}
+                  >
+                    Export Data
+                  </button>
+                </div>
+              </div>
+
+              {/* Historical Data */}
+              <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border-color)" }}>
+                <h3 className="text-sm font-black mb-4" style={{ color: "var(--text-primary)" }}>Experiment Timeline</h3>
+                <div className="text-center py-8" style={{ color: "var(--text-secondary)" }}>
+                  <div className="text-2xl mb-2">📊</div>
+                  <p className="text-sm">Experiment data will appear here as users interact with the pricing page.</p>
+                  <p className="text-xs mt-2">Check back after the deployment propagates and users start visiting.</p>
+                </div>
               </div>
             </div>
           </Section>
