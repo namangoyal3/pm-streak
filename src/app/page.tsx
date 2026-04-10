@@ -48,7 +48,6 @@ export const metadata: Metadata = {
   other: {
     "article:modified_time": new Date().toISOString(),
   },
-  sitemap: "https://learnanything.pro/sitemap.xml",
   manifest: "/manifest.webmanifest",
 };
 
