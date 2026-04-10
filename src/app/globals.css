@@ -204,9 +204,44 @@ body {
   --nav-ai-sweep-delay: 1.38s;
 }
 
+/* TikTok-style counter animations */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-count-up {
+  animation: count-up 1s ease-out forwards;
+}
+
+/* Smooth hover effects for article cards */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nav-ai-capsule::after {
     animation: none;
     opacity: 0;
+  }
+  .animate-pulse,
+  .animate-count-up,
+  .hover-lift {
+    animation: none;
+    transition: none;
   }
 }

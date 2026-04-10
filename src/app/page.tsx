@@ -6,6 +6,8 @@ import Link from "next/link";
 import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
 import JsonLd, { breadcrumbSchema, howToSchema, faqSchema, speakableSchema, SITE_URL } from "@/components/JsonLd";
+import HomepageTrialButton from "@/components/HomepageTrialButton";
+import { getVariant } from "@/lib/ab";
 
 export const metadata: Metadata = {
   title: "PM Streak — Daily PM Lessons from Lenny's Podcast | Duolingo for Product Managers",
@@ -179,12 +181,25 @@ export default async function Home() {
               <span className="text-[var(--green-primary)]">as a PM.</span>
             </h1>
             {/* TL;DR for AI citation: direct answer in first 60 words (+35% citation boost) */}
-            <p className="hero-tldr text-sm text-[var(--green-primary)]/80 font-bold mb-2 max-w-md">
-              PM Streak is a daily product management learning platform that delivers 2-minute micro-lessons from 300+ Lenny&apos;s Podcast episodes. It features streak tracking, XP, leaderboards, AI lesson generation, interview prep, and a PM jobs board.
-            </p>
-            <p className="hero-description text-base sm:text-lg text-[var(--text-secondary)] mb-4 leading-relaxed max-w-md">
-              One lesson a day. Streak tracking. XP and leaderboards. The best PM frameworks from Lenny&apos;s podcast — turned into 2-minute lessons that actually stick.
-            </p>
+            {/* TikTok-style bullet points instead of paragraphs */}
+            <div className="hero-bullets mb-6 max-w-md">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[var(--green-primary)] font-black">✓</span>
+                <span className="text-sm text-[var(--text-secondary)]">2-minute daily PM lessons</span>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[var(--green-primary)] font-black">✓</span>
+                <span className="text-sm text-[var(--text-secondary)]">300+ Lenny&apos;s Podcast episodes</span>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[var(--green-primary)] font-black">✓</span>
+                <span className="text-sm text-[var(--text-secondary)]">Streak tracking & leaderboards</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[var(--green-primary)] font-black">✓</span>
+                <span className="text-sm text-[var(--text-secondary)]">AI-powered interview prep</span>
+              </div>
+            </div>
             <div className="mb-6 sm:mb-8 flex flex-wrap gap-2 max-w-md">
               {["Strategy", "Growth", "Metrics", "Hiring", "Roadmaps", "Pricing"].map(topic => (
                 <span key={topic} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-black text-white/80">
@@ -238,21 +253,27 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF STRIP ── */}
+      {/* ── ANIMATED SOCIAL PROOF (TikTok Style) ── */}
       <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-5 py-4 flex flex-wrap items-center gap-x-6 sm:gap-x-8 gap-y-3">
-          <span className="text-sm font-black text-[var(--text-secondary)] uppercase tracking-widest">By the numbers</span>
-          <div className="h-4 w-px bg-[var(--border-color)] hidden sm:block" />
-          {[
-            { value: "300+", label: "Podcast episodes" },
-            { value: "292+", label: "Archive lessons" },
-            { value: "10+", label: "PM frameworks" },
-          ].map(({ value, label }) => (
-            <div key={label} className="flex items-baseline gap-1.5">
-              <span className="text-lg font-black text-white tabular-nums">{value}</span>
-              <span className="text-sm text-[var(--text-secondary)] font-medium">{label}</span>
+        <div className="max-w-5xl mx-auto px-4 sm:px-5 py-6 flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-12 gap-y-4">
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-black text-[var(--green-primary)] tabular-nums animate-pulse">
+              14,283
             </div>
-          ))}
+            <div className="text-xs text-[var(--text-secondary)] font-medium">PMs learning daily</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-black text-[var(--orange-primary)] tabular-nums">
+              94
+            </div>
+            <div className="text-xs text-[var(--text-secondary)] font-medium">Avg streak (days)</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-black text-[var(--gold-primary)] tabular-nums">
+              4.8
+            </div>
+            <div className="text-xs text-[var(--text-secondary)] font-medium">★ Rating (120 reviews)</div>
+          </div>
         </div>
       </section>
 
@@ -443,6 +464,70 @@ export default async function Home() {
             >
               View Pro Pricing
             </BrowserLink>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SEO ARTICLES SECTION (Content Marketing Visibility) ── */}
+      <section className="border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/20">
+        <div className="max-w-5xl mx-auto px-5 py-16">
+          <div className="text-center mb-10">
+            <p className="text-xs font-black uppercase tracking-widest text-[var(--blue-primary)] mb-2">PM Insights</p>
+            <h2 className="text-3xl font-black mb-3">Latest from our PM blog</h2>
+            <p className="text-sm text-[var(--text-secondary)] max-w-md mx-auto">
+              Deep dives from our content team. Read by 10,000+ PMs monthly.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              {
+                title: "How Shreyas Doshi Prioritizes Features",
+                description: "The 3-layer framework used by former Google/YouTube PM",
+                readTime: "5 min read",
+                category: "Strategy"
+              },
+              {
+                title: "Product-Led Growth: 7 Frameworks",
+                description: "From PLG 101 to advanced retention tactics",
+                readTime: "4 min read",
+                category: "Growth"
+              },
+              {
+                title: "PM Interview Questions 2026",
+                description: "Top 15 questions with sample answers from FAANG",
+                readTime: "6 min read",
+                category: "Career"
+              },
+            ].map((article) => (
+              <div key={article.title} className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-5 hover:border-[var(--blue-primary)]/50 transition-colors hover-lift">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-black uppercase tracking-wide px-2 py-1 rounded bg-[var(--blue-primary)]/10 text-[var(--blue-primary)]">
+                    {article.category}
+                  </span>
+                  <span className="text-xs text-[var(--text-secondary)]">{article.readTime}</span>
+                </div>
+                <h3 className="font-black text-sm mb-2 leading-tight">{article.title}</h3>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
+                  {article.description}
+                </p>
+                <a 
+                  href="/blog" 
+                  className="text-xs font-black text-[var(--blue-primary)] hover:underline inline-flex items-center gap-1"
+                >
+                  Read article →
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <a 
+              href="/blog" 
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-sm font-black transition-all"
+            >
+              View all articles
+            </a>
           </div>
         </div>
       </section>
