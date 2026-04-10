@@ -49,6 +49,7 @@ model User {
   paddleCustomerId   String?
   renewsAt           DateTime?
   cancelsAt          DateTime?
+  abExperiments      String[]   @default([]) // Track A/B experiments user is in
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -74,6 +75,7 @@ model User {
   skillProfiles      UserSkillProfile[]
   engagementMetrics  UserEngagementMetric?
   notes              Note[]
+  experimentEvents   ExperimentEvent[]
 }
 
 model Subscription {
@@ -531,4 +533,19 @@ model Note {
 
   @@index([userId])
   @@index([userId, lessonId])
+}
+
+model ExperimentEvent {
+  id             String   @id @default(cuid())
+  experimentName String
+  eventName      String
+  userId         String
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([experimentName])
+  @@index([userId])
+  @@index([createdAt])
 }
