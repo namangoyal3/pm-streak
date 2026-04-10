@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "/",
-    mobile: "https://learnanything.pro/",
   },
   robots: {
     index: true,
