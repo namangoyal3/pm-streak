@@ -516,6 +516,38 @@ export default function DashboardPage() {
         unreadNotifications={user.unreadNotifications}
       />
 
+      {/* Sticky Upgrade Bar for Free Users */}
+      {user.plan === 'free' && (
+        <div className="sticky top-14 z-50 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-b border-purple-500/30 px-4 py-3 backdrop-blur-sm">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Sparkles size={16} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-black text-white">🚀 Unlock {lockedPreviewCount} Premium Lessons</p>
+                <p className="text-xs text-purple-200/80">Get AI interview prep, unlimited credits, and all PM leader content</p>
+              </div>
+            </div>
+            <Link
+              href="/pricing"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm font-black transition-all shadow-lg shadow-purple-500/25 hover:scale-105 active:scale-95"
+              onClick={() => {
+                if (typeof window !== 'undefined' && (window as any).gtag) {
+                  (window as any).gtag('event', 'upgrade_clicked', {
+                    source: 'dashboard_sticky_bar',
+                    button_text: 'Upgrade to Pro',
+                    locked_lessons_count: lockedPreviewCount,
+                  });
+                }
+              }}
+            >
+              Upgrade to Pro
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Mobile sticky category bar */}
       {categories.length > 0 && (
         <div className="lg:hidden sticky top-14 z-40 bg-[var(--bg-primary)] border-b-2 border-[var(--border-color)] px-4 py-2">
