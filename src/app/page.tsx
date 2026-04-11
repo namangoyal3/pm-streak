@@ -523,7 +523,7 @@ export default async function Home() {
 
           <div className="mt-8 text-center">
             <Link
-              href="/learn"
+              href="/explore"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-sm font-black transition-all"
             >
               View all lessons
