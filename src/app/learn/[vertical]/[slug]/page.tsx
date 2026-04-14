@@ -74,11 +74,8 @@ export default async function ArticlePage({ params }: Props) {
       })
     : null;
 
-  const faqPairs = (article.faqPairs as { question: string; answer: string }[] | null) ?? [];
-  const rawSteps = (article.howToSteps as string[] | { name: string; text: string }[] | null) ?? [];
-  const howToSteps = rawSteps.map((s) =>
-    typeof s === "string" ? { name: s, text: s } : s
-  );
+  const faqPairs: { question: string; answer: string }[] = [];
+  const howToSteps: { name: string; text: string }[] = [];
   const articleUrl = `${SITE_URL}/learn/${vertical}/${slug}`;
 
   const articleJsonLd = {
