@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateSeoArticle } from "@/lib/llm-lessons";
 import { searchLennyTranscripts } from "@/lib/lesson-generator";
-import { EXPLORE_SEED_TOPICS } from "@/lib/explore-topics";
-import { scoreSEO } from "@/lib/seo-score";
+import { scoreSEO, scoreArticle } from "@/lib/seo-score";
 
 const ARTICLE_PUBLISH_THRESHOLD = 70;
 
@@ -44,26 +43,31 @@ export async function GET(req: Request) {
     // 3. Generate the SEO optimized article
     const articleData = await generateSeoArticle(targetTopic, searchResults);
 
-    // 4. Validate and Score
-    const seoScore = scoreSEO({
+    // 4. Validate and Score (SEO + GEO combined via scoreArticle)
+    const scoring = scoreArticle({
       title: articleData.title,
       description: articleData.description,
       body: articleData.body,
       primaryKeyword: articleData.primaryKeyword,
     });
 
-    if (seoScore < ARTICLE_PUBLISH_THRESHOLD) {
-      console.warn(`[cron/generate-seo] Article score too low: ${seoScore}. Skipping.`);
+    if (scoring.seoScore < ARTICLE_PUBLISH_THRESHOLD) {
+      console.warn(`[cron/generate-seo] Article SEO score too low: ${scoring.seoScore}. Skipping.`);
       await prisma.seoKeyword.update({
         where: { id: targetKeywordRow.id },
         data: { status: "failed" },
       });
-      return NextResponse.json({ 
-        ok: false, 
-        reason: "SEO score below threshold", 
-        score: seoScore 
+      return NextResponse.json({
+        ok: false,
+        reason: "SEO score below threshold",
+        seoScore: scoring.seoScore,
+        geoScore: scoring.geoScore,
+        overallScore: scoring.overallScore,
       });
     }
+
+    console.log(`[cron/generate-seo] Scores — SEO: ${scoring.seoScore} | GEO: ${scoring.geoScore} | Overall: ${scoring.overallScore}`);
+    console.log(`[cron/generate-seo] Breakdown: words=${scoring.breakdown.wordCount}, h2=${scoring.breakdown.h2Headings}, citability=${scoring.breakdown.citabilityBlocks}`);
 
     // 5. Create the Article in DB
     const slug = articleData.title
@@ -82,7 +86,8 @@ export async function GET(req: Request) {
         tags: [targetTopic, "lenny-podcast-insights"],
         pageType: pageType,
         keywordId: targetKeywordRow.id,
-        seoScore,
+        seoScore: scoring.seoScore,
+        geoScore: scoring.geoScore,
         published: true,
         publishedAt: new Date(),
         wordCount: articleData.body.split(/\s+/).length,
@@ -95,18 +100,21 @@ export async function GET(req: Request) {
       data: { status: "generated" },
     });
 
-    return NextResponse.json({ 
-      ok: true, 
-      topic: targetTopic, 
-      articleId: article.id, 
+    return NextResponse.json({
+      ok: true,
+      topic: targetTopic,
+      articleId: article.id,
       slug: article.slug,
-      score: seoScore 
+      seoScore: scoring.seoScore,
+      geoScore: scoring.geoScore,
+      overallScore: scoring.overallScore,
+      breakdown: scoring.breakdown,
     });
-
   } catch (error) {
     console.error("[cron/generate-seo] Error:", error);
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : "Generation failed" 
-    }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Generation failed" },
+      { status: 500 }
+    );
   }
 }
