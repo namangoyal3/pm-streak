@@ -62,8 +62,8 @@ function getRegion(country: string | null): PricingRegion {
 }
 
 const FREE_FEATURES = [
-  { text: "14 core curriculum lessons", yes: true },
-  { text: "7 archive lessons (batch-unlocked)", yes: true },
+  { text: "7 lessons per topic (35+ free lessons)", yes: true },
+  { text: "5 archive lessons (batch-unlocked)", yes: true },
   { text: "10 credits / month", yes: true },
   { text: "1 AI Explore lesson / week", yes: true },
   { text: "Basic streak tracking", yes: true },
@@ -217,7 +217,7 @@ async function PricingContent() {
     { question: "Are credits cumulative?", answer: "No — credits reset on the 1st of each month. Unused credits don't roll over." },
     { question: "Can I cancel anytime?", answer: "Yes. Cancel through the customer portal and you keep Pro access until your current period ends." },
     { question: "What payment methods are accepted?", answer: "UPI, credit/debit cards, net banking (India), PayPal (international) — via Dodo Payments secure checkout." },
-    { question: "What's the difference between Free and Pro?", answer: "Free includes 14 core lessons, 7 archive lessons, and 10 credits/month. Pro unlocks all 292+ lessons, 50 credits/month, unlimited AI Explore, interview prep, PM jobs board, and WhatsApp community." },
+    { question: "What's the difference between Free and Pro?", answer: "Free includes 7 lessons per topic (35+ lessons total) and 10 credits/month. Pro unlocks all 292+ lessons, 50 credits/month, unlimited AI Explore, interview prep, PM jobs board, and WhatsApp community." },
   ]);
 
   const pricingBreadcrumbs = breadcrumbSchema([

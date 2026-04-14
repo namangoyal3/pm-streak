@@ -38,12 +38,16 @@ export default function PricingBannerModal() {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     setIsIndia(tz === "Asia/Calcutta" || tz === "Asia/Kolkata");
 
+    // Only show once per session — if user already dismissed, don't re-fire
+    if (sessionStorage.getItem("pricing_modal_shown")) return;
+
     // Only show after user has scrolled 70% of the page — they've seen the value
     const handleScroll = () => {
       const scrolled = window.scrollY + window.innerHeight;
       const total = document.documentElement.scrollHeight;
       if (scrolled / total >= 0.70) {
         setIsVisible(true);
+        sessionStorage.setItem("pricing_modal_shown", "1");
         window.removeEventListener("scroll", handleScroll);
       }
     };
