@@ -230,14 +230,6 @@ export default async function Home() {
               <BrowserLink
                 href="/pricing"
                 className="inline-flex justify-center items-center gap-2 px-6 py-4 rounded-2xl bg-transparent hover:bg-white/5 text-white text-base font-black transition-all border-2 border-white/20 hover:border-white/40 flex-1"
-                onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).gtag) {
-                    (window as any).gtag('event', 'upgrade_clicked', {
-                      source: 'homepage',
-                      button_text: 'See Plans',
-                    });
-                  }
-                }}
               >
                 💰 See Plans
               </BrowserLink>
@@ -540,7 +532,7 @@ export default async function Home() {
 
           <div className="mt-8 text-center">
             <Link
-              href="/explore"
+              href="/learn"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--blue-primary)] hover:bg-[var(--blue-dark)] text-white text-sm font-black transition-all"
             >
               View all lessons
