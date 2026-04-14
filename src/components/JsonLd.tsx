@@ -113,3 +113,33 @@ export function speakableSchema(cssSelectors: string[]): Record<string, unknown>
 }
 
 export { SITE_URL, SITE_NAME };
+
+export function articleSchema(opts: {
+  headline: string;
+  description: string;
+  image: string;
+  datePublished: string;
+  dateModified: string;
+  author: { name: string; url: string };
+  publisher: { name: string; url: string };
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: opts.headline,
+    description: opts.description,
+    image: opts.image,
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified,
+    author: {
+      "@type": "Person",
+      name: opts.author.name,
+      url: opts.author.url,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: opts.publisher.name,
+      url: opts.publisher.url,
+    },
+  };
+}

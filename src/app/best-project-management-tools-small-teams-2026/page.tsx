@@ -4,7 +4,7 @@ import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/
 
 export const metadata: Metadata = {
   title: "Best Project Management Tools for Small Teams in 2026 | PM Streak",
-  description: "Discover the top project management tools for small teams in 2026. Compare features, pricing, and AI capabilities to boost your team's productivity.",
+  description: "Discover the top project management tools for small teams in 2026. Compare features, pricing, and AI capabilities to boost your team&apos;s productivity.",
   keywords: [
     "project management tools for small teams",
     "best PM tools 2026",
@@ -77,7 +77,7 @@ const TOOLS = [
 
 const FAQS = [
   {
-    q: "What's the best free project management tool for startups?",
+    q: "What&apos;s the best free project management tool for startups?",
     a: "PM Streak offers a compelling free tier that includes both project management and skill development. For pure task management, Trello and ClickUp have excellent free plans."
   },
   {
@@ -95,10 +95,10 @@ const FAQS = [
 ];
 
 const IMPLEMENTATION_TIPS = [
-  "Start Simple: Begin with basic task management before exploring advanced features. Most teams only use 20% of a tool's capabilities.",
+  "Start Simple: Begin with basic task management before exploring advanced features. Most teams only use 20% of a tool&apos;s capabilities.",
   "Establish Clear Processes: Define how your team will use the tool: naming conventions, status meanings, and review cycles.",
-  "Schedule Regular Reviews: Weekly check-ins to discuss what's working and what needs adjustment in your PM tool usage.",
-  "Leverage AI Features: Don't ignore AI capabilities—they can save hours on routine tasks like status updates and meeting summaries."
+  "Schedule Regular Reviews: Weekly check-ins to discuss what&apos;s working and what needs adjustment in your PM tool usage.",
+  "Leverage AI Features: Don&apos;t ignore AI capabilities—they can save hours on routine tasks like status updates and meeting summaries."
 ];
 
 export default function BestProjectManagementToolsSmallTeams2026Page() {
@@ -131,7 +131,7 @@ export default function BestProjectManagementToolsSmallTeams2026Page() {
             Best Project Management Tools for Small Teams in 2026
           </h1>
           <p className="text-lg text-white/70 mb-6">
-            Choosing the right project management tool can make or break your small team's productivity. 
+            Choosing the right project management tool can make or break your small team&apos;s productivity. 
             In 2026, AI-powered features and seamless collaboration have become essential.
           </p>
           <div className="flex flex-wrap gap-3 mb-8">
@@ -247,7 +247,7 @@ export default function BestProjectManagementToolsSmallTeams2026Page() {
             <div className="bg-[#111] border border-white/10 rounded-xl p-5">
               <h3 className="font-bold text-white mb-3">AI-Powered Skill Assessment</h3>
               <p className="text-sm text-white/70">
-                The platform analyzes your team's work patterns and suggests targeted lessons to address weaknesses.
+                The platform analyzes your team&apos;s work patterns and suggests targeted lessons to address weaknesses.
               </p>
             </div>
             <div className="bg-[#111] border border-white/10 rounded-xl p-5">
@@ -291,7 +291,7 @@ export default function BestProjectManagementToolsSmallTeams2026Page() {
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-white/10 rounded-2xl p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-4">Ready to Boost Your Team's PM Skills?</h2>
+            <h2 className="text-2xl font-bold mb-4">Ready to Boost Your Team&apos;s PM Skills?</h2>
             <p className="text-white/70 mb-6">
               The best project management tool for your small team depends on your specific needs, budget, and growth plans. 
               While traditional tools excel at task management, PM Streak offers the unique advantage of combining project execution with skill development.
