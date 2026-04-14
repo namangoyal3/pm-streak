@@ -5,8 +5,7 @@
 
 import { cookies } from "next/headers";
 import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 const COOKIE_NAME = "ab_uid";
@@ -48,8 +47,7 @@ export async function getExperimentVariant(
 ): Promise<{ variant: ABVariant; isNewAssignment: boolean }> {
   const jar = await cookies();
   const uid = jar.get(COOKIE_NAME)?.value;
-  const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = await getCurrentUserId();
 
   // Get experiment config
   const experiment = EXPERIMENTS[experimentName];
@@ -120,8 +118,7 @@ export async function trackExperimentConversion(
   eventName: string,
   metadata: Record<string, any> = {}
 ): Promise<void> {
-  const session = await getServerSession(authOptions);
-  const userId = session?.user?.id;
+  const userId = await getCurrentUserId();
 
   if (!userId) return;
 
