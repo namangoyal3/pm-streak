@@ -96,6 +96,7 @@ export default function DashboardPage() {
   const [showMobileUtilities, setShowMobileUtilities] = useState(false);
   const [jobPrepInsights, setJobPrepInsights] = useState<JobPrepInsights | null>(null);
   const [showGoalModal, setShowGoalModal] = useState(false);
+ const [showTrialBanner, setShowTrialBanner] = useState(false);
   const categoryRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
@@ -109,6 +110,14 @@ export default function DashboardPage() {
       /* ignore */
     }
     setShowGoalModal(true);
+  }, [user]);
+
+  // Show trial banner when user is on an active trial
+  useEffect(() => {
+    if (!user) return;
+    if (user.trialEndsAt && new Date(user.trialEndsAt) > new Date()) {
+      setShowTrialBanner(true);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -516,7 +525,45 @@ export default function DashboardPage() {
         unreadNotifications={user.unreadNotifications}
       />
 
-      {/* Sticky Upgrade Bar for Free Users */}
+     
+ {/* Trial Active Banner */}
+ {user.plan !== 'pro' && user.trialEndsAt && new Date(user.trialEndsAt) > new Date() && (
+ <div className="bg-gradient-to-r from-green-900/80 to-emerald-900/80 border border-green-500/30 mx-4 mt-4 rounded-2xl px-4 py-3">
+ <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+ <div className="flex items-center gap-3">
+ <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+ <Sparkles size={16} className="text-white" />
+ </div>
+ <div>
+ <p className="text-sm font-black text-white">&#127942; Your Pro Trial is Active!</p>
+ <p className="text-xs text-green-200/80">Full Pro access while your trial is active</p>
+ </div>
+ </div>
+ <Link href="/pricing" className="px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-black transition-all shadow-lg shadow-green-500/25 hover:scale-105 active:scale-95">
+ Start Subscription
+ </Link>
+ </div>
+ </div>
+ )}
+  {/* Free Tier Hard Stop — shown after 7 completed lessons */}
+      {user.plan === 'free' && totalCompleted >= 7 && (
+        <div className="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-r from-amber-900/40 to-orange-900/30 border border-amber-500/40">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-black text-amber-300">🔥 You&apos;ve completed {totalCompleted} lessons — you&apos;re in the top 10%</p>
+              <p className="text-xs text-amber-200/70 mt-1">Free plan includes 12 core lessons. Upgrade to unlock all 292+ and keep your momentum going.</p>
+            </div>
+            <Link
+              href="/pricing"
+              className="flex-shrink-0 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black transition-all"
+            >
+              Upgrade →
+            </Link>
+          </div>
+        </div>
+      )}
+
+  {/* Sticky Upgrade Bar for Free Users */}
       {user.plan === 'free' && (
         <div className="sticky top-14 z-50 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-b border-purple-500/30 px-4 py-3 backdrop-blur-sm">
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
