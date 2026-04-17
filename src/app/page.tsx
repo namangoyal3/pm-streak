@@ -64,6 +64,9 @@ export default async function Home() {
     redirect(user?.onboarded ? "/dashboard" : "/onboarding");
   }
 
+  const heroCtaVariant = await getVariant("hero_cta_v1");
+  const heroCtaText = heroCtaVariant === "treatment" ? "Try PM Streak — Free" : "Start Free Trial";
+
   const siteUrl = SITE_URL;
 
   const orgJsonLd = {
@@ -231,7 +234,7 @@ export default async function Home() {
                 href="/pricing"
                 className="inline-flex justify-center items-center gap-2 px-6 py-4 rounded-2xl bg-transparent hover:bg-white/5 text-white text-base font-black transition-all border-2 border-white/20 hover:border-white/40 flex-1"
               >
-                💰 See Plans
+                {heroCtaText}
               </BrowserLink>
             </div>
             <p className="mt-3 text-sm text-[var(--text-secondary)]">No credit card · 30 seconds to set up</p>
