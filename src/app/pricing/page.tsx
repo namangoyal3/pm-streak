@@ -8,23 +8,24 @@ import {
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isProEffective } from "@/lib/entitlements";
-import { cn } from "@/lib/utils";
+import type { BillingInterval } from "@/lib/billing/catalog";
+
+import { serverEvents } from "@/lib/ga4-server";
 import { Suspense } from "react";
 import PricingBannerModal from "@/components/PricingBannerModal";
 import JsonLd, { faqSchema, breadcrumbSchema } from "@/components/JsonLd";
 import PricingPageTrialCTA from "@/components/PricingPageTrialCTA";
+import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 import { getVariant } from "@/lib/ab";
-
-const PRICE_INCREASE_PERCENT = 70;
 
 function calculateMRP(discountedPrice: string, isIndia: boolean): string {
   const numMatch = discountedPrice.match(/[\d,.]+/);
   if (!numMatch) return discountedPrice;
-  
+
   const num = parseFloat(numMatch[0].replace(/,/g, ""));
   // Increase by 70% as requested (num * 1.7)
   const mrp = Math.round(num * 1.7);
-  
+
   if (isIndia) {
     return `₹${mrp.toLocaleString("en-IN")}`;
   }
@@ -133,6 +134,9 @@ async function PricingContent() {
     getVariant("pro_trial_cta_v1"),
   ]);
 
+  // Track pricing page view
+  userId ? serverEvents.pricingPageView(userId) : undefined;
+
   // Detect country from Vercel geo header (set automatically in production)
   const country = headersList.get("x-vercel-ip-country") ?? null;
   const region = getRegion(country);
@@ -141,6 +145,11 @@ async function PricingContent() {
   let userEmail: string | undefined;
   let userPlan: string = "free";
   let dodoCustomerId: string | null | undefined;
+  const razorpayEnabled = Boolean(
+    process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.trim() &&
+      process.env.RAZORPAY_KEY_SECRET?.trim()
+  );
+  const canUseRazorpay = isIndia && Boolean(userId) && razorpayEnabled;
 
   if (userId) {
     const user = await prisma.user.findUnique({
@@ -216,7 +225,7 @@ async function PricingContent() {
     { question: "When will my Pro access activate?", answer: "Instantly after payment — Dodo Payments processes your subscription and your Pro access is activated automatically." },
     { question: "Are credits cumulative?", answer: "No — credits reset on the 1st of each month. Unused credits don't roll over." },
     { question: "Can I cancel anytime?", answer: "Yes. Cancel through the customer portal and you keep Pro access until your current period ends." },
-    { question: "What payment methods are accepted?", answer: "UPI, credit/debit cards, net banking (India), PayPal (international) — via Dodo Payments secure checkout." },
+    { question: "What payment methods are accepted?", answer: "India buyers can use Razorpay for UPI, credit/debit cards, and net banking. International buyers can use Dodo Payments for cards and PayPal." },
     { question: "What's the difference between Free and Pro?", answer: "Free includes 7 lessons per topic (35+ lessons total) and 10 credits/month. Pro unlocks all 292+ lessons, 50 credits/month, unlimited AI Explore, interview prep, PM jobs board, and WhatsApp community." },
   ]);
 
@@ -278,11 +287,24 @@ async function PricingContent() {
               ⚡ Limited time: 70% OFF launch pricing
             </div>
           </div>
-          <a
-            href={
-              userPlan === "pro"
-                ? "/dashboard"
-                : plans.find((p) => p.key === "quarterly" && p.productId)
+          {userPlan === "pro" ? (
+            <Link
+              href="/dashboard"
+              className="sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black bg-[var(--surface-1)] border border-[var(--border-color)] text-white"
+            >
+              Manage Pro
+            </Link>
+          ) : canUseRazorpay ? (
+            <RazorpayCheckoutButton
+              plan={"quarterly" as BillingInterval}
+              className="sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black bg-green-400 text-black"
+            >
+              Start Pro
+            </RazorpayCheckoutButton>
+          ) : (
+            <a
+              href={
+                plans.find((p) => p.key === "quarterly" && p.productId)
                   ? buildCheckoutUrl({
                       productId: plans.find((p) => p.key === "quarterly")!.productId,
                       email: userEmail,
@@ -290,16 +312,12 @@ async function PricingContent() {
                       plan: "quarterly",
                     })
                   : "#comparison"
-            }
-            className={cn(
-              "sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black",
-              userPlan === "pro"
-                ? "bg-[var(--surface-1)] border border-[var(--border-color)] text-white"
-                : "bg-purple-500 text-white"
-            )}
-          >
-            {userPlan === "pro" ? "Manage Pro" : "Start Pro"}
-          </a>
+              }
+              className="sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black bg-purple-500 text-white"
+            >
+              Start Pro
+            </a>
+          )}
         </div>
 
         {/* Value Proposition */}
@@ -422,40 +440,71 @@ async function PricingContent() {
               </div>
             ) : (
               <div className="space-y-2">
-                {plans.map((plan) => (
-                  <a
-                    key={plan.key}
-                    href={plan.productId
-                      ? buildCheckoutUrl({ productId: plan.productId, email: userEmail, userId: userId ?? undefined, plan: plan.key })
-                      : "#"
-                    }
-                    aria-disabled={!plan.productId}
-                    className={`flex items-center justify-between w-full py-3 px-4 rounded-xl font-black text-sm transition-all ${
-                      plan.key === "quarterly"
-                        ? "bg-purple-500 hover:bg-purple-400 text-white"
-                        : "bg-white/10 hover:bg-white/20 text-white border border-white/20"
-                    } ${!plan.productId ? "opacity-50 pointer-events-none" : ""}`}
-                  >
-                    <span className="flex flex-col items-start gap-0.5">
-                      <span className="flex items-center gap-2">
-                        {plan.badge && (
-                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/20">
-                            {plan.badge}
+                {plans.map((plan) => {
+                  const dodoHref = plan.productId
+                    ? buildCheckoutUrl({
+                        productId: plan.productId,
+                        email: userEmail,
+                        userId: userId ?? undefined,
+                        plan: plan.key,
+                      })
+                    : null;
+
+                  return (
+                    <div key={plan.key} className="space-y-2">
+                      <a
+                        href={dodoHref ?? "#"}
+                        aria-disabled={!dodoHref}
+                        className={`flex items-center justify-between w-full py-3 px-4 rounded-xl font-black text-sm transition-all ${
+                          plan.key === "quarterly"
+                            ? "bg-purple-500 hover:bg-purple-400 text-white"
+                            : "bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                        } ${!dodoHref ? "opacity-50 pointer-events-none" : ""}`}
+                      >
+                        <span className="flex flex-col items-start gap-0.5">
+                          <span className="flex items-center gap-2">
+                            {plan.badge && (
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/20">
+                                {plan.badge}
+                              </span>
+                            )}
+                            Subscribe {plan.title}
                           </span>
-                        )}
-                        Subscribe {plan.title}
-                      </span>
-                      {(plan as any).desc && <span className="text-[10px] text-white/50 font-bold block leading-tight">{(plan as any).desc}</span>}
-                    </span>
-                    <span className="text-right flex flex-col items-end shrink-0 ml-2">
-                      <span className="flex items-center gap-1 flex-nowrap">
-                        <span className="text-white/40 line-through text-xs whitespace-nowrap">{plan.original}</span>
-                        <span className="font-black text-green-400 whitespace-nowrap">{plan.discounted} <span className="text-[9px] opacity-80">(70% OFF)</span></span>
-                      </span>
-                      <span className="text-white/60 text-[10px] whitespace-nowrap">{plan.period}</span>
-                    </span>
-                  </a>
-                ))}
+                          {(plan as any).desc && <span className="text-[10px] text-white/50 font-bold block leading-tight">{(plan as any).desc}</span>}
+                        </span>
+                        <span className="text-right flex flex-col items-end shrink-0 ml-2">
+                          <span className="flex items-center gap-1 flex-nowrap">
+                            <span className="text-white/40 line-through text-xs whitespace-nowrap">{plan.original}</span>
+                            <span className="font-black text-green-400 whitespace-nowrap">{plan.discounted} <span className="text-[9px] opacity-80">(70% OFF)</span></span>
+                          </span>
+                          <span className="text-white/60 text-[10px] whitespace-nowrap">{plan.period}</span>
+                        </span>
+                      </a>
+                      {canUseRazorpay && (
+                        <RazorpayCheckoutButton
+                          plan={plan.key as BillingInterval}
+                          className="flex items-center justify-between w-full py-3 px-4 rounded-xl font-black text-sm transition-all bg-green-400/15 hover:bg-green-400/25 text-white border border-green-400/30"
+                        >
+                          <span className="flex flex-col items-start gap-0.5">
+                            <span className="flex items-center gap-2">
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-green-400/20 text-green-300">
+                                Razorpay
+                              </span>
+                              Pay with Razorpay
+                            </span>
+                            <span className="text-[10px] text-white/50 font-bold block leading-tight">
+                              UPI, cards, and net banking
+                            </span>
+                          </span>
+                          <span className="text-right flex flex-col items-end shrink-0 ml-2">
+                            <span className="font-black text-green-300 whitespace-nowrap">Live checkout</span>
+                            <span className="text-white/60 text-[10px] whitespace-nowrap">Secure Indian gateway</span>
+                          </span>
+                        </RazorpayCheckoutButton>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -535,7 +584,7 @@ async function PricingContent() {
             isIndia
               ? { q: "What's the yearly plan?", a: `${calculateMRP("₹1,249", true)}/year — results in ₹1,249 with the applied discount.` }
               : { q: "What's the yearly plan?", a: `${calculateMRP("$32", false)}/year — results in $32 with the applied discount.` },
-            { q: "What payment methods are accepted?", a: isIndia ? "UPI, credit/debit cards, net banking, and more — via Dodo Payments secure checkout." : "Credit/debit cards, PayPal, and more — via Dodo Payments secure checkout." },
+            { q: "What payment methods are accepted?", a: isIndia ? "UPI, credit/debit cards, and net banking — via Razorpay live checkout. Dodo Payments remains available as a fallback." : "Credit/debit cards, PayPal, and more — via Dodo Payments secure checkout." },
           ].map((item) => (
             <div key={item.q} className="rounded-xl border border-white/10 p-4 bg-white/5">
               <h3 className="text-xs font-black mb-1.5">{item.q}</h3>

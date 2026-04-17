@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import { buildSourceTranscript } from "./podcast-quiz-helpers";
 import { generateActionablePMLesson, SearchResult } from "./llm-lessons";
+export type { SearchResult };
 import { spendCredits, CREDIT_COSTS } from "./credits";
 import { isUserPro } from "./entitlements";
 

@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Learn Product Management — Free PM Articles & Guides | PM Streak",
   description:
-    "Free in-depth articles on product management, PM interviews, roadmaps, metrics, career growth, and leadership. New expert-level content added weekly by AI research.",
+    "Free in-depth articles on product management, PM interviews, roadmaps, metrics, career growth, and leadership. Expert-reviewed PM guides, updated weekly.",
   alternates: { canonical: "/learn" },
   openGraph: {
     title: "Learn Product Management — Free PM Articles | PM Streak",
@@ -55,7 +55,7 @@ export default async function LearnPage() {
       <main className="min-h-screen bg-[var(--bg-primary)] text-white px-4 py-16 max-w-3xl mx-auto">
         <h1 className="text-3xl font-black mb-4">Learn</h1>
         <p className="text-[var(--text-secondary)]">
-          Articles coming soon — our research agent publishes new content weekly.
+          Articles coming soon — new expert-reviewed PM guides publish weekly.
         </p>
         <Link
           href="/dashboard"

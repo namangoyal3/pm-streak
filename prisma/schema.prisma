@@ -37,10 +37,10 @@ model User {
   emailOptOut        Boolean   @default(false)
   emailOptOutAt      DateTime?
 
-  // Billing / PM Streak Pro (Paddle)
+  // Billing / PM Streak Pro (multi-provider)
   plan               String    @default("free") // free | pro
   billingStatus      String?   // active | trialing | past_due | canceled | none
-  billingProvider    String?   // paddle
+  billingProvider    String?   // paddle | dodo | revenuecat | upi_india | razorpay
   country            String?   // ISO 3166-1 alpha-2 (from geo or checkout)
   currency           String?   // ISO 4217
   priceBand          String?   // A | B | C
@@ -82,9 +82,9 @@ model Subscription {
   id                   String    @id @default(cuid())
   userId               String
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider             String    @default("paddle") // paddle | upi_india
-  paddleSubscriptionId String?   @unique
-  paddlePriceId        String?
+  provider             String    @default("paddle") // paddle | dodo | revenuecat | upi_india | razorpay
+  paddleSubscriptionId String?   @unique // external subscription/order/payment id
+  paddlePriceId        String?   // external product/plan id
   status               String    @default("active") // active | canceled | past_due | paused | trialing | expired
   billingInterval      String?   // month | quarter | year
   currentPeriodEnd     DateTime?
@@ -99,7 +99,7 @@ model BillingEvent {
   id         String   @id @default(cuid())
   userId     String?
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  provider   String   @default("paddle")
+  provider   String   @default("paddle") // paddle | dodo | revenuecat | upi_india | razorpay
   eventType  String
   payload    String   // raw JSON
   externalId String?  @unique
@@ -116,7 +116,7 @@ model Entitlement {
   key       String    // unlimited_ai_lessons | deep_dives | interview_sprint | role_roadmaps | saved_notes | premium_recaps
   grantedAt DateTime  @default(now())
   expiresAt DateTime?
-  source    String    @default("subscription") // subscription | trial | admin | promo
+  source    String    @default("subscription") // subscription | trial | admin | promo | upi_india | razorpay
 
   @@unique([userId, key])
   @@index([userId])

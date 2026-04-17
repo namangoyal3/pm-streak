@@ -57,7 +57,9 @@ export async function isUserPro(userId: string): Promise<boolean> {
   const upi = await prisma.subscription.findFirst({
     where: {
       userId,
-      provider: "upi_india",
+      provider: {
+        in: ["upi_india", "razorpay"],
+      },
       status: "active",
       currentPeriodEnd: { gt: new Date() },
     },

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { serverEvents } from "@/lib/ga4-server";
 
 const MARKETING_TRIAL_DAYS = 3;
 
@@ -36,6 +37,7 @@ export async function POST() {
 
   // Already consumed a trial — don't grant a second one
   if (user.proPreviewConsumed) {
+    await serverEvents.trialStartBlocked(userId, "trial_already_used");
     return NextResponse.json({ error: "Trial already used" }, { status: 403 });
   }
 
@@ -51,5 +53,6 @@ export async function POST() {
     },
   });
 
+  await serverEvents.trialStartSuccess(userId, MARKETING_TRIAL_DAYS);
   return NextResponse.json({ ok: true, trialEndsAt: trialEndsAt.toISOString() });
 }

@@ -3,9 +3,10 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import JsonLd, { breadcrumbSchema, faqSchema, howToSchema, speakableSchema, SITE_URL } from "@/components/JsonLd";
 
-// Always render on-demand — articles are added by the SEO agent without deploys
-export const dynamic = "force-dynamic";
+// Articles are added by the SEO agent without deploys — render on-demand but cache for 24h
+export const revalidate = 86400;
 
 interface Props {
   params: Promise<{ vertical: string; slug: string }>;
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return { title: "Article not found" };
   const ogUrl = `/api/og?title=${encodeURIComponent(article.title)}&vertical=${encodeURIComponent(vertical)}`;
   return {
-    title: `${article.title} | PM Streak`,
+    title: article.title,
     description: article.description,
     openGraph: {
       title: article.title,
@@ -73,19 +74,30 @@ export default async function ArticlePage({ params }: Props) {
       })
     : null;
 
-  const jsonLd = {
+  const faqPairs: { question: string; answer: string }[] = [];
+  const howToSteps: { name: string; text: string }[] = [];
+  const articleUrl = `${SITE_URL}/learn/${vertical}/${slug}`;
+
+  const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
     description: article.description,
     datePublished: article.publishedAt?.toISOString(),
     dateModified: article.updatedAt.toISOString(),
+    url: articleUrl,
     publisher: {
       "@type": "Organization",
       name: "PM Streak",
-      url: process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro",
+      url: SITE_URL,
+    },
+    author: {
+      "@type": "Organization",
+      name: "PM Streak Editorial",
+      url: SITE_URL,
     },
     keywords: article.tags.join(", "),
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
   };
 
   const related = await prisma.article.findMany({
@@ -97,10 +109,20 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={articleJsonLd} />
+      <JsonLd data={breadcrumbSchema([
+        { name: "Home", url: "/" },
+        { name: "Learn", url: "/learn" },
+        { name: VERTICAL_LABELS[vertical] ?? vertical, url: `/learn/${vertical}` },
+        { name: article.title, url: `/learn/${vertical}/${slug}` },
+      ])} />
+      {faqPairs.length > 0 && <JsonLd data={faqSchema(faqPairs)} />}
+      {howToSteps.length > 0 && <JsonLd data={howToSchema({
+        name: article.title,
+        description: article.description,
+        steps: howToSteps,
+      })} />}
+      <JsonLd data={speakableSchema(["h1", ".prose-article p:first-of-type"])} />
       <main className="min-h-screen bg-[var(--bg-primary)] text-white">
         <div className="max-w-2xl mx-auto px-4 py-12">
           {/* Breadcrumb */}
@@ -122,6 +144,11 @@ export default async function ArticlePage({ params }: Props) {
             </p>
             <h1 className="text-3xl font-black leading-tight mb-3 tracking-tight">{article.title}</h1>
             <p className="text-[var(--text-secondary)] text-lg leading-relaxed">{article.description}</p>
+            <div className="flex items-center gap-2 mt-4 text-xs text-[var(--text-secondary)]">
+              <span className="font-semibold text-white">PM Streak Editorial</span>
+              <span>·</span>
+              <span>Expert-reviewed PM content sourced from 300+ Lenny&apos;s Podcast episodes</span>
+            </div>
           </header>
 
           {/* Article body */}

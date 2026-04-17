@@ -42,4 +42,48 @@ curl -s -X POST "$ENDPOINT" \
   -d @article5-rice-moscow-kano.json
 echo -e "\n"
 
-echo "=== Done — 5 articles published ==="
+# NEW articles from this run (April 9, 2026)
+echo "=== Publishing Article 6: Opportunity Solution Trees (NEW) ==="
+curl -s -X POST "$ENDPOINT" \
+  -H "Authorization: $AUTH" \
+  -H "Content-Type: application/json" \
+  -d @article-ost-discovery.json
+echo -e "\n"
+
+echo "=== Publishing Article 7: B2B SaaS Metrics Playbook (NEW) ==="
+curl -s -X POST "$ENDPOINT" \
+  -H "Authorization: $AUTH" \
+  -H "Content-Type: application/json" \
+  -d @article-b2b-saas-metrics.json
+echo -e "\n"
+
+echo "=== Publishing Article 8: PM Resume Guide (NEW) ==="
+curl -s -X POST "$ENDPOINT" \
+  -H "Authorization: $AUTH" \
+  -H "Content-Type: application/json" \
+  -d @article-pm-resume.json
+echo -e "\n"
+
+# NEW articles from this run (April 16, 2026)
+echo "=== Publishing Article 9: Product-Led Growth Strategy (NEW) ==="
+curl -s -X POST "$ENDPOINT" \
+  -H "Authorization: $AUTH" \
+  -H "Content-Type: application/json" \
+  -d @article-plg-strategy.json
+echo -e "\n"
+
+echo "=== Publishing Article 10: APM Program Guide (NEW) ==="
+curl -s -X POST "$ENDPOINT" \
+  -H "Authorization: $AUTH" \
+  -H "Content-Type: application/json" \
+  -d @article-apm-programs.json
+echo -e "\n"
+
+echo "=== Publishing Article 11: North Star Metric Framework (NEW) ==="
+curl -s -X POST "$ENDPOINT" \
+  -H "Authorization: $AUTH" \
+  -H "Content-Type: application/json" \
+  -d @article-north-star-metric.json
+echo -e "\n"
+
+echo "=== Done — 11 articles published ==="

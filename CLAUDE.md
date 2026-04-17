@@ -1,55 +1,55 @@
-# CLAUDE.md — PM Streak
+# PM Streak — Engineering Guidelines
 
-## Behavioral Rules (Karpathy Principles)
+## Project Context
+PM Streak is a daily PM education platform (Duolingo for Product Managers). Next.js 15 app with Prisma, Dodo Payments, RevenueCat, freemium model. AI generates daily lessons from 300+ PM leader transcripts. 0% conversion rate is the critical problem.
 
-These four rules apply to EVERY task — read them before touching any code.
+## Core Data Model
+- `User`: plan, credits, entitlement, streak, xp
+- `Article` / `SeoArticle`: AI-generated lesson content
+- `ExperimentEvent`: A/B test tracking
+- `CheckoutSession`, `Subscription`: payments via Dodo
 
-### 1. Think Before Coding
-- Before writing any code, state what you're about to do and why.
-- Identify tradeoffs and edge cases upfront.
-- If requirements are unclear, ask — don't assume and implement.
-- Never start coding to "figure it out" — think first, code second.
+## Architecture Decisions
+- Server actions for writes, API routes for external integrations
+- GA4 for analytics, IndexNow for SEO ping
+- AI lesson generation via DeepSeek + pipeline cron jobs
+- Feature flags control: prioritySupport, ai Tajwal-30 lessons, experiments
 
-### 2. Simplicity First
-- The simplest solution that works is the right solution.
-- Do not add abstractions, layers, or generalization unless explicitly asked.
-- Do not install new dependencies unless there's no reasonable built-in alternative.
-- A 10-line function is better than a 100-line "framework" for a one-time use case.
+## Design Principles
 
-### 3. Surgical Changes
-- Change only what was asked. Nothing more.
-- Do not refactor surrounding code, rename variables, add comments, or clean up files you weren't asked to touch.
-- If you notice a bug outside your task scope, mention it — don't fix it uninvited.
-- Every line you write has a blast radius. Keep it minimal.
+### Think Before Coding
+- Ask: what user outcome does this change? Who is affected?
+- Before touching payments, auth, or experiment tracking — understand the full data flow
+- 0% conversion is a product problem, not a code problem. Check `/pricing`, `/dashboard` before adding features.
 
-### 4. Goal-Driven Execution
-- Know the success criteria before writing the first line.
-- Write tests or verification steps first if possible.
-- Do not claim a task is done until you have verified it works.
-- "It should work" is not verification. Run it, check it, confirm it.
+### Simplicity First
+- Small PRs. One logical change per commit.
+- If you find yourself changing >5 files for a single feature,停下来 — you're over-engineering.
+- Copy patterns already in the codebase before importing new abstractions.
 
-## Design System
-Always read `DESIGN.md` before making any visual or UI decisions.
-All font choices, colors, spacing, and aesthetic direction are defined there.
-Do not deviate without explicit user approval.
-In QA mode, flag any code that doesn't match DESIGN.md.
+### Surgical Changes
+- Don't touch code that doesn't relate to the task
+- Don't refactor adjacent code "while you're there"
+- Don't add dependencies unless the feature explicitly requires them
 
-Key rules:
-- Only two saturated colors in the palette: green `#58cc02` and purple `#ce82ff`. Never introduce a third.
-- Surfaces must use `--bg-primary/-secondary/-card` variables — no hardcoded hex, no blue-teal.
-- Typography: DIN Round Pro → Nunito → system-ui. `font-black` for all headings. Never `font-medium` on H1/H2.
-- Section H2s are `text-4xl sm:text-5xl`. Not `text-3xl`.
+### Goal-Driven Execution
+- Always state the user-facing outcome before writing code
+- PR title: what changed. PR description: what problem it solves.
+- Test the happy path and one edge case before marking done.
 
-## SEO content
-- `/learn` routes serve AI-generated articles from the `Article` Prisma model.
-- Generation pipeline: `src/app/api/cron/generate-seo/route.ts` + `scripts/generate-seo-batch.ts`.
-- Keyword queue: `SeoKeyword` table, status machine `pending → mapping → generated | failed`.
-- Requires `GROQ_API_KEY` (primary) or `OPENROUTER_API_KEY` (fallback) in `.env.local`.
+## Payment & Auth — Extra Care
+- Never log payment tokens, user credentials, or full API keys
+- When touching `src/lib/billing/`, `src/app/api/checkout/`, `src/middleware.ts` — explain what you changed and why
+- Checkout flow: freemium → trial → paid. If you modify trial logic, test with a fresh user account.
 
-## Auth
-Custom JWT (not next-auth). `src/lib/auth.ts` exports `getCurrentUserId()`.
-Sign-up route is `/signup`, not `/auth/signup`.
+## SEO & AI Content
+- SEO articles live in `src/app/[slug]/page.tsx` (auto-generated routes)
+- GEO scoring: `src/lib/seo-score.ts` — passage length 134-167 words, self-containment, statistical density
+- Never commit full article content (bulk text belongs in `scripts/seo-output/` or `graphify-out/cache/`)
 
-## Tech
-- Next.js 15 App Router, Prisma + Neon Postgres, Tailwind v4, hosted on Vercel.
-- Run `npm run build` before deploying — the pipeline is strict on TS errors.
+## File Conventions
+- Routes: `src/app/api/[feature]/route.ts`
+- Components: `src/components/[FeatureName].tsx`
+- Server actions: `src/app/[page]/actions.ts`
+- Cron jobs: `src/app/api/cron/[job]/route.ts`
+- Prisma schema: `prisma/schema.prisma`

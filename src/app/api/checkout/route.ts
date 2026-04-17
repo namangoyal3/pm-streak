@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
+import { serverEvents } from "@/lib/ga4-server";
 
 const DODO_ENV =
   (process.env.DODO_PAYMENTS_ENVIRONMENT as "test_mode" | "live_mode" | undefined) ??
@@ -28,6 +29,14 @@ const FALLBACK_PRODUCTS: Record<string, string> = {
 };
 
 export async function GET(req: NextRequest) {
+  // Resolve userId early so it\'s available for error tracking
+  const userId = await getCurrentUserId();
+  let sessionEmail: string | null = null;
+  if (userId) {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+    sessionEmail = user?.email ?? null;
+  }
+
   const { searchParams } = req.nextUrl;
   const plan = searchParams.get("metadata_plan") ?? searchParams.get("plan");
   let productId = searchParams.get("productId");
@@ -43,6 +52,7 @@ export async function GET(req: NextRequest) {
 
   if (productId.trim() === "") {
     console.error("[checkout] productId resolved to empty string — check DODO product ID env vars");
+    if (userId) await serverEvents.checkoutError(userId, "empty_product_id");
     return NextResponse.json({ error: "Checkout is misconfigured. Please contact support." }, { status: 500 });
   }
 
@@ -58,12 +68,7 @@ export async function GET(req: NextRequest) {
   if (email) checkoutUrl.searchParams.set("email", email);
 
   // Resolve the authenticated user's email for coupon ownership checks
-  let sessionEmail: string | null = null;
-  const userId = await getCurrentUserId();
-  if (userId) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-    sessionEmail = user?.email ?? null;
-  }
+
 
   for (const [key, value] of searchParams.entries()) {
     if (key.startsWith("metadata_")) {
@@ -84,6 +89,12 @@ export async function GET(req: NextRequest) {
         }
       }
     }
+  }
+
+  // Track checkout initiation before redirect
+  if (userId) {
+    await serverEvents.checkoutInitiated(userId, plan ?? "unknown");
+    await serverEvents.checkoutDodoRedirect(userId);
   }
 
   return NextResponse.redirect(checkoutUrl.toString());

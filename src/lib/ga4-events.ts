@@ -5,8 +5,8 @@
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer: any[];
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
@@ -175,8 +175,8 @@ export function initGA4(measurementId: string): void {
     document.head.appendChild(script);
     
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function() {
-      window.dataLayer.push(arguments);
+    window.gtag = function(...args: unknown[]) {
+      (window.dataLayer as unknown[]).push(args);
     };
     window.gtag('js', new Date());
     window.gtag('config', measurementId);
