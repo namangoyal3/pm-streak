@@ -183,3 +183,109 @@ export function webPageSchema(opts: {
     ...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
   };
 }
+
+export function researchPaperSchema(opts: {
+  headline: string;
+  description: string;
+  url: string;
+  doi: string;
+  datePublished: string;
+  keywords: string[];
+  abstract: string;
+  license?: string;
+}): Record<string, unknown> {
+  const fullUrl = opts.url.startsWith("http") ? opts.url : `${SITE_URL}${opts.url}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "@id": `${fullUrl}#article`,
+    headline: opts.headline,
+    description: opts.description,
+    abstract: opts.abstract,
+    url: fullUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": fullUrl },
+    datePublished: opts.datePublished,
+    dateModified: opts.datePublished,
+    inLanguage: "en-US",
+    keywords: opts.keywords.join(", "),
+    identifier: { "@type": "PropertyValue", propertyID: "doi", value: opts.doi },
+    license: opts.license ?? "https://creativecommons.org/licenses/by/4.0/",
+    author: {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg`, width: 512, height: 512 },
+    },
+    isPartOf: {
+      "@type": "Periodical",
+      name: "PM Streak Research",
+      url: `${SITE_URL}/research`,
+    },
+  };
+}
+
+export function datasetSchema(opts: {
+  name: string;
+  description: string;
+  url: string;
+  license?: string;
+  keywords: string[];
+  datePublished: string;
+}): Record<string, unknown> {
+  const fullUrl = opts.url.startsWith("http") ? opts.url : `${SITE_URL}${opts.url}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: opts.name,
+    description: opts.description,
+    url: fullUrl,
+    keywords: opts.keywords,
+    license: opts.license ?? "https://creativecommons.org/licenses/by/4.0/",
+    datePublished: opts.datePublished,
+    creator: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    distribution: {
+      "@type": "DataDownload",
+      encodingFormat: "text/html",
+      contentUrl: fullUrl,
+    },
+    isAccessibleForFree: true,
+  };
+}
+
+export function collectionSchema(opts: {
+  name: string;
+  description: string;
+  url: string;
+  items: { name: string; url: string; description: string }[];
+}): Record<string, unknown> {
+  const fullUrl = opts.url.startsWith("http") ? opts.url : `${SITE_URL}${opts.url}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: opts.name,
+    description: opts.description,
+    url: fullUrl,
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    hasPart: opts.items.map((item) => ({
+      "@type": "ScholarlyArticle",
+      name: item.name,
+      description: item.description,
+      url: item.url.startsWith("http") ? item.url : `${SITE_URL}${item.url}`,
+    })),
+  };
+}
