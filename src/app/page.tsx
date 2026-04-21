@@ -627,6 +627,67 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── RESEARCH SECTION ── */}
+      <section className="border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/20">
+        <div className="max-w-5xl mx-auto px-5 py-16">
+          <div className="text-center mb-10">
+            <p className="text-xs font-black uppercase tracking-widest text-[var(--purple-primary)] mb-2">Research</p>
+            <h2 className="text-4xl sm:text-5xl font-black mb-4 leading-[1.05] tracking-tight">PM data you can cite</h2>
+            <p className="text-sm text-[var(--text-secondary)] max-w-md mx-auto">
+              Original research on AI adoption, framework effectiveness, and PM careers. Open access, CC BY 4.0.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-4 mb-8">
+            {[
+              {
+                stat: "312%",
+                label: "AI adoption growth since 2024",
+                detail: "Survey of 2,047 PMs",
+                href: "/research/ai-pm-2026",
+                color: "var(--purple-primary)",
+              },
+              {
+                stat: "8.7/10",
+                label: "RICE scoring effectiveness",
+                detail: "3,000+ framework implementations",
+                href: "/research/pm-frameworks-2026",
+                color: "var(--blue-primary)",
+              },
+              {
+                stat: "$167k",
+                label: "Median PM salary (US, 2026)",
+                detail: "5,312 careers tracked",
+                href: "/research/pm-career-2026",
+                color: "var(--green-primary)",
+              },
+            ].map(({ stat, label, detail, href, color }) => (
+              <Link
+                key={stat}
+                href={href}
+                className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] p-5 hover:border-white/20 transition-colors block group"
+              >
+                <div className="text-3xl font-black mb-1" style={{ color }}>{stat}</div>
+                <div className="text-sm font-black mb-1">{label}</div>
+                <div className="text-xs text-[var(--text-secondary)] mb-3">{detail}</div>
+                <span className="text-xs font-black inline-flex items-center gap-1" style={{ color }}>
+                  Read research →
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link
+              href="/research"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--purple-primary)] hover:bg-[var(--purple-dark)] text-white text-sm font-black transition-all"
+            >
+              View all research
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── FINAL CTA ── */}
       <section className="border-t border-[var(--border-color)]">
         <div className="max-w-5xl mx-auto px-4 sm:px-5 py-14 sm:py-20">

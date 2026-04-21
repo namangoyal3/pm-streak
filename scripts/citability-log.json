@@ -1,0 +1,120 @@
+[
+  {
+    "date": "2026-04-21T07:30:17.992Z",
+    "score": 61.2,
+    "papersCount": 0,
+    "technicalSeoComplete": 5,
+    "breakdown": [
+      {
+        "type": "technical",
+        "key": "robots_txt",
+        "present": true,
+        "points": 3
+      },
+      {
+        "type": "technical",
+        "key": "sitemap_xml",
+        "present": true,
+        "points": 3
+      },
+      {
+        "type": "technical",
+        "key": "llms_txt",
+        "present": true,
+        "points": 4
+      },
+      {
+        "type": "technical",
+        "key": "research_index",
+        "present": true,
+        "points": 4
+      },
+      {
+        "type": "technical",
+        "key": "jsonld_helpers",
+        "present": true,
+        "points": 3
+      },
+      {
+        "type": "paper",
+        "slug": "ai-pm-2026",
+        "present": true,
+        "complete": false,
+        "points": 3
+      },
+      {
+        "type": "paper",
+        "slug": "pm-frameworks-2026",
+        "present": true,
+        "complete": false,
+        "points": 3
+      },
+      {
+        "type": "paper",
+        "slug": "pm-career-2026",
+        "present": true,
+        "complete": false,
+        "points": 3
+      }
+    ]
+  },
+  {
+    "date": "2026-04-21T07:30:29.457Z",
+    "score": 76.2,
+    "papersCount": 3,
+    "technicalSeoComplete": 5,
+    "breakdown": [
+      {
+        "type": "technical",
+        "key": "robots_txt",
+        "present": true,
+        "points": 3
+      },
+      {
+        "type": "technical",
+        "key": "sitemap_xml",
+        "present": true,
+        "points": 3
+      },
+      {
+        "type": "technical",
+        "key": "llms_txt",
+        "present": true,
+        "points": 4
+      },
+      {
+        "type": "technical",
+        "key": "research_index",
+        "present": true,
+        "points": 4
+      },
+      {
+        "type": "technical",
+        "key": "jsonld_helpers",
+        "present": true,
+        "points": 3
+      },
+      {
+        "type": "paper",
+        "slug": "ai-pm-2026",
+        "present": true,
+        "complete": true,
+        "points": 8
+      },
+      {
+        "type": "paper",
+        "slug": "pm-frameworks-2026",
+        "present": true,
+        "complete": true,
+        "points": 8
+      },
+      {
+        "type": "paper",
+        "slug": "pm-career-2026",
+        "present": true,
+        "complete": true,
+        "points": 8
+      }
+    ]
+  }
+]
