@@ -18,6 +18,26 @@ else
 fi
 
 echo ""
+echo "1b. Checking Razorpay configuration..."
+if [ -z "$NEXT_PUBLIC_RAZORPAY_KEY_ID" ] && [ -z "$RAZORPAY_KEY_ID" ]; then
+    echo "❌ NEXT_PUBLIC_RAZORPAY_KEY_ID / RAZORPAY_KEY_ID not set"
+else
+    echo "✅ Razorpay key id is set"
+fi
+
+if [ -z "$RAZORPAY_KEY_SECRET" ]; then
+    echo "❌ RAZORPAY_KEY_SECRET not set"
+else
+    echo "✅ RAZORPAY_KEY_SECRET is set"
+fi
+
+if [ -z "$RAZORPAY_WEBHOOK_SECRET" ]; then
+    echo "❌ RAZORPAY_WEBHOOK_SECRET not set"
+else
+    echo "✅ RAZORPAY_WEBHOOK_SECRET is set"
+fi
+
+echo ""
 echo "2. Checking product IDs..."
 PRODUCT_IDS=(
     "NEXT_PUBLIC_DODO_MONTHLY_PRODUCT_ID"
@@ -73,8 +93,8 @@ fi
 echo ""
 echo "=== Summary ==="
 echo "To fix conversion issues:"
-echo "1. Ensure Dodo Payments is properly configured in production"
-echo "2. Test checkout flow end-to-end"
+echo "1. Ensure Dodo Payments and Razorpay are properly configured in production"
+echo "2. Test the India Razorpay flow and international Dodo flow end-to-end"
 echo "3. Add error tracking for failed payments"
 echo "4. Monitor conversion funnel in GA4"
 echo "5. Add upgrade prompts throughout the user journey"

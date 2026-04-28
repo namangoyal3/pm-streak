@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { expireStaleUpiAndReconcileUser } from "@/lib/billing/upi-india-server";
+import { reconcileExpiredProAccess } from "@/lib/billing/pro-reconciliation";
 
 export type EntitlementKey =
   | "unlimited_ai_lessons"
@@ -45,7 +45,7 @@ export async function hasEntitlement(
 }
 
 export async function isUserPro(userId: string): Promise<boolean> {
-  await expireStaleUpiAndReconcileUser(userId);
+  await reconcileExpiredProAccess(userId);
 
   const user = await prisma.user.findUnique({
     where: { id: userId },

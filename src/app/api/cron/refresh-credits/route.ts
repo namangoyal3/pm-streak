@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isUserPro } from "@/lib/entitlements";
 
 /**
  * Monthly credit refresh cron.
@@ -22,12 +23,12 @@ export async function GET(req: Request) {
         { creditsRefreshedAt: { lt: startOfMonth } },
       ],
     },
-    select: { id: true, plan: true },
+    select: { id: true },
   });
 
   let refreshed = 0;
   for (const user of users) {
-    const newCredits = user.plan === "pro" ? 50 : 10;
+    const newCredits = (await isUserPro(user.id)) ? 50 : 10;
     await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },

@@ -52,13 +52,44 @@ export async function GET() {
   }
 
   const effectiveIsPro = await isUserPro(userId);
+  const freshUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+      xp: true,
+      level: true,
+      streakCount: true,
+      longestStreak: true,
+      streakFreezes: true,
+      gems: true,
+      xpBoostActive: true,
+      streakLostAt: true,
+      lostStreakVal: true,
+      streakGoal: true,
+      onboarded: true,
+      learningGoal: true,
+      lastActiveAt: true,
+      createdAt: true,
+      plan: true,
+      billingStatus: true,
+      trialEndsAt: true,
+      proPreviewConsumed: true,
+      country: true,
+      priceBand: true,
+      credits: true,
+      creditsRefreshedAt: true,
+    },
+  });
 
-  return NextResponse.json({ 
-    user: { 
-      ...user, 
-      plan: effectiveIsPro ? "pro" : user.plan,
-      unreadNotifications 
-    } 
+  return NextResponse.json({
+    user: {
+      ...(freshUser ?? user),
+      plan: effectiveIsPro ? "pro" : "free",
+      unreadNotifications,
+    },
   });
 }
 

@@ -35,20 +35,38 @@ export async function GET() {
   }
 
   const isPro = await isUserPro(userId);
-  const band = user.priceBand ?? getPriceBandFromCountry(user.country);
+  const freshUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      plan: true,
+      billingStatus: true,
+      billingProvider: true,
+      country: true,
+      currency: true,
+      priceBand: true,
+      trialEndsAt: true,
+      renewsAt: true,
+      cancelsAt: true,
+      proPreviewConsumed: true,
+    },
+  });
+  if (!freshUser) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  const band = freshUser.priceBand ?? getPriceBandFromCountry(freshUser.country);
   const aiUsed = await countAiLessonsThisMonth(userId);
 
   return NextResponse.json({
-    plan: user.plan,
-    billingStatus: user.billingStatus ?? "none",
-    billingProvider: user.billingProvider,
-    country: user.country,
-    currency: user.currency,
+    plan: isPro ? "pro" : "free",
+    billingStatus: freshUser.billingStatus ?? "none",
+    billingProvider: freshUser.billingProvider,
+    country: freshUser.country,
+    currency: freshUser.currency,
     priceBand: band,
-    trialEndsAt: user.trialEndsAt,
-    renewsAt: user.renewsAt,
-    cancelsAt: user.cancelsAt,
-    proPreviewConsumed: user.proPreviewConsumed,
+    trialEndsAt: freshUser.trialEndsAt,
+    renewsAt: freshUser.renewsAt,
+    cancelsAt: freshUser.cancelsAt,
+    proPreviewConsumed: freshUser.proPreviewConsumed,
     isPro,
     ai: {
       usedThisMonth: aiUsed,

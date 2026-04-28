@@ -4,6 +4,7 @@ import {
   INTERVIEW_PREP_PRICING,
   interviewPrepSessionCreditTotal,
 } from "./interview-prep-pricing";
+import { isUserPro } from "./entitlements";
 
 export const CREDIT_COSTS = {
   lesson_unlock: 5,
@@ -85,7 +86,7 @@ export async function spendCredits(
 export async function refreshMonthlyCredits(userId: string): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { plan: true, trialEndsAt: true, creditsRefreshedAt: true },
+    select: { creditsRefreshedAt: true },
   });
   if (!user) return;
 
@@ -96,7 +97,7 @@ export async function refreshMonthlyCredits(userId: string): Promise<void> {
     return; // Already refreshed this month
   }
 
-  const isPro = user.plan === "pro" || (user.trialEndsAt != null && user.trialEndsAt > now);
+  const isPro = await isUserPro(userId);
   const newCredits = isPro ? 50 : 10;
 
   await prisma.$transaction([

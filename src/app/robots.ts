@@ -18,6 +18,12 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/admin", "/dashboard"],
       },
       {
+        // OpenAI's search bot — for SearchGPT/web-browsing features
+        userAgent: "OAI-SearchBot",
+        allow: "/",
+        disallow: ["/api/", "/admin", "/dashboard"],
+      },
+      {
         // Anthropic's ClaudeBot — allow for Claude citation
         userAgent: "ClaudeBot",
         allow: "/",
