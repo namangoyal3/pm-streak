@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm:*)",
+      "Bash(npx prisma:*)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Edit",
+      "Write",
+      "WebSearch"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(printenv:LYZR_API_KEY)",
+      "Bash(echo $LYZR_API_KEY)",
+      "Read(.env.local)"
+    ]
+  }
+}

@@ -550,3 +550,42 @@ model ExperimentEvent {
   @@index([userId])
   @@index([createdAt])
 }
+
+// --- GEO Swarm models ---
+
+model GeoOpportunity {
+  id          String   @id @default(cuid())
+  query       String
+  intentScore Float
+  source      String   // 'chatgpt' | 'perplexity' | 'gemini' | 'google'
+  currentTop3 Json
+  gapScore    Float
+  addressed   Boolean  @default(false)
+  pageSlug    String?
+  createdAt   DateTime @default(now())
+
+  @@index([addressed, intentScore])
+}
+
+model GeoPageMetric {
+  id              String   @id @default(cuid())
+  slug            String
+  citabilityScore Float
+  ga4Sessions     Int
+  attributedLeads Int
+  citationCount   Int
+  snapshotDate    DateTime @default(now())
+
+  @@index([slug, snapshotDate])
+}
+
+model GeoCitation {
+  id         String   @id @default(cuid())
+  pageSlug   String
+  source     String   // 'g2' | 'reddit' | 'haro' | 'directory:<name>'
+  url        String
+  status     String   // 'drafted' | 'awaiting_approval' | 'sent' | 'live'
+  approvedBy String?
+  draftBody  String?
+  createdAt  DateTime @default(now())
+}

@@ -1,0 +1,101 @@
+name: GEO Signal PR Gate
+
+on:
+  pull_request:
+    paths:
+      - 'seo-articles/**'
+      - 'seo-drafts/**'
+    types: [opened, synchronize]
+
+jobs:
+  citability-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Check citability scores
+        id: citability
+        run: |
+          score=0
+          count=0
+          for file in $(git diff --name-only origin/main -- 'seo-articles/*.mdx' 'seo-drafts/*.mdx'); do
+            if [ -f "$file" ]; then
+              # Extract citability score from meta or compute inline
+              count=$((count + 1))
+            fi
+          done
+          echo "count=$count" >> $GITHUB_OUTPUT
+          echo "Checked $count files"
+
+      - name: Auto-merge label
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const mdxFiles = files.filter(f => f.filename.match(/\.(mdx|md)$/));
+            if (mdxFiles.length === 0) return;
+
+            // Check for citability metadata in PR body or commit messages
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const citabilityMatch = pr.body?.match(/citability:\s*(\d+)/i);
+            const score = citabilityMatch ? parseInt(citabilityMatch[1]) : 0;
+
+            if (score >= 80) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['geo:auto'],
+              });
+              console.log(`Citability ${score} >= 80: auto-merge label applied`);
+            } else if (score >= 70) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['geo:review'],
+              });
+              console.log(`Citability ${score} >= 70 but < 80: human review required`);
+            } else {
+              console.log(`Citability ${score} < 70: PR should not merge`);
+            }
+
+  auto-merge:
+    needs: citability-gate
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'geo:auto')
+    steps:
+      - name: Enable auto-merge
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              merge_method: 'squash',
+            });

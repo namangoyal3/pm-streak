@@ -24,7 +24,7 @@ PM Streak is a daily PM education platform (Duolingo for Product Managers). Next
 
 ### Simplicity First
 - Small PRs. One logical change per commit.
-- If you find yourself changing >5 files for a single feature,停下来 — you're over-engineering.
+- If you find yourself changing >5 files for a single feature, stop — you're over-engineering.
 - Copy patterns already in the codebase before importing new abstractions.
 
 ### Surgical Changes
@@ -52,4 +52,32 @@ PM Streak is a daily PM education platform (Duolingo for Product Managers). Next
 - Components: `src/components/[FeatureName].tsx`
 - Server actions: `src/app/[page]/actions.ts`
 - Cron jobs: `src/app/api/cron/[job]/route.ts`
+- GEO cron jobs: `src/app/api/geo/[agent]/run/route.ts`
 - Prisma schema: `prisma/schema.prisma`
+- Path alias: `@/*` maps to `./src/*`
+- Package manager: `pnpm` (or `npm` fallback)
+
+## GEO Swarm (Lyzr-backed)
+
+This repo deploys 8 GEO agents on Lyzr Agent Studio, orchestrated by a Conductor managerial agent. Full design: `docs/geo-architecture.md`. Tech spec: `docs/geo-tech-spec.md`.
+
+### Conventions
+- Lyzr client: `src/lib/lyzr.ts`. All agent calls go through `callAgent(agentId, message, sessionId)` or `callConductor(message, sessionId)`.
+- Agent IDs come from `process.env.LYZR_AGENT_*` and `LYZR_CONDUCTOR_ID` — never hardcode.
+- API routes that Lyzr tools call live under `src/app/api/geo/tools/*`. Validate every input with Zod.
+- Forge writes drafts to `seo-drafts/<slug>.mdx`; Signal opens PRs from there. Never write directly to `seo-articles/`.
+- Citability gate ≥70 enforced in `src/lib/geo/citability.ts`. Don't bypass.
+- All Prisma access from agent tool routes goes through allowlisted helpers in `src/lib/geo/safe-prisma.ts`. No raw SQL from agents.
+
+### Hard rules
+- Anchor never auto-sends. Drafts only.
+- Lyzr API key is server-only. Never `NEXT_PUBLIC_*`. Never echo in logs.
+- KB attachment is required on every agent before calling it for real. See `src/lib/geo/kb-attach.ts`.
+
+### Useful commands
+- `pnpm tsx scripts/lyzr/attach-kb.ts` — bulk-attach the shared KB to all 9 agents.
+- `pnpm tsx scripts/lyzr/seed-kb.ts` — Cortex bootstrap from repo files.
+- `pnpm tsx scripts/lyzr/smoke.ts <agent>` — smoke test an agent.
+- `/forge-page <topic>` — Claude Code slash command to forge a draft locally.
+- `/lyzr-deploy <agent>` — push that agent's spec from `src/agents/*/spec.ts` to Lyzr.
+- `/pulse-snapshot` — manual Pulse run + analyst review.
