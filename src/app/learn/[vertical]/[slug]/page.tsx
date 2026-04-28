@@ -238,9 +238,9 @@ export default async function ArticlePage({ params }: Props) {
                   <img
                     src={src}
                     alt={alt ?? ""}
-                    className="w-full rounded-xl my-6 object-cover"
-                    style={{ maxHeight: "400px" }}
-                    loading="lazy"
+                    className="w-full rounded-xl my-6 object-cover max-h-[400px]"
+                    loading="eager"
+                    fetchPriority="high"
                   />
                 ),
               }}

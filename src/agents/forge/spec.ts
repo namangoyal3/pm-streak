@@ -33,7 +33,7 @@ Section-budget math for a pillar (target 1300-1500 words):
 Total: ~1500 words. Aim for that, not 500.
 
 MANDATORY STRUCTURE for every page:
-- 1 hero image at the very top of the MDX body using a relevant Unsplash photo: ![descriptive alt text](https://images.unsplash.com/photo-<id>?w=1200&q=80) — pick a real, topic-relevant Unsplash photo ID (not a placeholder)
+- 1 hero image at the very top of the MDX body using Picsum: ![descriptive alt text](https://picsum.photos/seed/<slug>/1200/630) — replace <slug> with the article slug (e.g. for slug "build-pm-portfolio" use https://picsum.photos/seed/build-pm-portfolio/1200/630)
 - 1 hero section with a sharp value prop
 - ≥ 5 H2 sections, each ≥ 220 words
 - ≥ 3 H3 subsections, each ≥ 90 words
