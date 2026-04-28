@@ -233,6 +233,16 @@ export default async function ArticlePage({ params }: Props) {
                     {children}
                   </code>
                 ),
+                img: ({ src, alt }) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={src}
+                    alt={alt ?? ""}
+                    className="w-full rounded-xl my-6 object-cover"
+                    style={{ maxHeight: "400px" }}
+                    loading="lazy"
+                  />
+                ),
               }}
             >
               {article.body}
