@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createHmac } from "node:crypto";
-import { seedKB } from "@/lib/geo/kb-seed";
+import { verifyKB } from "@/lib/geo/kb-seed";
+
+export const runtime = "nodejs";
 
 function verifySignature(body: string, signature: string | null): boolean {
   const secret = process.env.GITHUB_WEBHOOK_SECRET;
@@ -14,8 +16,10 @@ export async function POST(req: Request) {
   const signature = req.headers.get("x-hub-signature-256");
   const event = req.headers.get("x-github-event");
 
-  // Allow cron-triggered refreshes too
-  const isCron = req.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`;
+  // Allow cron-triggered refreshes too. Vercel cron sends x-vercel-cron: 1.
+  const isCron =
+    req.headers.get("x-vercel-cron") === "1" ||
+    req.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`;
 
   if (!isCron && !verifySignature(body, signature)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
@@ -49,7 +53,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await seedKB(process.cwd());
+    const result = await verifyKB();
     return NextResponse.json({
       ok: true,
       responseLength: result.response.length,

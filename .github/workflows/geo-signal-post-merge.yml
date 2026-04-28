@@ -1,0 +1,92 @@
+name: GEO Signal — Post-merge IndexNow + llms.txt
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'seo-articles/**'
+
+jobs:
+  signal-post-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get changed seo-articles files
+        id: changed
+        run: |
+          files=$(git diff --name-only HEAD~1 HEAD -- 'seo-articles/*.mdx' | tr '\n' ' ')
+          echo "files=$files" >> $GITHUB_OUTPUT
+          echo "Changed: $files"
+
+      - name: Ping IndexNow via existing cron route
+        if: steps.changed.outputs.files != ''
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/seo-indexnow" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          echo "IndexNow ping status: $response"
+          if [ "$response" != "200" ]; then
+            echo "Warning: IndexNow ping returned $response"
+          fi
+
+      - name: Update llms.txt with new articles
+        if: steps.changed.outputs.files != ''
+        run: |
+          for file in ${{ steps.changed.outputs.files }}; do
+            if [ ! -f "$file" ]; then continue; fi
+
+            # Extract slug and title from frontmatter
+            slug=$(basename "$file" .mdx)
+            title=$(grep -m1 '^title:' "$file" | sed 's/title: //' | tr -d '"')
+            description=$(grep -m1 '^description:' "$file" | sed 's/description: //' | tr -d '"')
+
+            if [ -z "$title" ]; then
+              title="$slug"
+            fi
+
+            url="https://learnanything.pro/learn/career/$slug"
+            entry="- [$title]($url): $description"
+
+            # Check if entry already exists
+            if grep -qF "$slug" public/llms.txt; then
+              echo "Already in llms.txt: $slug"
+              continue
+            fi
+
+            # Append under ## Learn Hub section or at end of Primary Pages
+            if grep -q "## Primary Pages" public/llms.txt; then
+              # Insert after the Learn Hub line
+              sed -i "/\[Learn Hub\]/a\\$entry" public/llms.txt
+            else
+              echo "$entry" >> public/llms.txt
+            fi
+
+            echo "Added to llms.txt: $title"
+          done
+
+      - name: Commit llms.txt update
+        if: steps.changed.outputs.files != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/llms.txt
+          if git diff --staged --quiet; then
+            echo "No changes to llms.txt"
+          else
+            git commit -m "chore(geo): update llms.txt with new GEO articles [skip ci]"
+            git push
+          fi
+
+      - name: Trigger Cortex refresh
+        if: steps.changed.outputs.files != ''
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/geo/cortex/refresh" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          echo "Cortex refresh status: $response"

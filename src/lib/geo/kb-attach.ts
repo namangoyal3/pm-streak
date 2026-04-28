@@ -1,19 +1,22 @@
 import { getAgent, putAgent } from "@/lib/lyzr";
 
-// WARNING: The Lyzr API accepts {"type":"RAG"} in PUT but the inference
-// endpoint rejects it with "Invalid feature type: RAG". KB attachment must
-// be done via the Lyzr Studio UI (toggle KB on → click Update) to get the
-// canonical shape the runtime accepts. This script is kept for reference
-// but should NOT be used until the canonical shape is captured from the UI.
-//
-// To attach KB manually: Lyzr Studio → each agent → Knowledge Base tab →
-// toggle ON → select pm_streak_shared_kb → Basic retrieval, 5 chunks → Update.
+// Canonical KB feature shape captured from Lyzr Studio UI on 2026-04-28.
+// This is the exact shape Lyzr's runtime accepts — captured from the PUT
+// request body when clicking "Update" after toggling Knowledge Base on in Studio.
 const KB_FEATURE = {
-  // FILL IN: Capture from Studio UI DevTools Network tab when clicking Update.
-  // The shape Lyzr's runtime actually accepts is NOT {"type":"RAG",...}.
-  type: "PLACEHOLDER",
+  type: "KNOWLEDGE_BASE",
   config: {
-    id: process.env.LYZR_KB_ID,
+    lyzr_rag: {
+      base_url: "https://rag-prod.studio.lyzr.ai",
+      rag_id: process.env.LYZR_KB_ID,
+      rag_name: process.env.LYZR_KB_NAME ?? "pm_streak_shared_kb",
+      params: {
+        top_k: 5,
+        retrieval_type: "basic",
+        score_threshold: 0,
+      },
+    },
+    agentic_rag: [],
   },
   priority: 0,
 };

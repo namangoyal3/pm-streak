@@ -1,10 +1,8 @@
-import { seedKB } from "../../src/lib/geo/kb-seed";
-import path from "node:path";
-
-const repoRoot = path.resolve(__dirname, "../..");
+import { verifyKB } from "../../src/lib/geo/kb-seed";
 
 (async () => {
-  console.log("Seeding KB via Cortex...");
-  const result = await seedKB(repoRoot);
+  console.log("Verifying KB via Cortex...");
+  const result = await verifyKB();
+  console.log("KB healthy:", result.kbHealthy);
   console.log("Cortex response:", result.response.slice(0, 500));
 })();
