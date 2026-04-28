@@ -3,17 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 import { isUserPro } from "@/lib/entitlements";
 import {
-  createRazorpayOrder,
-  getRazorpayCheckoutKeyId,
+  createRazorpayCheckoutOrder,
   isRazorpayConfigured,
-  type RazorpayPlanKey,
+  type RazorpayPlan,
 } from "@/lib/billing/razorpay-server";
 import { getValidCheckoutCoupon } from "@/lib/billing/checkout-coupons";
 import RazorpayCheckoutLauncher from "@/components/RazorpayCheckoutLauncher";
 import Link from "next/link";
 import { ShieldCheck, ArrowLeft, AlertTriangle } from "lucide-react";
 
-function parsePlan(value: string | string[] | undefined): RazorpayPlanKey | null {
+function parsePlan(value: string | string[] | undefined): RazorpayPlan | null {
   const raw = Array.isArray(value) ? value[0] : value;
   if (raw === "monthly" || raw === "quarterly" || raw === "yearly") return raw;
   return null;
@@ -90,14 +89,9 @@ export default async function RazorpayCheckoutPage({
 
   let orderPayload;
   try {
-    orderPayload = await createRazorpayOrder({
+    orderPayload = await createRazorpayCheckoutOrder({
       userId: user.id,
-      email: user.email,
-      name: user.name,
       plan,
-      couponCode: coupon?.code ?? null,
-      discountPercent: coupon?.discountPercent ?? 0,
-      priceBand: user.priceBand ?? null,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "We could not start Razorpay checkout.";
@@ -122,7 +116,7 @@ export default async function RazorpayCheckoutPage({
 
   return (
     <RazorpayCheckoutLauncher
-      keyId={getRazorpayCheckoutKeyId()}
+      keyId={orderPayload.keyId}
       orderPayload={orderPayload}
       redirectTo="/dashboard?checkout=success&gateway=razorpay"
     />

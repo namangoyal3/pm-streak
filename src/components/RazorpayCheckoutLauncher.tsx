@@ -4,10 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Loader2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type {
-  RazorpayCheckoutOrder,
-  RazorpayOrderRecordPayload,
-} from "@/lib/billing/razorpay-server";
+import type { RazorpayCheckoutConfig } from "@/lib/billing/razorpay-server";
 
 declare global {
   interface Window {
@@ -52,7 +49,7 @@ type CheckoutState = "loading" | "opening" | "verifying" | "failed";
 
 export default function RazorpayCheckoutLauncher(props: {
   keyId: string;
-  orderPayload: RazorpayOrderRecordPayload;
+  orderPayload: RazorpayCheckoutConfig;
   redirectTo: string;
 }) {
   const router = useRouter();
@@ -72,22 +69,16 @@ export default function RazorpayCheckoutLauncher(props: {
           throw new Error("Razorpay checkout is unavailable.");
         }
 
-        const order = props.orderPayload.order as RazorpayCheckoutOrder;
         const options = {
-          key: props.keyId,
-          amount: order.amount,
-          currency: order.currency,
-          name: "PM Streak",
-          description: `${props.orderPayload.planTitle} Pro plan`,
-          order_id: order.id,
-          prefill: {
-            name: props.orderPayload.notes.customer_name ?? props.orderPayload.email.split("@")[0],
-            email: props.orderPayload.email,
-          },
+          key: props.orderPayload.keyId,
+          amount: props.orderPayload.amount,
+          currency: props.orderPayload.currency,
+          name: props.orderPayload.name,
+          description: props.orderPayload.description,
+          order_id: props.orderPayload.orderId,
+          prefill: props.orderPayload.prefill,
           notes: props.orderPayload.notes,
-          theme: {
-            color: "#22c55e",
-          },
+          theme: props.orderPayload.theme,
           modal: {
             backdropclose: false,
             escape: true,
@@ -113,8 +104,8 @@ export default function RazorpayCheckoutLauncher(props: {
               },
               body: JSON.stringify({
                 ...response,
-                orderId: order.id,
-                plan: props.orderPayload.plan,
+                orderId: props.orderPayload.orderId,
+                plan: props.orderPayload.notes?.plan,
               }),
             });
 
@@ -171,10 +162,8 @@ export default function RazorpayCheckoutLauncher(props: {
           Completing your <span className="text-emerald-400">Pro</span> upgrade
         </h1>
         <p className="mt-3 max-w-xl text-sm text-white/60 sm:text-base">
-          {props.orderPayload.planTitle} plan • ₹{props.orderPayload.finalAmount.toLocaleString("en-IN")} •
-          {props.orderPayload.discountPercent > 0
-            ? ` ${props.orderPayload.discountPercent}% launch discount applied`
-            : " secure checkout"}
+          {props.orderPayload.description} • {props.orderPayload.currency} {(props.orderPayload.amount / 100).toLocaleString("en-IN")} •
+          secure checkout
         </p>
 
         <div className="mt-8 w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur">
