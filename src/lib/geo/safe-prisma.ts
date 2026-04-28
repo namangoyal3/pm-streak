@@ -80,3 +80,19 @@ export async function updateCitationStatus(id: string, status: string, approvedB
     data: { status, approvedBy },
   });
 }
+
+export async function publishArticle(data: {
+  slug: string;
+  title: string;
+  description: string;
+  body: string;
+  vertical?: string;
+}) {
+  const { slug, title, description, body, vertical = "pm" } = data;
+  return prisma.article.upsert({
+    where: { slug },
+    update: { title, description, body, published: true, updatedAt: new Date() },
+    create: { slug, title, description, body, vertical, published: true },
+    select: { id: true, slug: true, vertical: true },
+  });
+}
