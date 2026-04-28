@@ -7,11 +7,16 @@ const isAllowed = (req: Request) =>
 
 export async function POST(req: Request) {
   if (!isAllowed(req)) return NextResponse.json({ ok: false }, { status: 401 });
-  const result = await callAgent(
-    Agents.anchor(),
-    "Run weekly authority scan. Draft citations for recently published pages. Output drafts only — never auto-send.",
-    `anchor-${new Date().toISOString().slice(0, 10)}`,
-    { timeoutMs: 90_000 }
-  );
-  return NextResponse.json({ ok: true, length: result.response.length });
+  try {
+    const result = await callAgent(
+      Agents.anchor(),
+      "Run weekly authority scan. Draft citations for recently published pages. Output drafts only — never auto-send.",
+      `anchor-${new Date().toISOString().slice(0, 10)}`,
+      { timeoutMs: 90_000 }
+    );
+    return NextResponse.json({ ok: true, length: result.response.length });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+  }
 }
