@@ -24,6 +24,48 @@ jobs:
           echo "files=$files" >> $GITHUB_OUTPUT
           echo "Changed: $files"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Publish articles to DB via Signal
+        if: steps.changed.outputs.files != ''
+        run: |
+          for file in ${{ steps.changed.outputs.files }}; do
+            if [ ! -f "$file" ]; then continue; fi
+
+            slug=$(basename "$file" .mdx)
+            title=$(grep -m1 '^title:' "$file" | sed 's/title: //' | tr -d '"')
+            description=$(grep -m1 '^description:' "$file" | sed 's/description: //' | tr -d '"')
+            body=$(cat "$file")
+
+            if [ -z "$title" ] || [ -z "$description" ]; then
+              echo "Skipping $slug — missing frontmatter"
+              continue
+            fi
+
+            payload=$(node -e "
+              const body = require('fs').readFileSync('$file', 'utf8');
+              console.log(JSON.stringify({
+                slug: '$slug',
+                title: process.env.TITLE,
+                description: process.env.DESC,
+                body,
+                vertical: 'pm',
+              }));
+            " TITLE="$title" DESC="$description")
+
+            response=$(curl -s -w "\n%{http_code}" \
+              -X POST "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/geo/signal/publish" \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              -H "Content-Type: application/json" \
+              -d "$payload")
+
+            status=$(echo "$response" | tail -1)
+            body_out=$(echo "$response" | head -1)
+            echo "[$slug] DB publish: $status $body_out"
+          done
+
       - name: Ping IndexNow via existing cron route
         if: steps.changed.outputs.files != ''
         run: |
