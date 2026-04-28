@@ -81,18 +81,48 @@ export async function updateCitationStatus(id: string, status: string, approvedB
   });
 }
 
+/**
+ * Strips MDX/frontmatter artefacts from Forge output before DB insert:
+ * - YAML frontmatter block (--- ... ---)
+ * - The # H1 title line (page renders it from article.title)
+ * - <script type="application/ld+json"> blocks (page injects its own JSON-LD)
+ * - Trailing whitespace
+ */
+function cleanArticleBody(raw: string): string {
+  let body = raw;
+
+  // Remove YAML frontmatter
+  body = body.replace(/^---[\s\S]*?---\n?/, "");
+
+  // Remove <script type="application/ld+json">...</script> blocks
+  body = body.replace(/<script\s+type=["']application\/ld\+json["'][\s\S]*?<\/script>/gi, "");
+
+  // Remove fenced JSON code blocks that are schema/meta artefacts (```json { "@context"... } ```)
+  body = body.replace(/```json\s*\{[\s\S]*?"@context"[\s\S]*?```/g, "");
+  body = body.replace(/```json\s*\{[\s\S]*?"schema"[\s\S]*?```/g, "");
+  body = body.replace(/```json\s*\{[\s\S]*?"meta"[\s\S]*?```/g, "");
+
+  // Remove leading # H1 title (already shown by page layout)
+  body = body.replace(/^#\s+.+\n?/, "");
+
+  return body.trim();
+}
+
 export async function publishArticle(data: {
   slug: string;
   title: string;
   description: string;
   body: string;
   vertical?: string;
+  publishedAt?: Date;
 }) {
-  const { slug, title, description, body, vertical = "pm" } = data;
+  const { slug, title, description, body, vertical = "pm", publishedAt } = data;
+  const cleanBody = cleanArticleBody(body);
+  const now = new Date();
   return prisma.article.upsert({
     where: { slug },
-    update: { title, description, body, published: true, updatedAt: new Date() },
-    create: { slug, title, description, body, vertical, published: true },
+    update: { title, description, body: cleanBody, published: true, updatedAt: now, ...(publishedAt ? { publishedAt } : {}) },
+    create: { slug, title, description, body: cleanBody, vertical, published: true, publishedAt: publishedAt ?? now },
     select: { id: true, slug: true, vertical: true },
   });
 }
