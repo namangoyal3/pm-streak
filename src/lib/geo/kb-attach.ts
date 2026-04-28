@@ -1,17 +1,21 @@
 import { getAgent, putAgent } from "@/lib/lyzr";
 
-// Canonical KB feature shape — fill in after capturing from Studio UI per tech spec §2.4.
-// Until captured, this placeholder follows the most likely shape.
+// WARNING: The Lyzr API accepts {"type":"RAG"} in PUT but the inference
+// endpoint rejects it with "Invalid feature type: RAG". KB attachment must
+// be done via the Lyzr Studio UI (toggle KB on → click Update) to get the
+// canonical shape the runtime accepts. This script is kept for reference
+// but should NOT be used until the canonical shape is captured from the UI.
+//
+// To attach KB manually: Lyzr Studio → each agent → Knowledge Base tab →
+// toggle ON → select pm_streak_shared_kb → Basic retrieval, 5 chunks → Update.
 const KB_FEATURE = {
-  type: "KNOWLEDGE_BASE",
+  // FILL IN: Capture from Studio UI DevTools Network tab when clicking Update.
+  // The shape Lyzr's runtime actually accepts is NOT {"type":"RAG",...}.
+  type: "PLACEHOLDER",
   config: {
     id: process.env.LYZR_KB_ID,
-    top_k: 5,
-    retrieval_type: "basic",
-    score_threshold: 0,
   },
   priority: 0,
-  enabled: true,
 };
 
 const ALL = [
