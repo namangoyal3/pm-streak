@@ -1,0 +1,131 @@
+name: GEO Swarm Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/agents/**'
+      - 'src/lib/lyzr.ts'
+      - 'src/lib/geo/**'
+      - 'scripts/lyzr/**'
+      - '.github/workflows/geo-swarm-smoke.yml'
+  pull_request:
+    paths:
+      - 'src/agents/**'
+      - 'src/lib/lyzr.ts'
+      - 'src/lib/geo/**'
+      - 'scripts/lyzr/**'
+      - '.github/workflows/geo-swarm-smoke.yml'
+  schedule:
+    # Daily at 07:00 UTC — runs ~1h after Scout's 06:00 cron so the swarm
+    # has had a chance to refresh state before we probe contracts.
+    - cron: '0 7 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+# A failing run on `main` or a PR shows red on the commit; Vercel's
+# git-integration treats that as a failed status, blocking auto-deploy
+# unless the user has explicitly disabled the GH check.
+concurrency:
+  group: geo-swarm-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Server-only secrets (CLAUDE.md hard rule). Never NEXT_PUBLIC_*.
+      # Set these once via:
+      #   gh secret set LYZR_API_KEY --body "$LYZR_API_KEY"
+      #   gh secret set LYZR_CONDUCTOR_ID --body "$LYZR_CONDUCTOR_ID"
+      #   gh secret set LYZR_AGENT_CORTEX --body "$LYZR_AGENT_CORTEX"
+      #   ...repeat for BLUEPRINT/SCOUT/FORGE/RIVAL/SIGNAL/ANCHOR/PULSE
+      LYZR_API_KEY: ${{ secrets.LYZR_API_KEY }}
+      LYZR_API_BASE: ${{ vars.LYZR_API_BASE }}
+      LYZR_CONDUCTOR_ID: ${{ secrets.LYZR_CONDUCTOR_ID }}
+      LYZR_AGENT_CORTEX: ${{ secrets.LYZR_AGENT_CORTEX }}
+      LYZR_AGENT_BLUEPRINT: ${{ secrets.LYZR_AGENT_BLUEPRINT }}
+      LYZR_AGENT_SCOUT: ${{ secrets.LYZR_AGENT_SCOUT }}
+      LYZR_AGENT_FORGE: ${{ secrets.LYZR_AGENT_FORGE }}
+      LYZR_AGENT_RIVAL: ${{ secrets.LYZR_AGENT_RIVAL }}
+      LYZR_AGENT_SIGNAL: ${{ secrets.LYZR_AGENT_SIGNAL }}
+      LYZR_AGENT_ANCHOR: ${{ secrets.LYZR_AGENT_ANCHOR }}
+      LYZR_AGENT_PULSE: ${{ secrets.LYZR_AGENT_PULSE }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify required secrets are set
+        run: |
+          missing=()
+          for v in LYZR_API_KEY LYZR_CONDUCTOR_ID LYZR_AGENT_CORTEX LYZR_AGENT_BLUEPRINT \
+                  LYZR_AGENT_SCOUT LYZR_AGENT_FORGE LYZR_AGENT_RIVAL LYZR_AGENT_SIGNAL \
+                  LYZR_AGENT_ANCHOR LYZR_AGENT_PULSE; do
+            if [ -z "${!v}" ]; then missing+=("$v"); fi
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+          echo "All required secrets present."
+
+      - name: Prepare log dir
+        run: mkdir -p smoke-logs
+
+      # Step 1: connectivity — every worker must answer one sentence.
+      - name: Connectivity (8 workers)
+        id: smoke
+        run: npx tsx scripts/lyzr/smoke.ts 2>&1 | tee smoke-logs/smoke.log
+
+      # Step 2: conductor reachable + self-aware.
+      - name: Conductor reachable
+        id: conductor
+        run: npx tsx scripts/lyzr/smoke-conductor.ts 2>&1 | tee smoke-logs/smoke-conductor.log
+
+      # Step 3: behavior contracts (12 probes). This is the gate that
+      # would have caught today's Cortex output-keys regression.
+      - name: Behavior probes (contracts)
+        id: behaviors
+        run: npx tsx scripts/lyzr/smoke-behaviors.ts 2>&1 | tee smoke-logs/smoke-behaviors.log
+
+      - name: Upload smoke logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geo-swarm-smoke-${{ github.run_id }}
+          path: smoke-logs/
+          retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## GEO swarm smoke results"
+            echo ""
+            echo "| Stage | Status |"
+            echo "|---|---|"
+            echo "| Connectivity (workers) | ${{ steps.smoke.outcome }} |"
+            echo "| Conductor | ${{ steps.conductor.outcome }} |"
+            echo "| Behavior probes | ${{ steps.behaviors.outcome }} |"
+            echo ""
+            for f in smoke-logs/smoke.log smoke-logs/smoke-conductor.log smoke-logs/smoke-behaviors.log; do
+              if [ -f "$f" ]; then
+                echo "### $(basename "$f")"
+                echo ""
+                echo '```'
+                tail -n 80 "$f"
+                echo '```'
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"

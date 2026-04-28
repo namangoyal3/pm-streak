@@ -7,6 +7,8 @@ prisma/dev.db-journal
 .env.production
 .env.vercel
 .env.vercel.production
+.env*.pulled
+.env.vercel.tmp
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
