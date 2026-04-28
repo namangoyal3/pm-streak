@@ -29,6 +29,18 @@
     },
     "src/app/api/cron/performance-refiner/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/geo/scout/run/route.ts": {
+      "maxDuration": 120
+    },
+    "src/app/api/geo/pulse/snapshot/route.ts": {
+      "maxDuration": 120
+    },
+    "src/app/api/geo/rival/run/route.ts": {
+      "maxDuration": 120
+    },
+    "src/app/api/geo/anchor/run/route.ts": {
+      "maxDuration": 120
     }
   },
   "crons": [
@@ -67,6 +79,22 @@
     {
       "path": "/api/cron/performance-refiner",
       "schedule": "0 4 * * 0"
+    },
+    {
+      "path": "/api/geo/scout/run",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/geo/pulse/snapshot",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/geo/rival/run",
+      "schedule": "0 4 * * 1"
+    },
+    {
+      "path": "/api/geo/anchor/run",
+      "schedule": "0 3 * * 1"
     }
   ]
 }
