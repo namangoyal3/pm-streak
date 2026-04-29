@@ -81,3 +81,14 @@ This repo deploys 8 GEO agents on Lyzr Agent Studio, orchestrated by a Conductor
 - `/forge-page <topic>` — Claude Code slash command to forge a draft locally.
 - `/lyzr-deploy <agent>` — push that agent's spec from `src/agents/*/spec.ts` to Lyzr.
 - `/pulse-snapshot` — manual Pulse run + analyst review.
+
+## Image Generation (nanaban)
+
+SEO/GEO page images use [nanaban](https://github.com/paperfoot/nanaban-cli) (paperfoot) — a CLI that generates images via GPT Image 2 at **$0** (billed against ChatGPT Plus/Pro subscription via Codex OAuth), Nano Banana (Gemini), and GPT-5 Image.
+
+- Installed globally via npm: `npm install -g nanaban`
+- Auth: `codex login` enables free GPT Image 2 via ChatGPT sub; `nanaban auth` checks reachable models
+- Agent mode: `nanaban "<prompt>" --json` returns structured output with file path, cost, model used
+- Lyzr tool route: `POST /api/geo/tools/image-gen` (wraps nanaban --json for GEO swarm agents)
+- Forge calls this tool when generating article images via the GEO pipeline
+- Claude Code skill auto-installed at `~/.claude/skills/nanaban/SKILL.md`

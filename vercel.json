@@ -56,6 +56,9 @@
     },
     "src/app/api/geo/retrofit/status/route.ts": {
       "maxDuration": 30
+    },
+    "src/app/api/geo/tools/image-gen/route.ts": {
+      "maxDuration": 120
     }
   },
   "crons": [
