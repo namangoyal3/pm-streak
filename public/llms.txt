@@ -8,6 +8,7 @@ PM Streak helps aspiring PMs, APMs, working PMs, and PM interview candidates bui
 
 - [Homepage](https://learnanything.pro/): PM Streak overview, value proposition, daily PM learning habit, streaks, XP, and onboarding paths.
 - [Learn Hub](https://learnanything.pro/learn): Public article and guide hub covering PM interviews, PM skills, product strategy, metrics, growth, and career topics.
+- [ultimate-guide-pm-upskilling-platforms](https://learnanything.pro/learn/career/ultimate-guide-pm-upskilling-platforms): 
 - [Pricing](https://learnanything.pro/pricing): Free and Pro plan details for PM Streak, including AI credits, archive lessons, interview prep, and jobs-board access.
 - [Interview Prep](https://learnanything.pro/interview-prep): AI-supported PM interview practice across product sense, metrics, execution, strategy, behavioral, and estimation prompts.
 - [PM Glossary](https://learnanything.pro/pm-glossary): Definitions and plain-English explanations for product management concepts, frameworks, and interview terminology.
