@@ -65,6 +65,7 @@ export const Agents = {
   signal: () => process.env.LYZR_AGENT_SIGNAL!,
   anchor: () => process.env.LYZR_AGENT_ANCHOR!,
   pulse: () => process.env.LYZR_AGENT_PULSE!,
+  retrofit: () => process.env.LYZR_AGENT_RETROFIT!,
 };
 
 export const callConductor = (message: string, sessionId: string) =>

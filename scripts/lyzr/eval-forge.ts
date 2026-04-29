@@ -131,10 +131,34 @@ function check(name: string, pass: boolean, detail = "") {
   const passed = results.filter((r) => r.pass).length;
   const failed = results.filter((r) => !r.pass).length;
   console.log(`\n=== Summary: ${passed}/${results.length} passed, ${failed} failed ===`);
+
+  // Loop 4: on failures, post a KB note to Cortex so agents can learn from it.
   if (failed > 0) {
-    console.log("\nFailed:");
-    results.filter((r) => !r.pass).forEach((r) => console.log(`  ✗ ${r.name}: ${r.detail}`));
+    const failureList = results
+      .filter((r) => !r.pass)
+      .map((r) => `- ${r.name}${r.detail ? `: ${r.detail}` : ""}`)
+      .join("\n");
+    console.log("\nFailed:\n" + failureList);
     console.log(`\nArtifacts: ${OUT}`);
+
+    // Post failure summary to Cortex so it's stored in KB for future agent sessions.
+    const cortexUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://learnanything.pro";
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret) {
+      try {
+        const res = await fetch(`${cortexUrl}/api/geo/cortex/refresh`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${cronSecret}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            note: `eval-forge run ${RUN_ID}: ${failed} check(s) failed.\n${failureList}\nArtifacts: ${OUT}`,
+          }),
+        });
+        if (res.ok) console.log("[eval] Failure note posted to Cortex KB.");
+      } catch {
+        // Non-fatal — eval result is the source of truth regardless.
+      }
+    }
+
     process.exitCode = 1;
   } else {
     console.log(`Artifacts: ${OUT}`);

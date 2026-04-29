@@ -129,10 +129,84 @@ export async function publishArticle(data: {
   const { slug, title, description, body, vertical = "pm", publishedAt } = data;
   const cleanBody = cleanArticleBody(body);
   const now = new Date();
-  return prisma.article.upsert({
+  const article = await prisma.article.upsert({
     where: { slug },
     update: { title, description, body: cleanBody, published: true, updatedAt: now, ...(publishedAt ? { publishedAt } : {}) },
     create: { slug, title, description, body: cleanBody, vertical, published: true, publishedAt: publishedAt ?? now },
     select: { id: true, slug: true, vertical: true },
   });
+
+  // Loop 1: seed/re-queue this article in the self-improvement triage queue.
+  // Wrapped in try/catch — triage failure must never break article publishing.
+  try {
+    await prisma.geoPageTriage.upsert({
+      where: { slug },
+      create: { slug, source: "article", jobStatus: "pending" },
+      // Re-queue shipped articles so they're re-evaluated after content changes.
+      update: { jobStatus: "pending", updatedAt: now },
+    });
+  } catch (e) {
+    console.warn(`[publishArticle] triage upsert failed for ${slug}:`, (e as Error).message);
+  }
+
+  return article;
+}
+
+// ── Parsers for Pulse + Rival structured JSON output ────────────────────────
+//
+// Both agents are instructed to append a trailing ```json block.
+// If the block is absent or malformed, we return [] and log a warning.
+
+export type PulseMetricRow = {
+  slug: string;
+  sessions30d: number;
+  leads30d: number;
+  citability?: number;
+};
+
+export function parsePulseMetrics(agentResponse: string): PulseMetricRow[] {
+  // Find the LAST ```json block in the response (agents may include prose before it)
+  const fences = [...agentResponse.matchAll(/```(?:json)?\s*\n([\s\S]*?)\n```/g)];
+  const last = fences[fences.length - 1];
+  if (!last) return [];
+  try {
+    const parsed = JSON.parse(last[1]);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (r): r is PulseMetricRow =>
+        typeof r?.slug === "string" &&
+        typeof r?.sessions30d === "number" &&
+        typeof r?.leads30d === "number"
+    );
+  } catch {
+    console.warn("[parsePulseMetrics] JSON parse failed");
+    return [];
+  }
+}
+
+export type RivalGapRow = {
+  query: string;
+  intentScore: number;
+  gapScore: number;
+  competitors: string[];
+};
+
+export function parseRivalGaps(agentResponse: string): RivalGapRow[] {
+  const fences = [...agentResponse.matchAll(/```(?:json)?\s*\n([\s\S]*?)\n```/g)];
+  const last = fences[fences.length - 1];
+  if (!last) return [];
+  try {
+    const parsed = JSON.parse(last[1]);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (r): r is RivalGapRow =>
+        typeof r?.query === "string" &&
+        typeof r?.intentScore === "number" &&
+        typeof r?.gapScore === "number" &&
+        Array.isArray(r?.competitors)
+    );
+  } catch {
+    console.warn("[parseRivalGaps] JSON parse failed");
+    return [];
+  }
 }

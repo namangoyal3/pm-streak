@@ -589,3 +589,29 @@ model GeoCitation {
   draftBody  String?
   createdAt  DateTime @default(now())
 }
+
+// Retrofit pipeline queue: every published page is one row.
+// The Retrofit cloud agent (cron-driven) walks this table tier by tier.
+model GeoPageTriage {
+  slug                String    @id
+  source              String    // 'article' | 'route' | 'mdx'
+  currentCitability   Float?
+  currentSeoScore     Int?
+  ga4Sessions30d      Int?
+  attributedLeads30d  Int?
+  hasArticleSchema    Boolean   @default(false)
+  hasFaqSchema        Boolean   @default(false)
+  hasFaqSection       Boolean   @default(false)
+  wordCount           Int?
+  tier                String?   // 'winner' | 'uplift' | 'rewrite' | 'merge' | 'kill'
+  jobStatus           String    @default("pending") // 'pending' | 'queued' | 'in_progress' | 'shipped' | 'failed' | 'skipped'
+  attempts            Int       @default(0)
+  lastError           String?
+  lastShippedPrUrl    String?
+  lastShippedAt       DateTime?
+  inventoriedAt       DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([tier, jobStatus])
+  @@index([jobStatus, attempts])
+}

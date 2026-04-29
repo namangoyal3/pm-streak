@@ -1,47 +1,194 @@
 User-agent: *
 Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
 
-# AI crawlers — explicitly permitted to index all public content
+# OpenAI crawlers and user-triggered fetchers
 User-agent: GPTBot
 Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: CCBot
-Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
 
 User-agent: OAI-SearchBot
 Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
 
-User-agent: Amazonbot
+User-agent: ChatGPT-User
 Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
 
-User-agent: FacebookBot
+# Anthropic crawlers and user-triggered fetchers
+User-agent: ClaudeBot
 Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: Claude-SearchBot
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: Claude-User
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+# Perplexity search crawler and user-triggered fetcher
+User-agent: PerplexityBot
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: Perplexity-User
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+# Google Search and Gemini/Vertex AI control token
+User-agent: Googlebot
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: Google-Extended
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: GoogleOther
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+# Common AI/search crawlers
+User-agent: CCBot
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
 
 User-agent: Applebot
 Allow: /
-
-# Disallow internal/auth routes from all crawlers
-User-agent: *
+Allow: /api/agents/pm-streak-context
 Disallow: /api/
+Disallow: /admin
 Disallow: /dashboard
 Disallow: /onboarding
+Disallow: /reset-password
 Disallow: /settings
+Disallow: /_next/
+
+User-agent: Applebot-Extended
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
 Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: FacebookBot
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /_next/
+
+User-agent: Bytespider
+Allow: /
+Allow: /api/agents/pm-streak-context
+Disallow: /api/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /settings
 Disallow: /_next/
 
 Sitemap: https://learnanything.pro/sitemap.xml
+Host: https://learnanything.pro

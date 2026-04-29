@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import JsonLd, { breadcrumbSchema, faqSchema, howToSchema, speakableSchema, SITE_URL } from "@/components/JsonLd";
+import { extractFaqPairs, extractHowToSteps } from "@/lib/geo/markdown-faq";
 
 // Articles are added by the SEO agent without deploys — render on-demand but cache for 24h
 export const revalidate = 86400;
@@ -88,8 +89,11 @@ export default async function ArticlePage({ params }: Props) {
       })
     : null;
 
-  const faqPairs: { question: string; answer: string }[] = [];
-  const howToSteps: { name: string; text: string }[] = [];
+  // Pull FAQ + HowTo pairs from the markdown body. The Retrofit agent's
+  // `appendFaqOnly` and `rewriteForge` modes write "## FAQ" sections into
+  // article.body — this is what surfaces them as FAQPage / HowTo schema.
+  const faqPairs = extractFaqPairs(article.body ?? "");
+  const howToSteps = extractHowToSteps(article.body ?? "");
   const articleUrl = `${SITE_URL}/learn/${vertical}/${slug}`;
 
   const ogImageUrl = `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&vertical=${encodeURIComponent(vertical)}`;

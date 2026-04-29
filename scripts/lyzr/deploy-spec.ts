@@ -16,6 +16,7 @@ const AGENT_ENV: Record<string, string> = {
   signal: "LYZR_AGENT_SIGNAL",
   anchor: "LYZR_AGENT_ANCHOR",
   pulse: "LYZR_AGENT_PULSE",
+  retrofit: "LYZR_AGENT_RETROFIT",
   conductor: "LYZR_CONDUCTOR_ID",
 };
 
@@ -48,6 +49,33 @@ async function deploy(name: string) {
   // Always carry KB features and credential from the live agent.
   body.features = live.features;
   body.llm_credential_id = live.llm_credential_id;
+
+  // Lyzr `managed_agents` is an array of {id, name, usage_description} objects,
+  // not strings. The spec stores names for readability; we promote each name to
+  // the matching live object (or build a fresh object if the live conductor
+  // doesn't yet manage that worker, by env id lookup).
+  if (Array.isArray(body.managed_agents) && body.managed_agents.length > 0 &&
+      typeof (body.managed_agents as unknown[])[0] === "string") {
+    const liveByShort = new Map<string, Record<string, unknown>>();
+    for (const m of (live.managed_agents ?? []) as Array<Record<string, unknown>>) {
+      const n = String(m.name ?? "").toLowerCase();
+      // map both "cortex" and "pm-streak-cortex" to the same live entry
+      const short = n.replace(/^pm-streak-/, "");
+      liveByShort.set(short, m);
+    }
+    body.managed_agents = (body.managed_agents as string[]).map((shortName) => {
+      const existing = liveByShort.get(shortName);
+      if (existing) return existing;
+      const envKey = AGENT_ENV[shortName];
+      const id = envKey ? process.env[envKey] : undefined;
+      if (!id) throw new Error(`Cannot resolve managed agent "${shortName}" — missing ${envKey ?? "id"}`);
+      return {
+        id,
+        name: `pm-streak-${shortName}`,
+        usage_description: `Use ${shortName} per its agent_role.`,
+      };
+    });
+  }
 
   await putAgent(id, body);
 

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { Agents, callAgent } from "@/lib/lyzr";
+import { createOpportunity, parseRivalGaps } from "@/lib/geo/safe-prisma";
+import type { Prisma } from "@prisma/client";
 
 const isAllowed = (req: Request) =>
   req.headers.get("x-vercel-cron") === "1" ||
@@ -10,11 +12,30 @@ export async function POST(req: Request) {
   try {
     const result = await callAgent(
       Agents.rival(),
-      "Run weekly competitive scan. Update rival_gaps.json in the shared KB.",
+      `Run daily competitive scan. Update rival_gaps.json in the shared KB.
+
+After your analysis, append a trailing \`\`\`json block (array) of content gaps competitors cover that we don't:
+[{ "query": "...", "intentScore": <0-1>, "gapScore": <0-1>, "competitors": ["domain.com", ...] }]
+This block is machine-parsed to seed new article opportunities into Scout's queue.`,
       `rival-${new Date().toISOString().slice(0, 10)}`,
       { timeoutMs: 90_000 }
     );
-    return NextResponse.json({ ok: true, length: result.response.length });
+
+    // Loop 3: parse gap rows and queue them as Scout opportunities.
+    const gaps = parseRivalGaps(result.response);
+    await Promise.all(
+      gaps.map((g) =>
+        createOpportunity({
+          query: g.query,
+          intentScore: g.intentScore,
+          source: "rival",
+          currentTop3: g.competitors as Prisma.InputJsonValue,
+          gapScore: g.gapScore,
+        })
+      )
+    );
+
+    return NextResponse.json({ ok: true, length: result.response.length, opportunitiesQueued: gaps.length });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ ok: false, error: message }, { status: 500 });

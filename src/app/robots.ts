@@ -3,77 +3,103 @@ import type { MetadataRoute } from "next";
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
 
 export default function robots(): MetadataRoute.Robots {
+  const publicPaths = ["/", "/api/agents/pm-streak-context"];
+  const privatePaths = ["/api/", "/admin", "/dashboard", "/onboarding", "/reset-password", "/settings", "/_next/"];
   return {
     rules: [
       {
-        // Default: allow everything except private/API routes
+        // Default: allow public content while protecting private app surfaces.
         userAgent: "*",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard", "/onboarding", "/reset-password"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // OpenAI's GPTBot — allow for ChatGPT citation
+        // OpenAI crawlers and user-triggered fetchers.
         userAgent: "GPTBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // OpenAI's search bot — for SearchGPT/web-browsing features
         userAgent: "OAI-SearchBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Anthropic's ClaudeBot — allow for Claude citation
+        userAgent: "ChatGPT-User",
+        allow: publicPaths,
+        disallow: privatePaths,
+      },
+      {
+        // Anthropic crawlers and user-triggered fetchers.
         userAgent: "ClaudeBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Perplexity's bot — allow for Perplexity citation
+        userAgent: "Claude-SearchBot",
+        allow: publicPaths,
+        disallow: privatePaths,
+      },
+      {
+        userAgent: "Claude-User",
+        allow: publicPaths,
+        disallow: privatePaths,
+      },
+      {
+        // Perplexity search crawler and user-triggered fetcher.
         userAgent: "PerplexityBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Google AI / Gemini training data
+        userAgent: "Perplexity-User",
+        allow: publicPaths,
+        disallow: privatePaths,
+      },
+      {
+        // Google Search and Gemini/Vertex AI control token.
+        userAgent: "Googlebot",
+        allow: publicPaths,
+        disallow: privatePaths,
+      },
+      {
         userAgent: "Google-Extended",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Common Crawl — feeds many AI models
+        userAgent: "GoogleOther",
+        allow: publicPaths,
+        disallow: privatePaths,
+      },
+      {
+        // Common AI/search crawlers.
         userAgent: "CCBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // OpenAI search bot (ChatGPT web browsing / SearchGPT)
-        userAgent: "OAI-SearchBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        userAgent: "Applebot",
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Apple Intelligence / Applebot Extended (Siri citations)
         userAgent: "Applebot-Extended",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Meta AI training crawler
         userAgent: "FacebookBot",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
       {
-        // Bytespider — TikTok/ByteDance AI training
         userAgent: "Bytespider",
-        allow: "/",
-        disallow: ["/api/", "/admin", "/dashboard"],
+        allow: publicPaths,
+        disallow: privatePaths,
       },
     ],
     sitemap: [`${siteUrl}/sitemap.xml`],
     host: siteUrl,
   };
 }
-

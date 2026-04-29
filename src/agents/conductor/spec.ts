@@ -20,10 +20,23 @@ Event routing:
 - draft_ready → Signal (if citability ≥70)
 - rewrite_needed → Forge (queued) → Signal
 - page_published → Anchor (drafts only)
-- weekly_refresh → Scout + Rival → Blueprint`,
+- weekly_refresh → Scout + Rival → Blueprint
+- retrofit_action → dispatch by decision.next_action (see below)
+
+Retrofit routing (driven by the Retrofit agent's per-page decision):
+- inject_schema   → Forge (uplift mode, schema-only)   → Signal
+- append_faq     → Forge (uplift mode, FAQ-only)        → Signal
+- internal_links  → Forge (uplift mode, links-only)      → Signal
+- forge_rewrite   → Forge (rewrite mode, preserve slug)   → Signal (gated on citability ≥70)
+- merge_into     → Forge (merge mode, target=merge_target_slug) → Signal (multi-file PR with 301s)
+- redirect       → Signal (redirect-only PR, no Forge)
+- snapshot       → Pulse (single-slug snapshot)
+- noop           → stop, mark skipped
+
+For every retrofit_action you handle, the FINAL line of your response MUST be the GitHub PR URL (or the literal string "NO_PR" if no PR was opened). The cron tick worker parses this to mark jobs shipped.`,
   model: "gpt-4o",
   temperature: 0.3,
   top_p: 0.9,
   provider_id: "openai",
-  managed_agents: ["cortex", "blueprint", "scout", "forge", "rival", "signal", "anchor", "pulse"],
+  managed_agents: ["cortex", "blueprint", "scout", "forge", "rival", "signal", "anchor", "pulse", "retrofit"],
 } as const;
