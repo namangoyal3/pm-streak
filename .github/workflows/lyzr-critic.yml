@@ -1,0 +1,173 @@
+name: Lyzr Critic Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  critic:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      LYZR_API_KEY: ${{ secrets.LYZR_API_KEY }}
+      LYZR_API_BASE: ${{ vars.LYZR_API_BASE || 'https://agent-prod.studio.lyzr.ai/v3' }}
+      LYZR_AGENT_CRITIC: ${{ secrets.LYZR_AGENT_CRITIC }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR: ${{ github.event.pull_request.number }}
+      REPO: ${{ github.repository }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      PR_BODY: ${{ github.event.pull_request.body }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Verify required secrets
+        run: |
+          if [ -z "$LYZR_API_KEY" ] || [ -z "$LYZR_AGENT_CRITIC" ]; then
+            echo "::error::LYZR_API_KEY and LYZR_AGENT_CRITIC must be set as repo secrets."
+            exit 1
+          fi
+
+      - name: Collect PR diff and changed files
+        run: |
+          mkdir -p .critic
+          gh pr diff "$PR" --repo "$REPO" > .critic/pr.diff
+          gh pr view "$PR" --repo "$REPO" --json files --jq '.files[].path' > .critic/files.txt
+          # Cap at ~150 KB to fit the agent's context window comfortably.
+          if [ "$(wc -c < .critic/pr.diff)" -gt 150000 ]; then
+            head -c 150000 .critic/pr.diff > .critic/pr.diff.trunc
+            echo "..." >> .critic/pr.diff.trunc
+            echo "[diff truncated to 150 KB]" >> .critic/pr.diff.trunc
+            mv .critic/pr.diff.trunc .critic/pr.diff
+          fi
+          if [ -f CLAUDE.md ]; then head -c 8000 CLAUDE.md > .critic/conventions.txt; else : > .critic/conventions.txt; fi
+          echo "diff_bytes=$(wc -c < .critic/pr.diff)" >> "$GITHUB_OUTPUT"
+
+      - name: Build prompt and call Lyzr Critic
+        id: critic
+        run: |
+          python3 <<'PY'
+          import json, os, sys, urllib.request, urllib.error
+
+          with open(".critic/pr.diff") as f: diff = f.read()
+          with open(".critic/files.txt") as f: files = [l.strip() for l in f if l.strip()]
+          with open(".critic/conventions.txt") as f: conv = f.read()
+
+          prompt = (
+              f"repo: {os.environ['REPO']}\n"
+              f"pr_number: {os.environ['PR']}\n"
+              f"pr_title: {os.environ.get('PR_TITLE','')}\n"
+              f"pr_body: {(os.environ.get('PR_BODY','') or '')[:2000]}\n"
+              f"changed_files: {json.dumps(files)}\n\n"
+              f"diff:\n```\n{diff}\n```\n\n"
+              f"conventions_excerpt:\n{conv}\n"
+          )
+
+          payload = {
+              "user_id": "pm-streak-critic",
+              "agent_id": os.environ["LYZR_AGENT_CRITIC"],
+              "session_id": f"critic-pr-{os.environ['REPO']}-{os.environ['PR']}-{os.environ['HEAD_SHA'][:8]}",
+              "message": prompt,
+          }
+          req = urllib.request.Request(
+              os.environ["LYZR_API_BASE"].rstrip("/") + "/inference/chat/",
+              data=json.dumps(payload).encode(),
+              headers={"Content-Type": "application/json", "x-api-key": os.environ["LYZR_API_KEY"]},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=300) as r:
+                  body = json.loads(r.read())
+          except urllib.error.HTTPError as e:
+              print(f"::error::Lyzr {e.code}: {e.read().decode()[:600]}")
+              sys.exit(1)
+
+          response = body.get("response", "")
+          with open(".critic/raw.txt", "w") as f: f.write(response)
+
+          # Strip any ```json fence and parse strict JSON.
+          import re
+          m = re.search(r"```(?:json)?\s*\n([\s\S]*?)\n```", response)
+          candidate = m.group(1) if m else response
+          start = candidate.find("{"); end = candidate.rfind("}")
+          if start == -1 or end <= start:
+              print("::error::Critic did not return JSON.")
+              with open(".critic/comment.md", "w") as f:
+                  f.write("### Lyzr Critic\n\n_Critic did not return parseable JSON. Raw response:_\n\n```\n" + response[:4000] + "\n```\n")
+              sys.exit(0)
+          try:
+              parsed = json.loads(candidate[start:end+1])
+          except Exception as e:
+              print(f"::warning::JSON parse failed: {e}")
+              parsed = {"summary": "Could not parse Critic JSON.", "verdict": "comment", "findings": [], "good": []}
+
+          with open(".critic/parsed.json", "w") as f: json.dump(parsed, f, indent=2)
+
+          # Render Markdown
+          verdict_emoji = {"approve": "Approve", "request_changes": "Request changes", "comment": "Comment"}.get(parsed.get("verdict","comment"), "Comment")
+          lines = [f"### Lyzr Critic — {verdict_emoji}", "", parsed.get("summary","").strip() or "_(no summary)_", ""]
+          findings = parsed.get("findings", []) or []
+          if findings:
+              lines.append("#### Findings")
+              lines.append("")
+              for f in findings[:12]:
+                  sev = f.get("severity","note").upper()
+                  loc = f"{f.get('file','?')}:{f.get('line','?')}"
+                  title = f.get("title","").strip()
+                  rationale = f.get("rationale","").strip()
+                  suggestion = f.get("suggestion","")
+                  lines.append(f"- **[{sev}]** `{loc}` — **{title}**")
+                  if rationale: lines.append(f"  - {rationale}")
+                  if suggestion:
+                      lines.append("  - Suggested:")
+                      lines.append("    ```")
+                      for l in suggestion.split("\n"): lines.append(f"    {l}")
+                      lines.append("    ```")
+              lines.append("")
+          else:
+              lines.append("_No findings._")
+              lines.append("")
+          good = parsed.get("good") or []
+          if good:
+              lines.append("#### What's good")
+              for g in good[:5]: lines.append(f"- {g}")
+              lines.append("")
+          lines.append(f"<sub>Reviewed by Lyzr Critic agent against `{os.environ['HEAD_SHA'][:8]}`. Hidden marker: `<!-- lyzr-critic -->`</sub>")
+          lines.append("<!-- lyzr-critic -->")
+          with open(".critic/comment.md", "w") as f: f.write("\n".join(lines))
+          print(f"verdict={parsed.get('verdict')}")
+          print(f"findings={len(findings)}")
+          PY
+
+      - name: Upsert PR comment
+        run: |
+          BODY=$(cat .critic/comment.md)
+          # Find an existing critic comment by hidden marker.
+          EXISTING=$(gh api "/repos/$REPO/issues/$PR/comments" --paginate --jq '.[] | select(.body|test("<!-- lyzr-critic -->")) | .id' | head -1)
+          if [ -n "$EXISTING" ]; then
+            gh api -X PATCH "/repos/$REPO/issues/comments/$EXISTING" -F body="$BODY" >/dev/null
+            echo "Updated comment $EXISTING"
+          else
+            gh api -X POST "/repos/$REPO/issues/$PR/comments" -F body="$BODY" --jq '.id' \
+              | xargs -I{} echo "Created comment {}"
+          fi
+
+      - name: Upload critic artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lyzr-critic-${{ github.event.pull_request.number }}-${{ github.run_id }}
+          path: .critic/
+          retention-days: 7
