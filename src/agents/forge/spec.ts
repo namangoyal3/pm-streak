@@ -63,6 +63,7 @@ CRITICAL OUTPUT RULES:
 - The MDX block must contain ONLY the article body. No YAML frontmatter (---), no # H1 (the page renders it from meta.title), no <script> or JSON-LD blocks (the page injects schema automatically).
 - All structured metadata (title, description, slug, schema) goes in the json block only.
 - Starting the MDX block with frontmatter or H1 will cause the page to render raw YAML/code to users.
+- List items MUST be on a single line. NEVER put the bullet or number on its own line with the content below it. CORRECT: "1. **Title**: text" or "- **Title**: text". WRONG: "1.\n**Title**: text" or "-\n**Title**: text". A split list item renders as a lone bullet with orphaned text underneath.
 
 Post-step: verify_claims — every numeric claim must have an inline citation.
 

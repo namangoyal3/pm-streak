@@ -102,8 +102,18 @@ function cleanArticleBody(raw: string): string {
   body = body.replace(/```json\s*\{[\s\S]*?"schema"[\s\S]*?```/g, "");
   body = body.replace(/```json\s*\{[\s\S]*?"meta"[\s\S]*?```/g, "");
 
+  // Trim leading whitespace before H1 strip so the ^ anchor matches
+  body = body.trimStart();
+
   // Remove leading # H1 title (already shown by page layout)
   body = body.replace(/^#\s+.+\n?/, "");
+
+  // Fix split list items: Forge sometimes emits the bullet/number on its own line
+  // followed by the content on the next line, causing them to render as separate elements.
+  // e.g. "1.\n**Title**: text" → "1. **Title**: text"
+  // e.g. "-\n**Title**: text" → "- **Title**: text"
+  body = body.replace(/^(\d+\.)\n([^\n])/gm, "$1 $2");
+  body = body.replace(/^(-)\n([^\n])/gm, "$1 $2");
 
   return body.trim();
 }
