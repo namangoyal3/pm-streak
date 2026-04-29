@@ -127,7 +127,12 @@ jobs:
           if start == -1 or end <= start:
               print("::error::Critic did not return JSON.")
               with open(".critic/comment.md", "w") as f:
-                  f.write("### Lyzr Critic\n\n_Critic did not return parseable JSON. Raw response:_\n\n```\n" + response[:4000] + "\n```\n")
+                  f.write(
+                      "### Lyzr Critic — parser fallback\n\n"
+                      "_Critic did not return parseable JSON. Raw response:_\n\n"
+                      "```\n" + response[:4000] + "\n```\n\n"
+                      "<!-- lyzr-critic -->\n"
+                  )
               sys.exit(0)
           slice_ = candidate[start:end+1]
           parsed = None
