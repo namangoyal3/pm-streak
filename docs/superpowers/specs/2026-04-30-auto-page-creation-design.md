@@ -59,13 +59,16 @@ NEW: /api/geo/create/tick  (POST)
 ### State machine: GeoOpportunity
 
 ```
-unaddressed ──▶ [in_progress] ──▶ addressed  (pageSlug set)
+unaddressed ──▶ in_progress ──▶ addressed  (pageSlug set)
      │               │
-     │          failed (attempts++, stays unaddressed)
+     │          failed (attempts++, back to unaddressed)
      │               │
      │          [attempts ≥ 3] ──▶ permanently_skipped
      │
      └── skipped (duplicate found / intentScore < 0.65)
+
+Stale recovery: any in_progress row older than 30 min is reset to
+unaddressed at the start of each tick (prevents timeout orphans).
 ```
 
 ---
@@ -76,6 +79,37 @@ unaddressed ──▶ [in_progress] ──▶ addressed  (pageSlug set)
 |------|---------|
 | `src/app/api/geo/create/tick/route.ts` | Cron endpoint — auth, quota, calls `runCreateTick()` |
 | `src/lib/geo/create-worker.ts` | `runCreateTick()`, `buildForgePrompt()` |
+
+### `buildForgePrompt` signature (pure function — no DB calls inside)
+
+```typescript
+function buildForgePrompt(
+  opportunity: { query: string; currentTop3: string[] },
+  blueprint: { title: string; page_type: string; target_queries: string[]; outline: string[] },
+  internalLinks: { slug: string; currentCitability: number }[]
+): string
+```
+
+Internal links are fetched **once before the per-opportunity loop** and passed in. This keeps the function unit-testable with mock data and avoids N+1 DB reads (5 identical queries → 1).
+
+### Tick loop pseudocode
+
+```
+internalLinks = selectInternalLinks(3)       // 1 DB query, reused for all opportunities
+staleCutoff = now - 30min
+reset stale in_progress rows → unaddressed   // idempotency recovery
+
+for each opportunity (up to quota):
+  mark opportunity in_progress               // prevent double-run on timeout
+  if slug exists in Article → mark addressed, skip
+  blueprint = callAgent(Blueprint, opportunity.query)
+  slug = slugify(blueprint.title) or slugify(opportunity.query)
+  forge = callAgent(Forge, buildForgePrompt(opportunity, blueprint, internalLinks))
+  if gate fails → expand once → re-check gate
+  if still fails → mark failed (attempts++), continue
+  publishArticle(...)
+  markOpportunityAddressed(id, slug)
+```
 
 ## Existing Code Reused (unchanged)
 
@@ -161,6 +195,7 @@ Internal links: top-3 `GeoPageTriage` rows with `currentCitability ≥ 75`, orde
 | Happy path: opportunity → published article | Integration | Full flow, article in DB, opportunity marked addressed |
 | Duplicate guard | Unit | Slug exists → skip, no Forge call, opportunity marked addressed |
 | Quality gate fail → expansion retry | Unit | First fail triggers expansion; second fail → attempts++ |
+| Expansion retry saves short draft | Unit | First Forge returns 900 words → expander called → result is 1300 words → publishes |
 | 3 attempts exhausted → permanent skip | Unit | `attempts ≥ 3` → skipped, never picked again |
 | Blueprint timeout | Unit | Catch fires, attempts++, opportunity stays unaddressed |
 | `buildForgePrompt()` | Unit | Competitor names appear in prompt, target queries in FAQ hint |
