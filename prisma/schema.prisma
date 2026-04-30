@@ -563,6 +563,9 @@ model GeoOpportunity {
   addressed   Boolean  @default(false)
   pageSlug    String?
   createdAt   DateTime @default(now())
+  attempts    Int      @default(0)   // retry counter; permanently skipped at ≥3
+  lastError   String?               // last failure message for debugging
+  updatedAt   DateTime @updatedAt   // needed for stale-recovery logic in the worker
 
   @@index([addressed, intentScore])
 }
