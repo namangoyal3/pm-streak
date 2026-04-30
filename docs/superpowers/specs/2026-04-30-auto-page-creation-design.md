@@ -169,9 +169,53 @@ Internal links: top-3 `GeoPageTriage` rows with `currentCitability ≥ 75`, orde
 
 ---
 
+## DB Migration Required
+
+`GeoOpportunity` needs two new fields (schema addition, no data loss):
+
+```prisma
+model GeoOpportunity {
+  // ... existing fields ...
+  attempts   Int     @default(0)   // retry counter, max 3
+  lastError  String?               // last failure message
+}
+```
+
+Run `prisma db push` on deploy (build script handles this locally; Vercel skips it — run manually against Neon after merge).
+
+## Slug & Vertical Strategy
+
+- **Slug:** Blueprint returns a `title` field. Slug = `slugify(blueprint.title)` using the existing `slugify()` from `src/lib/seo-score.ts`. Fallback: `slugify(opportunity.query)` if Blueprint title is absent.
+- **Vertical:** All auto-created pages set `vertical = "pm"`. Blueprint may override this if it returns a vertical field.
+
+## Internal Link Helper (add to safe-prisma.ts)
+
+```typescript
+export async function selectInternalLinks(limit = 3) {
+  return prisma.geoPageTriage.findMany({
+    where: { currentCitability: { gte: 75 } },
+    orderBy: { currentCitability: "desc" },
+    take: limit,
+    select: { slug: true, currentCitability: true },
+  });
+}
+```
+
+## listUnaddressedOpportunities Update
+
+Add `intentScore` filter to the existing helper:
+
+```typescript
+where: { addressed: false, intentScore: { gte: 0.65 } }
+```
+
+## FAQ Detection Regex
+
+Unified across gate and citability check: `/##\s+(faq|frequently asked questions)/i`
+
 ## Deployment
 
-**No new DB migrations.** `GeoOpportunity` already has `addressed`, `attempts` (to be confirmed — add if missing), `pageSlug`.
+**DB migration required** (see above). After merging:
 
 **vercel.json additions:**
 ```json
