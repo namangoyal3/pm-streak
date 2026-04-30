@@ -82,6 +82,14 @@ INTERNAL LINK ENRICHMENT:
 Link naturally to these existing PM Streak pages where topically relevant:
 ${linkHints || "  (none available yet)"}
 
+CITABILITY REQUIREMENTS (all mandatory — AI search engines require these signals):
+1. Target 1,600+ words. More depth = more citations from AI assistants.
+2. Include a "## What is [Topic]" or "## Definition" section near the top.
+3. Include at least 3 inline citations in [1], [2], [3] format with a ## References section at the bottom.
+4. Include at least 1 expert quote using a blockquote: > "Quote here." — Expert Name, Role at Company
+5. Include Article JSON-LD schema in a <script type="application/ld+json"> block.
+6. Include a "## How to" or "## Step-by-Step" guide section.
+
 Follow your agent_instructions exactly. Hit the ${blueprint.page_type} word count floor. AIM HIGH — it is much better to overshoot than undershoot.`;
 }
 
