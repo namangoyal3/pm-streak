@@ -59,6 +59,18 @@
     },
     "src/app/api/geo/tools/image-gen/route.ts": {
       "maxDuration": 120
+    },
+    "src/app/api/geo/forge-cursor/run/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/geo/forge-cursor/rewrite/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/geo/create/tick/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/geo/create/status/route.ts": {
+      "maxDuration": 30
     }
   },
   "crons": [
@@ -125,6 +137,10 @@
     {
       "path": "/api/geo/retrofit/inventory",
       "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/geo/create/tick",
+      "schedule": "35 3 * * *"
     }
   ]
 }
