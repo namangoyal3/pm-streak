@@ -78,6 +78,7 @@ unaddressed at the start of each tick (prevents timeout orphans).
 | File | Purpose |
 |------|---------|
 | `src/app/api/geo/create/tick/route.ts` | Cron endpoint — auth, quota, calls `runCreateTick()` |
+| `src/app/api/geo/create/status/route.ts` | Queue health: unaddressed/in_progress/failed/addressed counts |
 | `src/lib/geo/create-worker.ts` | `runCreateTick()`, `buildForgePrompt()` |
 
 ### `buildForgePrompt` signature (pure function — no DB calls inside)
