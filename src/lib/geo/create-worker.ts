@@ -163,6 +163,17 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
       }
 
       // 6. Call Forge with enriched prompt.
+      // Guard: currentTop3 must exist; without competitor data the enriched prompt is useless.
+      if (!opp.currentTop3) {
+        await prisma.geoOpportunity.update({
+          where: { id: opp.id },
+          data: { attempts: { increment: 1 }, lastError: "Missing currentTop3 competitor data" },
+        });
+        result.failed++;
+        result.errors.push({ query: opp.query, message: "Missing currentTop3 competitor data" });
+        result.decisions.push({ query: opp.query, action: "error" });
+        continue;
+      }
       const enrichedPrompt = buildForgePrompt(opp, blueprint, internalLinks);
       const forgeOut = await runForge(
         {
@@ -190,7 +201,7 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
           where: { id: opp.id },
           data: {
             attempts: { increment: 1 },
-            lastError: `Quality gate failed: wc=${forgeOut.body_word_count} citability=${citabilityOk} faq=${faqOk} hero=${heroOk}`,
+            lastError: `Quality gate failed: wc=${forgeOut.body_word_count} citability_ok=${citabilityOk} score=${scoreCitability(factors)} faq=${faqOk} hero=${heroOk}`,
           },
         });
         result.failed++;
