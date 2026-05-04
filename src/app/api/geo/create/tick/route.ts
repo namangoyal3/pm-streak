@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { runCreateTick } from "@/lib/geo/create-worker";
-import { writeCronLog } from "@/lib/geo/safe-prisma";
 
 export const maxDuration = 300;
 
@@ -20,14 +19,6 @@ export async function POST(req: Request) {
 
   try {
     const result = await runCreateTick(prisma, { quota, dryRun });
-    if (!dryRun) {
-      await writeCronLog({
-        cronId: "create/tick",
-        status: result.created > 0 ? "ok" : result.failed > 0 ? "error" : "empty",
-        summary: `Created ${result.created}, failed ${result.failed}, skipped ${result.skipped} of ${result.picked}`,
-        details: { quota, picked: result.picked, created: result.created, failed: result.failed, skipped: result.skipped, errors: result.errors.slice(0, 10) },
-      });
-    }
     return NextResponse.json({
       ok: true,
       quota,

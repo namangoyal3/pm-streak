@@ -54,15 +54,6 @@ export async function createPageMetric(data: {
   return prisma.geoPageMetric.create({ data });
 }
 
-export async function writeCronLog(data: {
-  cronId: string;
-  status: "ok" | "error" | "empty";
-  summary: string;
-  details?: Record<string, unknown>;
-}) {
-  return prisma.geoCronLog.create({ data: { ...data, details: data.details ?? {} } });
-}
-
 export async function getPageMetrics(slug: string, days = 30) {
   const since = new Date();
   since.setDate(since.getDate() - days);

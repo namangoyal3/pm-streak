@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { runTick } from "@/lib/geo/retrofit-worker";
-import { writeCronLog } from "@/lib/geo/safe-prisma";
 
 const isAllowed = (req: Request) =>
   req.headers.get("x-vercel-cron") === "1" ||
@@ -23,14 +22,6 @@ export async function POST(req: Request) {
 
   try {
     const result = await runTick(prisma, { quota, dryRun });
-    if (!dryRun) {
-      await writeCronLog({
-        cronId: "retrofit/tick",
-        status: result.shipped > 0 ? "ok" : "empty",
-        summary: `Shipped ${result.shipped}, failed ${result.failed}, skipped ${result.skipped} of ${result.picked}`,
-        details: { shipped: result.shipped, failed: result.failed, skipped: result.skipped, picked: result.picked, errors: result.errors.slice(0, 10) },
-      });
-    }
     return NextResponse.json({
       ok: true,
       quota,
