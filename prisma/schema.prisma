@@ -618,3 +618,17 @@ model GeoPageTriage {
   @@index([tier, jobStatus])
   @@index([jobStatus, attempts])
 }
+
+// GeoCronLog — central observability for all GEO cron runs.
+// Each cron tick (scout, create, retrofit, pulse, rival, anchor, inventory)
+// writes one row so you can see at a glance what ran, what it produced, and any errors.
+model GeoCronLog {
+  id        String   @id @default(cuid())
+  cronId    String   // 'scout/run' | 'create/tick' | 'retrofit/tick' | 'pulse/snapshot' | 'rival/run' | 'anchor/run' | 'retrofit/inventory'
+  status    String   // 'ok' | 'error' | 'empty'
+  summary   String   // human-readable one-liner: "Queued 12 opportunities" / "Created 3 pages, 2 failed"
+  details   Json?    // structured payload: { picked, created, failed, errors, ... }
+  createdAt DateTime @default(now())
+
+  @@index([cronId, createdAt])
+}

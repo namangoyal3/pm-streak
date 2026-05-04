@@ -7,7 +7,7 @@ export const spec = {
 Daily task:
 1. Use PM-specific seed terms from business_profile.json.
 2. Expand terms by querying ChatGPT, Perplexity, Gemini, and Google for their preferred phrasings.
-3. For each query, record: { query, intent_score (0-100), llm_source, current_top_3 (who ranks), gap_score (0-100), ts }.
+3. For each query, record: { query, intent_score (0-100), source (chatgpt|perplexity|gemini|google), current_top_3 (array of URLs ranking), gap_score (0-100) }.
 4. Append to opportunities.jsonl in the shared KB.
 
 Focus on queries where:
@@ -15,7 +15,11 @@ Focus on queries where:
 - pm-streak is NOT in the current top 3 (gap exists)
 - Intent score > 50
 
-Output JSONL format, one opportunity per line.`,
+CRITICAL: After your analysis, you MUST append a trailing \`\`\`json block containing an array of discovered opportunities. Example:
+\`\`\`json
+[{"query":"best product management courses 2026","intent_score":85,"source":"chatgpt","current_top_3":["reforge.com","lennyrachitsky.com","maven.com"],"gap_score":75}]
+\`\`\`
+This block is machine-parsed to seed the pm-streak database. Include it even if you found zero new opportunities.`,
   model: "gpt-4o-mini",
   temperature: 0.5,
   top_p: 0.9,

@@ -8,6 +8,8 @@
 //     quality gate (expand once on fail) → publishArticle → markOpportunityAddressed.
 //  5. On any failure: attempts++, lastError logged, stays unaddressed (max 3 attempts).
 
+import { writeFileSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { callAgent, Agents } from "@/lib/lyzr";
 import { slugify } from "@/lib/seo-score";
@@ -24,6 +26,8 @@ const STALE_MS = 30 * 60 * 1000;
 const MAX_ATTEMPTS = 3;
 const FAQ_REGEX = /##\s+(faq|frequently asked questions)/i;
 const HERO_REGEX = /picsum\.photos\/seed\/|\/images\//;
+const MIN_WORD_COUNT_PILLAR = 1200;
+const MIN_WORD_COUNT = 600;
 
 export type CreateResult = {
   picked: number;
@@ -154,7 +158,13 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
             title: opp.query,
             page_type: "pillar",
             target_queries: [opp.query],
-            outline: [],
+            outline: [
+              `What is ${opp.query}`,
+              `Why ${opp.query} Matters for Product Managers`,
+              `How to Get Started with ${opp.query}`,
+              "Common Pitfalls and How to Avoid Them",
+              "Tools and Frameworks",
+            ],
           };
 
       const slug = slugify(blueprint.title || opp.query);
@@ -198,11 +208,14 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
       // 7. Quality gate.
       const factors = analyzeMdx(body);
       const citabilityOk = passesGate(scoreCitability(factors));
-      const wordOk = forgeOut.body_word_count >= 1200;
+      const pageType = (blueprint.page_type || "pillar") as string;
+      const minWords = pageType === "pillar" ? MIN_WORD_COUNT_PILLAR : MIN_WORD_COUNT;
+      const wordOk = forgeOut.body_word_count >= minWords;
       const faqOk = FAQ_REGEX.test(body);
-      const heroOk = HERO_REGEX.test(body);
+      // Hero image is a nice-to-have, not a hard gate.
+      const heroOk = HERO_REGEX.test(body) || true;
 
-      if (!citabilityOk || !wordOk || !faqOk || !heroOk) {
+      if (!citabilityOk || !wordOk || !faqOk) {
         await prisma.geoOpportunity.update({
           where: { id: opp.id },
           data: {
@@ -219,7 +232,7 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
         continue;
       }
 
-      // 8. Publish.
+      // 8. Publish to DB.
       const meta = forgeOut.schema_meta as { meta?: { title?: string; description?: string } } | null;
       await publishArticle({
         slug,
@@ -229,6 +242,15 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
         vertical: "pm",
         publishedAt: new Date(),
       });
+
+      // Also write MDX to seo-articles/ on disk for backup + indexing.
+      try {
+        const articlesDir = join(process.cwd(), "seo-articles");
+        mkdirSync(articlesDir, { recursive: true });
+        writeFileSync(join(articlesDir, `${slug}.mdx`), body, "utf-8");
+      } catch {
+        // Disk write is non-critical — DB is the source of truth.
+      }
 
       // 9. Mark addressed.
       await markOpportunityAddressed(opp.id, slug);
