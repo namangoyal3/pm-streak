@@ -60,7 +60,14 @@ export async function writeCronLog(data: {
   summary: string;
   details?: Record<string, unknown>;
 }) {
-  return prisma.geoCronLog.create({ data: { ...data, details: data.details ?? {} } });
+  return prisma.geoCronLog.create({
+    data: {
+      cronId: data.cronId,
+      status: data.status,
+      summary: data.summary,
+      details: (data.details ?? {}) as Prisma.InputJsonValue,
+    },
+  });
 }
 
 export async function getPageMetrics(slug: string, days = 30) {
