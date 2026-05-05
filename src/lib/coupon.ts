@@ -1,13 +1,16 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 
-const COUPON_SECRET = (process.env.COUPON_SECRET || process.env.JWT_SECRET) as string;
-if (!COUPON_SECRET) {
-  throw new Error("COUPON_SECRET (or JWT_SECRET) env var is required but not set");
+function getCouponSecret(): string {
+  const secret = process.env.COUPON_SECRET || process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("COUPON_SECRET (or JWT_SECRET) env var is required but not set");
+  }
+  return secret;
 }
 
 function signCoupon(code: string, email: string, discountPercent: number, expiresAt: number): string {
   const payload = `${code}:${email === "*" ? "*" : email.toLowerCase()}:${discountPercent}:${expiresAt}`;
-  return createHmac("sha256", COUPON_SECRET).update(payload).digest("hex");
+  return createHmac("sha256", getCouponSecret()).update(payload).digest("hex");
 }
 
 export function verifyCouponSignature(
