@@ -204,12 +204,13 @@ export async function runLyzrDream(): Promise<LyzrDreamResult> {
   const okCount = results.filter((r) => r.status === "ok").length;
   const errCount = results.filter((r) => r.status === "error").length;
 
-  await writeCronLog({
+  // Non-blocking — DB may not be available in all envs.
+  writeCronLog({
     cronId: "lyzr-dream/run",
     status: errCount === 0 ? "ok" : okCount > 0 ? "ok" : "error",
     summary: `Lyzr dream complete: ${okCount} ok, ${errCount} errors, ${memoryEntriesWritten} memory entries written`,
     details: { ranAt, results, memoryEntriesWritten },
-  });
+  }).catch(() => undefined);
 
   return { ranAt, results, memoryEntriesWritten };
 }
