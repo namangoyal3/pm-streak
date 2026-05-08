@@ -81,9 +81,8 @@ Only include queries where intent_score > 50 and pm-streak is NOT in the current
         opportunities
           .filter((r) => r.query)
           .map((r) => ({
-            key: `opportunity:${r.query.toLowerCase().replace(/\s+/g, "-").slice(0, 80)}:${date}`,
+            path: `/opportunity/${r.query.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)}/${date}`,
             content: `Scout opportunity ${date} — query="${r.query}" intentScore=${r.intent_score ?? r.intentScore ?? 50} source=${r.llm_source ?? r.source ?? "scout"} gapScore=${r.gap_score ?? r.gapScore ?? 50}`,
-            metadata: { source: "scout", date },
           }))
       );
     }

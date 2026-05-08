@@ -77,6 +77,12 @@
     },
     "src/app/api/geo/dream/status/route.ts": {
       "maxDuration": 30
+    },
+    "src/app/api/geo/lyzr-dream/run/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/geo/lyzr-dream/status/route.ts": {
+      "maxDuration": 30
     }
   },
   "crons": [
@@ -151,6 +157,10 @@
     {
       "path": "/api/geo/dream/run",
       "schedule": "0 2 * * 0"
+    },
+    {
+      "path": "/api/geo/lyzr-dream/run",
+      "schedule": "0 4 * * 0"
     }
   ]
 }

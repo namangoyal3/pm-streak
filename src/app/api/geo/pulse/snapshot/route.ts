@@ -52,9 +52,8 @@ This block is machine-parsed to update the self-improvement queue — include it
       const date = new Date().toISOString().slice(0, 10);
       await writeMemoryBatch(
         rows.map((r) => ({
-          key: `pulse:${r.slug}:${date}`,
+          path: `/pulse/${r.slug}/${date}`,
           content: `Pulse snapshot ${date} — slug="${r.slug}" sessions30d=${r.sessions30d} leads30d=${r.leads30d} citability=${r.citability ?? "unknown"}`,
-          metadata: { source: "pulse", date },
         }))
       );
     }

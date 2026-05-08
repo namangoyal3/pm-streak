@@ -259,9 +259,8 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
       // Write published page to Claude memory store for Dreams consolidation (fire-and-forget).
       if (process.env.ANTHROPIC_GEO_MEMORY_STORE_ID) {
         writeMemory({
-          key: `page:${slug}`,
+          path: `/page/${slug}`,
           content: `Published page slug="${slug}" query="${opp.query}" wordCount=${forgeOut.body_word_count} citabilityScore=${scoreCitability(factors)} pageType=${blueprint.page_type}`,
-          metadata: { source: "forge", slug },
         }).catch(() => undefined);
       }
 
