@@ -21,6 +21,7 @@ import {
 } from "./safe-prisma";
 import { analyzeMdx, passesGate, scoreCitability } from "./citability";
 import { runForge } from "./forge-runner";
+import { writeMemory } from "@/lib/claude-memory";
 
 const STALE_MS = 30 * 60 * 1000;
 const MAX_ATTEMPTS = 3;
@@ -254,6 +255,15 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
 
       // 9. Mark addressed.
       await markOpportunityAddressed(opp.id, slug);
+
+      // Write published page to Claude memory store for Dreams consolidation (fire-and-forget).
+      if (process.env.ANTHROPIC_GEO_MEMORY_STORE_ID) {
+        writeMemory({
+          key: `page:${slug}`,
+          content: `Published page slug="${slug}" query="${opp.query}" wordCount=${forgeOut.body_word_count} citabilityScore=${scoreCitability(factors)} pageType=${blueprint.page_type}`,
+          metadata: { source: "forge", slug },
+        }).catch(() => undefined);
+      }
 
       result.created++;
       result.decisions.push({ query: opp.query, action: "created", slug });
