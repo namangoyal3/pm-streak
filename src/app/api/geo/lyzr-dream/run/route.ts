@@ -4,7 +4,7 @@
 // Each agent receives a reflection prompt asking it to deduplicate,
 // resolve contradictions, and surface new insights from its KB knowledge.
 // The primary Lyzr KB (pm_streak_shared_kb) is NEVER deleted or overwritten.
-// Outputs are saved to .lyzr-dream-cache/ and written to the Claude memory store.
+// Outputs are saved to .lyzr-dream-cache/. Cortex writes the consolidated summary back to the Lyzr KB.
 //
 // Auth: x-vercel-cron: 1  OR  Authorization: Bearer $CRON_SECRET
 
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       agentsProcessed: result.results.length,
       okCount,
       errCount,
-      memoryEntriesWritten: result.memoryEntriesWritten,
+      cortexConsolidated: result.cortexConsolidated,
       results: result.results.map((r) => ({
         agent: r.agent,
         status: r.status,

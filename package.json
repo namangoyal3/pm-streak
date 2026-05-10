@@ -21,7 +21,6 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.95.1",
     "@cursor/sdk": "^1.0.9",
     "@dodopayments/nextjs": "^0.3.5",
     "@mendable/firecrawl-js": "^4.18.0",

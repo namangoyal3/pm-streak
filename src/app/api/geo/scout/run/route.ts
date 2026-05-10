@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { Agents, callAgent } from "@/lib/lyzr";
 import { createOpportunity, writeCronLog } from "@/lib/geo/safe-prisma";
-import { writeMemoryBatch } from "@/lib/claude-memory";
 import type { Prisma } from "@prisma/client";
 
 const isAllowed = (req: Request) =>
@@ -73,19 +72,6 @@ Only include queries where intent_score > 50 and pm-streak is NOT in the current
       summary: queued > 0 ? `Queued ${queued} opportunities from ${opportunities.length} parsed` : `Parsed ${opportunities.length} rows, 0 queued`,
       details: { parsed: opportunities.length, queued, errors },
     });
-
-    // Write discovered opportunities to Claude memory store for Dreams consolidation.
-    if (queued > 0 && process.env.ANTHROPIC_GEO_MEMORY_STORE_ID) {
-      const date = new Date().toISOString().slice(0, 10);
-      await writeMemoryBatch(
-        opportunities
-          .filter((r) => r.query)
-          .map((r) => ({
-            path: `/opportunity/${r.query.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80)}/${date}`,
-            content: `Scout opportunity ${date} — query="${r.query}" intentScore=${r.intent_score ?? r.intentScore ?? 50} source=${r.llm_source ?? r.source ?? "scout"} gapScore=${r.gap_score ?? r.gapScore ?? 50}`,
-          }))
-      );
-    }
 
     return NextResponse.json({
       ok: true,

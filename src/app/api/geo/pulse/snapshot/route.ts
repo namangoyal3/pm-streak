@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { Agents, callAgent } from "@/lib/lyzr";
 import { prisma } from "@/lib/prisma";
 import { parsePulseMetrics } from "@/lib/geo/safe-prisma";
-import { writeMemoryBatch } from "@/lib/claude-memory";
 
 const isAllowed = (req: Request) =>
   req.headers.get("x-vercel-cron") === "1" ||
@@ -46,17 +45,6 @@ This block is machine-parsed to update the self-improvement queue — include it
         })
       )
     );
-
-    // Write pulse metrics to Claude memory store for Dreams consolidation.
-    if (rows.length > 0 && process.env.ANTHROPIC_GEO_MEMORY_STORE_ID) {
-      const date = new Date().toISOString().slice(0, 10);
-      await writeMemoryBatch(
-        rows.map((r) => ({
-          path: `/pulse/${r.slug}/${date}`,
-          content: `Pulse snapshot ${date} — slug="${r.slug}" sessions30d=${r.sessions30d} leads30d=${r.leads30d} citability=${r.citability ?? "unknown"}`,
-        }))
-      );
-    }
 
     return NextResponse.json({ ok: true, length: result.response.length, triageUpdated: rows.length });
   } catch (error) {
