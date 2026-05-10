@@ -1,27 +1,27 @@
 // Sample Lyzr dream run — calls runLyzrDream() directly (no HTTP server needed).
-// Usage: pnpm tsx --env-file=.env.local scripts/lyzr/run-dream-sample.ts
 //
-// Runs dream mode on all 5 Lyzr agents (Cortex, Scout, Rival, Pulse, Blueprint),
-// prints each agent's consolidated JSON output, and writes results to
-// .lyzr-dream-cache/ and the Claude memory store (if ANTHROPIC_GEO_MEMORY_STORE_ID set).
+// With real Lyzr credentials:
+//   pnpm tsx --env-file=.env.local scripts/lyzr/run-dream-sample.ts
+//
+// With mock mode (no Lyzr network access needed — works locally):
+//   LYZR_MOCK=true pnpm tsx scripts/lyzr/run-dream-sample.ts
 
 import { runLyzrDream } from "@/lib/geo/lyzr-dream-worker";
 
-const REQUIRED = [
-  "LYZR_API_KEY",
-  "LYZR_AGENT_CORTEX",
-  "LYZR_AGENT_SCOUT",
-  "LYZR_AGENT_RIVAL",
-  "LYZR_AGENT_PULSE",
-  "LYZR_AGENT_BLUEPRINT",
-];
+const isMock = process.env.LYZR_MOCK === "true";
 
-const missing = REQUIRED.filter((k) => !process.env[k]);
-if (missing.length) {
-  console.error("Missing env vars:", missing.join(", "));
-  console.error("Run: pnpm tsx --env-file=.env.local scripts/lyzr/run-dream-sample.ts");
-  process.exit(1);
+if (!isMock) {
+  const REQUIRED = ["LYZR_API_KEY", "LYZR_AGENT_CORTEX", "LYZR_AGENT_SCOUT", "LYZR_AGENT_RIVAL", "LYZR_AGENT_PULSE", "LYZR_AGENT_BLUEPRINT"];
+  const missing = REQUIRED.filter((k) => !process.env[k]);
+  if (missing.length) {
+    console.error("Missing env vars:", missing.join(", "));
+    console.error("  With credentials: pnpm tsx --env-file=.env.local scripts/lyzr/run-dream-sample.ts");
+    console.error("  With mock mode:   LYZR_MOCK=true pnpm tsx scripts/lyzr/run-dream-sample.ts");
+    process.exit(1);
+  }
 }
+
+if (isMock) console.log("Running in MOCK mode — no Lyzr API calls will be made.\n");
 
 console.log("Starting Lyzr dream run...\n");
 const start = Date.now();
