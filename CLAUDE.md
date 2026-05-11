@@ -15,27 +15,61 @@ PM Streak is a daily PM education platform (Duolingo for Product Managers). Next
 - AI lesson generation via DeepSeek + pipeline cron jobs
 - Feature flags control: prioritySupport, ai Tajwal-30 lessons, experiments
 
-## Design Principles
+## Behavioral Rules
 
-### Think Before Coding
-- Ask: what user outcome does this change? Who is affected?
-- Before touching payments, auth, or experiment tracking — understand the full data flow
-- 0% conversion is a product problem, not a code problem. Check `/pricing`, `/dashboard` before adding features.
+These 12 rules apply to every task. Bias: caution over speed on non-trivial work.
 
-### Simplicity First
-- Small PRs. One logical change per commit.
-- If you find yourself changing >5 files for a single feature, stop — you're over-engineering.
-- Copy patterns already in the codebase before importing new abstractions.
+### Rule 1 — Think Before Coding
+State assumptions explicitly. If uncertain, ask rather than guess.
+Ask: what user outcome does this change? Who is affected?
+Before touching payments, auth, or experiment tracking — understand the full data flow.
+0% conversion is a product problem, not a code problem. Check `/pricing`, `/dashboard` before adding features.
 
-### Surgical Changes
-- Don't touch code that doesn't relate to the task
-- Don't refactor adjacent code "while you're there"
-- Don't add dependencies unless the feature explicitly requires them
+### Rule 2 — Simplicity First
+Minimum code that solves the problem. No speculative features. No abstractions for single-use code.
+Small PRs. One logical change per commit. If changing >5 files for one feature, stop — over-engineering.
+Copy patterns already in the codebase before importing new abstractions.
 
-### Goal-Driven Execution
-- Always state the user-facing outcome before writing code
-- PR title: what changed. PR description: what problem it solves.
-- Test the happy path and one edge case before marking done.
+### Rule 3 — Surgical Changes
+Touch only what you must. Don't refactor adjacent code "while you're there."
+Don't add dependencies unless the feature explicitly requires them. Match existing style.
+
+### Rule 4 — Goal-Driven Execution
+Always state the user-facing outcome before writing code.
+PR title: what changed. PR description: what problem it solves.
+Define success criteria. Loop until verified. Test the happy path and one edge case before marking done.
+
+### Rule 5 — Use Claude Only for Judgment Calls
+Use for: classification, drafting, summarization, extraction from unstructured text.
+Do NOT use for: routing, retries, status-code handling, deterministic transforms. If code can answer, code answers.
+
+### Rule 6 — Token Budgets Are Not Advisory
+Per-task: 4,000 tokens. Per-session: 30,000 tokens.
+If approaching budget, summarize and start fresh. Surface the breach — do not silently overrun.
+
+### Rule 7 — Surface Conflicts, Don't Average Them
+If two patterns contradict, pick one (more recent / more tested). Explain why. Flag the other for cleanup.
+Don't blend conflicting patterns. "Average" code that satisfies both is the worst code.
+
+### Rule 8 — Read Before You Write
+Before adding code, read the file's exports, the immediate caller, and shared utilities.
+If unsure why existing code is structured a certain way, ask before adding to it.
+
+### Rule 9 — Tests Verify Intent, Not Just Behavior
+Tests must encode WHY behavior matters, not just WHAT it does.
+A test that cannot fail when business logic changes is wrong.
+
+### Rule 10 — Checkpoint After Every Significant Step
+Summarize what was done, what's verified, what's left after each step in a multi-step task.
+Don't continue from a state you can't describe back. If you lose track, stop and restate.
+
+### Rule 11 — Match the Codebase's Conventions, Even If You Disagree
+Conformance > taste inside the codebase.
+If a convention is genuinely harmful, surface it. Don't fork it silently.
+
+### Rule 12 — Fail Loud
+"Completed" is wrong if anything was skipped silently. "Tests pass" is wrong if any were skipped.
+Default to surfacing uncertainty, not hiding it.
 
 ## Payment & Auth — Extra Care
 - Never log payment tokens, user credentials, or full API keys
