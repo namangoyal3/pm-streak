@@ -1,0 +1,124 @@
+# The AI Product Manager Skills That Actually Get You Hired in 2026
+
+> **description**: Master the exact AI PM skills hiring managers test for right now — from model evals and prompt engineering to ethics frameworks.
+> **primaryKeyword**: AI product manager skills
+> **vertical**: pm
+> **tags**: AI product manager, AI PM skills, product management, machine learning, career growth
+> **seoScore**: 100
+
+The AI product manager skills required to get hired have shifted dramatically. If you're applying to AI PM roles in 2026 with nothing but "familiarity with machine learning" on your resume, you're losing to candidates who write eval suites, interpret precision-recall tradeoffs, and debate hallucination tolerance thresholds with their engineering teams.
+
+The AI PM role has matured fast. What was a novelty in 2023 is a table-stakes job requirement today. Here's the exact skill stack that separates candidates who get offers from those who get ghosted — based on what Google, Anthropic, Meta, and OpenAI hiring managers are testing for right now.
+
+## What Makes AI PM Different from Traditional PM
+
+Traditional PMs manage deterministic systems: code that does exactly what it's told. AI PMs manage probabilistic systems where outputs vary, confidence scores matter, and "good enough" is a measurable target, not a vibe.
+
+This changes everything about requirements, testing, and success metrics. You're no longer writing "the button must redirect to checkout." You're writing: "the summarization model must achieve ≥87% factual accuracy on the internal benchmark with a ≤3% hallucination rate on PII-adjacent content."
+
+If you're still writing user stories without model behavior acceptance criteria, you're building for the previous decade.
+
+## The Five-Layer AI PM Skill Stack
+
+### 1. ML Fundamentals — Understanding, Not Coding
+
+You don't need to build models. You need to understand what they can and can't do — well enough to push back on your engineers when they're wrong.
+
+Concretely, you should be able to:
+- Explain the difference between supervised, unsupervised, and reinforcement learning to a non-technical stakeholder without stumbling
+- Read a confusion matrix and know why precision matters more than recall in fraud detection, and vice versa in medical screening
+- Distinguish between fine-tuning, RAG (Retrieval-Augmented Generation), and prompt engineering — and recommend the right approach for a given problem
+- Explain model drift and why you need production monitoring, not just pre-launch testing
+
+A useful calibration: if your ML engineer says "our F1 score dropped from 0.91 to 0.84 after the data refresh," you should immediately ask about train/test distribution shifts — not nod politely.
+
+### 2. Eval Design — The Skill Nobody Talks About
+
+Writing AI product requirements is one thing. Knowing how to verify them is another — and most PM candidates are completely unprepared for this.
+
+The best AI PMs write evals: synthetic test suites that validate model behavior against specific acceptance criteria. Think of them as automated acceptance tests for probabilistic systems.
+
+A minimal eval setup includes:
+- **Golden dataset**: 50–200 hand-labeled examples covering real edge cases
+- **Pass/fail thresholds**: specific numeric targets, not "it should feel accurate"
+- **Regression suite**: tests that run before every model update to catch silent degradation
+
+If you've never written an eval, start now: take your product's top 20 AI failure cases from customer support, label what the correct output should have been, and build a script that checks new model versions against them. That alone puts you ahead of 80% of AI PM candidates.
+
+### 3. Data Literacy Over Data Science
+
+You don't need a statistics degree. You need to know when data is lying to you — and in AI development, it will lie frequently.
+
+Key skills that matter:
+- Identifying selection bias in training data (the model inherits every prejudice in your data pipeline)
+- Spotting when a metric improves technically but degrades practically (average session duration going up because confused users can't find the exit)
+- Segmenting A/B results by user cohort so aggregate numbers don't hide model failures on specific demographics
+
+The question to bring to every data review meeting: "What user group would this model fail worst for, and is that group represented in our test set?"
+
+### 4. Prompt Engineering as Product Thinking
+
+Generative AI PMs need to treat prompt design the way UX designers treat interaction patterns — with iteration, testing, and documented principles.
+
+Prompts are product requirements for LLMs. A poorly written prompt is a production bug at scale.
+
+Practical skills in demand today:
+- Chain-of-thought prompting for multi-step reasoning tasks
+- Few-shot examples for classification and extraction tasks
+- Structured output formatting (JSON, XML) to make model outputs parseable by downstream systems
+- Negative constraints that enforce predictable behavior: "Do not mention competitor products. If asked, redirect to our feature comparison page."
+
+Build a versioned prompt library for your product. Treat prompt regressions exactly like code regressions — with tickets, owners, and post-mortems.
+
+### 5. AI Ethics and Compliance Literacy
+
+This is not soft skills. In 2026, it is increasingly a legal and regulatory requirement.
+
+AI PMs need working knowledge of:
+- **GDPR**: How it applies to data used in model training, especially personal data in fine-tuning sets
+- **NIST AI RMF**: The dominant US framework for AI risk governance — your legal team will reference this
+- **EU AI Act**: If your product reaches European users, you need to know which risk tier your AI falls into and what documentation is required
+- **Bias auditing**: How to commission and interpret demographic fairness reports on your models
+
+When you can walk into a legal review meeting and explain your AI's risk classification without needing your lawyer to translate, you become the PM executives want leading high-visibility projects.
+
+## A Real AI PM's Day in 2026
+
+This is what top AI PMs' schedules actually look like — not the aspirational version:
+
+**Morning**: Review overnight model performance dashboards. Flag accuracy dips in the engineering Slack channel. Triage customer support tickets where users mentioned incorrect AI responses — these are your eval improvement candidates.
+
+**Midday**: Run a prompt refinement session with engineers using yesterday's failure cases as input. Review eval results from last night's model update before giving the green light to ship.
+
+**Afternoon**: Write requirements for the next feature — including explicit model behavior acceptance criteria, not just UI specs. Attend a cross-functional review where you explain the model's error budget to a skeptical finance stakeholder.
+
+**Throughout**: Use AI tools to accelerate your own PM work — summarizing user research interviews, generating edge case scenarios for QA, drafting PRD sections for review.
+
+The core mindset shift: model behavior is a product surface that you own. Not an engineering black box you hand off and hope for the best.
+
+## How to Build This Skill Stack in 30 Days
+
+You don't need to enroll in a graduate program. Here's the accelerated path:
+
+1. **Week 1**: Complete [fast.ai's Practical Deep Learning course](https://fast.ai) (free). Focus on understanding what's happening, not implementing from scratch.
+2. **Week 2**: Build a small eval suite for any AI product you use daily. Pick 20 failure cases. Write specific acceptance criteria for correct behavior.
+3. **Week 3**: Practice prompt engineering systematically on real tasks. Read OpenAI's prompt engineering guide. Create a versioned prompt library in Notion or GitHub.
+4. **Week 4**: Read the NIST AI RMF executive summary and EU AI Act risk tier definitions. Apply them to a product you've worked on.
+
+Then sharpen your judgment on [real AI product challenges at PM Streak's daily challenge](/daily-challenge) — each one is built around decisions you'll face in interviews and on the job.
+
+## What Hiring Managers Are Actually Testing
+
+When top AI companies interview you for a PM role, they're not testing whether you know the word "transformer." They're testing three specific things:
+
+1. **Can you write requirements for a system that could be wrong?** Acceptance criteria with explicit error budgets, not binary pass/fail.
+2. **Can you make a prioritization call when the data is ambiguous?** AI development is inherently uncertain — interviewers want your decision-making process, not just your conclusion.
+3. **Can you translate a model failure into a product requirement?** Most candidates describe what went wrong. Top candidates immediately articulate what the requirement should have been.
+
+Practice all three at [PM Streak's interview prep](/interview-prep), where you'll work through AI-specific PM interview questions that mirror the actual bar at FAANG and AI-native companies.
+
+## The Bottom Line
+
+The AI PM skill stack is not about coding. It's about developing judgment to make good decisions when the system you're responsible for is, by design, uncertain. ML literacy + eval thinking + data skepticism + prompt craft + ethics fluency = the package that gets you hired and keeps you advancing in the most valuable PM roles in the market right now.
+
+Start building it today — and use [PM Streak's daily challenges](/daily-challenge) to make it a daily practice.
