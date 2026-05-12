@@ -54,6 +54,62 @@ async function recordDodoEvent(opts: {
   }
 }
 
+/**
+ * Page the team the first time we ever see a Dodo event of this type.
+ * Counts existing rows in `BillingEvent` for (provider="dodo", eventType);
+ * after `recordDodoEvent` inserts, count of 1 means this is the first.
+ *
+ * Best-effort: catches all errors internally so the webhook response is never
+ * blocked by an alert failure. Skipped when Resend is not configured.
+ *
+ * Tracked under [LEA-7] AC 5.
+ */
+async function notifyFirstDodoEventOfType(opts: {
+  eventType: string;
+  payload: unknown;
+}): Promise<void> {
+  try {
+    const count = await prisma.billingEvent.count({
+      where: { provider: "dodo", eventType: opts.eventType },
+    });
+    if (count !== 1) return;
+
+    const apiKey = process.env.RESEND_API_KEY;
+    const from = process.env.EMAIL_FROM;
+    const to = process.env.OPS_ALERT_EMAIL;
+    if (!apiKey || !from || !to) {
+      console.warn(
+        `[dodo-webhook] First ${opts.eventType} event — alert not sent (RESEND_API_KEY, EMAIL_FROM, or OPS_ALERT_EMAIL missing)`
+      );
+      return;
+    }
+
+    const isSuccess =
+      opts.eventType === "subscription.active" ||
+      opts.eventType === "subscription.renewed";
+    const subject = isSuccess
+      ? `[pm-streak] First Dodo ${opts.eventType} — paying customer captured`
+      : `[pm-streak] First Dodo ${opts.eventType} — investigate`;
+    const body = [
+      `First Dodo event of type "${opts.eventType}" just landed in BillingEvent.`,
+      ``,
+      `Payload:`,
+      `${JSON.stringify(opts.payload, null, 2)}`,
+    ].join("\n");
+
+    const { Resend } = await import("resend");
+    const resend = new Resend(apiKey);
+    await resend.emails.send({ from, to, subject, text: body });
+    console.log(`[dodo-webhook] First-${opts.eventType} alert sent to`, to);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(
+      `[dodo-webhook] First-${opts.eventType} alert send failed:`,
+      message
+    );
+  }
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   // Lazy import so the Webhooks factory (which validates the key) only runs at request time
   const { Webhooks } = await import("@dodopayments/nextjs");
@@ -81,6 +137,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         payload,
         userId,
       });
+      await notifyFirstDodoEventOfType({ eventType: payload.type, payload });
       if (!userId) {
         console.error("[dodo-webhook] onSubscriptionActive: user not found for", sub.customer.email);
         return;
@@ -104,6 +161,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         payload,
         userId,
       });
+      await notifyFirstDodoEventOfType({ eventType: payload.type, payload });
       if (!userId) {
         console.error("[dodo-webhook] onSubscriptionRenewed: user not found for", sub.customer.email);
         return;
@@ -127,6 +185,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         payload,
         userId,
       });
+      await notifyFirstDodoEventOfType({ eventType: payload.type, payload });
       if (!userId) return;
       await setDodoSubscriptionCancelling({
         userId,
@@ -145,6 +204,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         payload,
         userId,
       });
+      await notifyFirstDodoEventOfType({ eventType: payload.type, payload });
       if (!userId) return;
       await revokeDodoPro({
         userId,
@@ -162,6 +222,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         payload,
         userId,
       });
+      await notifyFirstDodoEventOfType({ eventType: payload.type, payload });
       if (!userId) return;
       await prisma.user.update({
         where: { id: userId },
