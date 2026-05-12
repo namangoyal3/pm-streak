@@ -1,6 +1,25 @@
 /**
  * GA4 Event Tracking for Conversion Funnel Analysis
- * Tracks key user actions to identify dropoff points
+ * Tracks key user actions to identify dropoff points.
+ *
+ * Per LEA-6 / CONVERSION_PLAN.md this file is the canonical registry of
+ * conversion-funnel event names. Each name below is fired from one specific
+ * call site so the funnel is observable end-to-end in GA4 Realtime:
+ *
+ *   trial_start_attempt           — POST /api/billing/start-trial entry
+ *   trial_start_success           — trial granted in /api/billing/start-trial
+ *   trial_start_blocked           — { reason } from /api/billing/start-trial
+ *   checkout_initiated            — GET /api/checkout entry
+ *   checkout_dodo_redirect        — before redirecting to Dodo
+ *   checkout_error                — { error } from /api/checkout
+ *   pricing_page_view             — /pricing mounted (server)
+ *   hero_cta_clicked              — homepage hero CTA click
+ *   dashboard_upgrade_cta_clicked — dashboard upgrade bar click
+ *
+ * Server-side names go through `trackServerEvent` in `ga4-server.ts`
+ * (Measurement Protocol). Client-side names go through `trackEvent` below,
+ * which writes to `window.gtag`. Event payloads must contain no PII beyond
+ * the existing GA user id — no emails, no payment tokens.
  */
 
 declare global {
@@ -41,6 +60,47 @@ export const FUNNEL_EVENTS = {
   // Referral
   SHARE_CLICKED: 'share_clicked',
   REFERRAL_INVITED: 'referral_invited',
+};
+
+/**
+ * Canonical conversion-funnel event names (LEA-6).
+ * Use these constants in both client (`trackEvent`) and server
+ * (`trackServerEvent` from `ga4-server.ts`) call sites so the event name
+ * is owned in exactly one place.
+ */
+export const CONVERSION_FUNNEL_EVENTS = {
+  TRIAL_START_ATTEMPT: 'trial_start_attempt',
+  TRIAL_START_SUCCESS: 'trial_start_success',
+  TRIAL_START_BLOCKED: 'trial_start_blocked',
+  CHECKOUT_INITIATED: 'checkout_initiated',
+  CHECKOUT_DODO_REDIRECT: 'checkout_dodo_redirect',
+  CHECKOUT_ERROR: 'checkout_error',
+  PRICING_PAGE_VIEW: 'pricing_page_view',
+  HERO_CTA_CLICKED: 'hero_cta_clicked',
+  DASHBOARD_UPGRADE_CTA_CLICKED: 'dashboard_upgrade_cta_clicked',
+} as const;
+
+export type ConversionFunnelEvent =
+  (typeof CONVERSION_FUNNEL_EVENTS)[keyof typeof CONVERSION_FUNNEL_EVENTS];
+
+/**
+ * Client-side helpers for the three conversion-funnel events that fire from
+ * the browser (the others fire from API routes via `serverEvents` in
+ * `ga4-server.ts`). Keep payloads PII-free.
+ */
+export const conversionFunnel = {
+  pricingPageView: () =>
+    trackEvent(CONVERSION_FUNNEL_EVENTS.PRICING_PAGE_VIEW),
+  heroCtaClicked: (variant?: string) =>
+    trackEvent(
+      CONVERSION_FUNNEL_EVENTS.HERO_CTA_CLICKED,
+      variant ? { experiment_variant: variant } : {},
+    ),
+  dashboardUpgradeCtaClicked: (source?: string) =>
+    trackEvent(
+      CONVERSION_FUNNEL_EVENTS.DASHBOARD_UPGRADE_CTA_CLICKED,
+      source ? { source } : {},
+    ),
 };
 
 /**

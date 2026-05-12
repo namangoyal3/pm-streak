@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, ChevronRight, Zap } from "lucide-react";
+import { ChevronRight, Zap } from "lucide-react";
+import { conversionFunnel } from "@/lib/ga4-events";
 
 interface ProBannerProps {
   plan?: string;
@@ -19,8 +20,9 @@ export default function ProBanner({ plan }: ProBannerProps) {
             🎉 70% OFF for first 500 users — Limited time!
           </p>
         </div>
-        <Link 
-          href="/pricing" 
+        <Link
+          href="/pricing"
+          onClick={() => conversionFunnel.dashboardUpgradeCtaClicked("pro_banner")}
           className="bg-white text-purple-700 text-[10px] font-black px-3 py-1 rounded-full whitespace-nowrap hover:bg-purple-50 transition-colors flex items-center gap-0.5 shadow-sm active:scale-95"
         >
           Upgrade <ChevronRight size={10} strokeWidth={3} />

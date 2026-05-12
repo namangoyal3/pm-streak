@@ -137,8 +137,9 @@ async function PricingContent() {
     getVariant("pro_trial_cta_v1"),
   ]);
 
-  // Track pricing page view
-  userId ? serverEvents.pricingPageView(userId) : undefined;
+  // Track pricing page view (fire for anonymous visitors too — they're the
+  // top of the funnel and we need to see them in GA4 Realtime).
+  serverEvents.pricingPageView(userId);
 
   // Detect country from Vercel geo header (set automatically in production)
   const country = headersList.get("x-vercel-ip-country") ?? null;

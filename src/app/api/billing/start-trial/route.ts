@@ -12,7 +12,12 @@ const MARKETING_TRIAL_DAYS = 3;
  */
 export async function POST() {
   const userId = await getCurrentUserId();
+  // Fire trial_start_attempt at the entry of every POST so we can measure
+  // how many requests reach the route vs. how many succeed downstream.
+  await serverEvents.trialStartAttempt(userId);
+
   if (!userId) {
+    await serverEvents.trialStartBlocked(null, "not_authenticated");
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 

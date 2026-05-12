@@ -41,18 +41,23 @@ export async function GET(req: NextRequest) {
   const plan = searchParams.get("metadata_plan") ?? searchParams.get("plan");
   let productId = searchParams.get("productId");
 
+  // Fire checkout_initiated at the start of every GET — anonymous users count
+  // for funnel observability too.
+  await serverEvents.checkoutInitiated(userId, plan ?? "unknown");
+
   // If no productId provided but plan is, use the base product for that plan
   if (!productId && plan) {
     productId = FALLBACK_PRODUCTS[plan];
   }
 
   if (!productId) {
+    await serverEvents.checkoutError(userId, "missing_product_id");
     return NextResponse.json({ error: "productId is required" }, { status: 400 });
   }
 
   if (productId.trim() === "") {
     console.error("[checkout] productId resolved to empty string — check DODO product ID env vars");
-    if (userId) await serverEvents.checkoutError(userId, "empty_product_id");
+    await serverEvents.checkoutError(userId, "empty_product_id");
     return NextResponse.json({ error: "Checkout is misconfigured. Please contact support." }, { status: 500 });
   }
 
@@ -91,11 +96,9 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Track checkout initiation before redirect
-  if (userId) {
-    await serverEvents.checkoutInitiated(userId, plan ?? "unknown");
-    await serverEvents.checkoutDodoRedirect(userId);
-  }
+  // Fire checkout_dodo_redirect immediately before the redirect so the funnel
+  // shows the last server-observable step before Dodo takes over.
+  await serverEvents.checkoutDodoRedirect(userId);
 
   return NextResponse.redirect(checkoutUrl.toString());
 }

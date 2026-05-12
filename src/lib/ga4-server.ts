@@ -10,6 +10,8 @@
  *   GA4_MEASUREMENT_SECRET=<your-secret>
  */
 
+import { CONVERSION_FUNNEL_EVENTS } from "./ga4-events";
+
 const GA4_MEASUREMENT_URL = "https://www.google-analytics.com/mp/collect";
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const MEASUREMENT_SECRET = process.env.GA4_MEASUREMENT_SECRET;
@@ -58,38 +60,56 @@ export async function trackServerEvent(
   }
 }
 
-// Convenience wrappers for trial/checkout funnel events
+// Convenience wrappers for trial/checkout funnel events.
+// Event names are sourced from `CONVERSION_FUNNEL_EVENTS` so the canonical
+// registry in `ga4-events.ts` stays the single source of truth.
 export const serverEvents = {
-  trialStartAttempt: (userId: string) =>
-    trackServerEvent("trial_start_attempt", { user_id: userId }, userId),
+  trialStartAttempt: (userId: string | null) =>
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.TRIAL_START_ATTEMPT,
+      { authenticated: Boolean(userId) },
+      userId ?? undefined,
+    ),
 
   trialStartSuccess: (userId: string, trialDays: number) =>
-    trackServerEvent("trial_start_success", {
-      trial_days: trialDays,
-      user_id: userId,
-    }, userId),
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.TRIAL_START_SUCCESS,
+      { trial_days: trialDays },
+      userId,
+    ),
 
-  trialStartBlocked: (userId: string, reason: string) =>
-    trackServerEvent("trial_start_blocked", {
-      blocked_reason: reason,
-      user_id: userId,
-    }, userId),
+  trialStartBlocked: (userId: string | null, reason: string) =>
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.TRIAL_START_BLOCKED,
+      { reason },
+      userId ?? undefined,
+    ),
 
-  checkoutInitiated: (userId: string, plan: string) =>
-    trackServerEvent("checkout_initiated", {
-      plan,
-      user_id: userId,
-    }, userId),
+  checkoutInitiated: (userId: string | null, plan: string) =>
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.CHECKOUT_INITIATED,
+      { plan },
+      userId ?? undefined,
+    ),
 
-  checkoutDodoRedirect: (userId: string) =>
-    trackServerEvent("checkout_dodo_redirect", { user_id: userId }, userId),
+  checkoutDodoRedirect: (userId: string | null) =>
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.CHECKOUT_DODO_REDIRECT,
+      {},
+      userId ?? undefined,
+    ),
 
-  checkoutError: (userId: string, error: string) =>
-    trackServerEvent("checkout_error", {
-      error,
-      user_id: userId,
-    }, userId),
+  checkoutError: (userId: string | null, error: string) =>
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.CHECKOUT_ERROR,
+      { error },
+      userId ?? undefined,
+    ),
 
-  pricingPageView: (userId?: string) =>
-    trackServerEvent("pricing_page_view", { user_id: userId ?? "anonymous" }),
+  pricingPageView: (userId?: string | null) =>
+    trackServerEvent(
+      CONVERSION_FUNNEL_EVENTS.PRICING_PAGE_VIEW,
+      {},
+      userId ?? undefined,
+    ),
 };

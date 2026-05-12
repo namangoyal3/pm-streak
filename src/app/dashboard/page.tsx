@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ds } from "@/lib/ds";
+import { conversionFunnel } from "@/lib/ga4-events";
 import ShareCard from "@/components/ShareCard";
 import StreakCelebration from "@/components/StreakCelebration";
 import GoalSelectionModal from "@/components/GoalSelectionModal";
@@ -885,6 +886,7 @@ export default function DashboardPage() {
                   
                   <Link
                     href="/pricing"
+                    onClick={() => conversionFunnel.dashboardUpgradeCtaClicked("dashboard_card")}
                     className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-[var(--purple-primary)] text-black text-xs font-black uppercase tracking-wider hover:bg-[var(--purple-primary)]/90 transition-colors"
                   >
                     <Star size={12} /> Upgrade Now - Limited Time

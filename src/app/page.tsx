@@ -7,6 +7,7 @@ import BrowserLink from "@/components/BrowserLink";
 import SafariBar from "@/components/SafariBar";
 import JsonLd, { breadcrumbSchema, howToSchema, faqSchema, speakableSchema, SITE_URL } from "@/components/JsonLd";
 import HomepageTrialButton from "@/components/HomepageTrialButton";
+import HeroCtaLink from "@/components/HeroCtaLink";
 import { getVariant } from "@/lib/ab";
 
 export const metadata: Metadata = {
@@ -245,12 +246,13 @@ export default async function Home() {
                 Sign up with Google
               </BrowserLink>
               
-              <BrowserLink
+              <HeroCtaLink
                 href="/pricing"
+                variant={heroCtaVariant}
                 className="inline-flex justify-center items-center gap-2 px-6 py-4 rounded-2xl bg-transparent hover:bg-white/5 text-white text-base font-black transition-all border-2 border-white/20 hover:border-white/40 flex-1"
               >
                 {heroCtaText}
-              </BrowserLink>
+              </HeroCtaLink>
             </div>
             <p className="mt-3 text-sm text-[var(--text-secondary)]">No credit card · 30 seconds to set up</p>
           </div>
