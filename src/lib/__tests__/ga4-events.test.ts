@@ -75,3 +75,39 @@ describe("ga4-events: conversionFunnel client helpers", () => {
     expect(() => trackEvent("any_event", { ok: true })).not.toThrow();
   });
 });
+
+describe("ga4-server: trackServerEvent URL hygiene", () => {
+  const fetchMock = vi.fn();
+  const originalFetch = globalThis.fetch;
+  const originalGaId = process.env.NEXT_PUBLIC_GA_ID;
+  const originalSecret = process.env.GA4_MEASUREMENT_SECRET;
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    // Reproduce LEA-14: env value carries a trailing newline (the bug
+    // surfaced in production on dpl_3uB7ovzAgNx8hkWjkMCNeQZ8CKrd).
+    process.env.NEXT_PUBLIC_GA_ID = "G-G8MN39TWEP\n";
+    process.env.GA4_MEASUREMENT_SECRET = "secret-abc\n";
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    process.env.NEXT_PUBLIC_GA_ID = originalGaId;
+    process.env.GA4_MEASUREMENT_SECRET = originalSecret;
+  });
+
+  it("strips trailing whitespace from GA_ID and the measurement secret in the request URL", async () => {
+    const { trackServerEvent } = await import("../ga4-server");
+    await trackServerEvent("pricing_page_view", { plan: "pro" }, "user-1");
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [calledUrl] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(calledUrl).toBe(
+      "https://www.google-analytics.com/mp/collect?measurement_id=G-G8MN39TWEP&api_secret=secret-abc",
+    );
+    expect(calledUrl).not.toMatch(/\s/);
+  });
+});
