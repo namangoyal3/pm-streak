@@ -13,8 +13,8 @@
 import { CONVERSION_FUNNEL_EVENTS } from "./ga4-events";
 
 const GA4_MEASUREMENT_URL = "https://www.google-analytics.com/mp/collect";
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-const MEASUREMENT_SECRET = process.env.GA4_MEASUREMENT_SECRET;
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID?.trim();
+const MEASUREMENT_SECRET = process.env.GA4_MEASUREMENT_SECRET?.trim();
 
 interface GA4Event {
   name: string;
