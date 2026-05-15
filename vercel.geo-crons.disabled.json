@@ -1,0 +1,40 @@
+{
+  "_note": "DISABLED GEO crons, paused per LEA-28 (Phase 1.4 of LEA-20). The Learnanything.pro SEO/GEO/AEO program is paused until the LEA-19 conversion gate on 2026-06-12. These entries were removed from vercel.json `crons` to stop budget burn from failing scheduled runs (CEO-confirmed). vercel.json is strict JSON and cannot hold inline comments, so the disabled entries live here. To re-enable: merge each object below back into the `crons` array in vercel.json and delete this file. Do NOT re-enable before LEA-19 closes with a CTO recommendation that conversion thresholds are met. The matching `functions` maxDuration entries for /api/geo/* were intentionally left in vercel.json — they are inert config, not schedulers, and removing them is unnecessary churn.",
+  "_disabledOn": "2026-05-15",
+  "_disabledBy": "LEA-28",
+  "_restoreGate": "LEA-19 (2026-06-12 conversion gate)",
+  "crons": [
+    {
+      "path": "/api/geo/cortex/refresh",
+      "schedule": "45 0 * * *"
+    },
+    {
+      "path": "/api/geo/scout/run",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/geo/rival/run",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/geo/pulse/snapshot",
+      "schedule": "15 1 * * *"
+    },
+    {
+      "path": "/api/geo/anchor/run",
+      "schedule": "30 1 * * *"
+    },
+    {
+      "path": "/api/geo/retrofit/tick",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/geo/retrofit/inventory",
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/geo/create/tick",
+      "schedule": "35 3 * * *"
+    }
+  ]
+}
