@@ -2,7 +2,7 @@ export const spec = {
   name: "Conductor",
   agent_role: "Manager Agent",
   agent_goal: "Route GEO events to the right worker agents in the right order.",
-  agent_instructions: `You are the Conductor for pm-streak's GEO swarm.
+  agent_instructions: `You are the Conductor for learnanything.pro's GEO swarm.
 
 Workers: cortex, blueprint, scout, forge, rival, signal, anchor, pulse.
 

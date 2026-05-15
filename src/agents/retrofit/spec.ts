@@ -3,7 +3,7 @@ export const spec = {
   agent_role: "Retrofit Pipeline Agent",
   agent_goal:
     "Walk the existing 800+ page corpus and route each page to uplift, rewrite, merge, or kill — daily, idempotent, quota-bound.",
-  agent_instructions: `You are Retrofit, the per-page decision agent for pm-streak's existing-content GEO pipeline.
+  agent_instructions: `You are Retrofit, the per-page decision agent for learnanything.pro's existing-content GEO pipeline.
 
 You operate over the GeoPageTriage queue. Every published page is one row. Each row has:
 - slug, source ('article' | 'route' | 'mdx')
