@@ -1,5 +1,7 @@
 # PM Streak — Conversion Funnel Analysis & Fix Plan
 
+> **STALE (2026-06-11 audit):** The P0-BROKEN items below (GA4 events, trial visibility, homepage CTA) have since SHIPPED — see ga4-server, start-trial route, HomepageTrialButton. The real remaining funnel gaps are in docs/audits/2026-06-11-repo-audit.md (DIR-01..05). Do not action the items below without re-verifying against code.
+
 > Status: PLANNER_COMPLETE | Priority: CRITICAL | Date: 2026-04-15
 
 ---

@@ -16,8 +16,9 @@ export async function getVariant(experiment: string): Promise<ABVariant> {
 
   // No cookie yet (first request — middleware sets it on the response, not the
   // request, so it won't be readable until the next page load). Default to
-  // control so we never show treatment to unassigned visitors.
-  if (!uid) return "control";
+  // treatment so cold/unassigned traffic always sees the trial CTA offer
+  // (conversion fix DIR-01: "control" was silently hiding the offer from new visitors).
+  if (!uid) return "treatment";
 
   // Stable hash: deterministic split on uid + experiment name
   const seed = `${uid}:${experiment}`; // uid is guaranteed non-empty here
