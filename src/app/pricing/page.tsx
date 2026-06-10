@@ -305,23 +305,34 @@ async function PricingContent() {
             >
               Start Pro
             </RazorpayCheckoutButton>
-          ) : (
-            <a
-              href={
-                plans.find((p) => p.key === "quarterly" && p.productId)
-                  ? buildCheckoutUrl({
-                      productId: plans.find((p) => p.key === "quarterly")!.productId,
-                      email: userEmail,
-                      userId: userId ?? undefined,
-                      plan: "quarterly",
-                    })
-                  : "#comparison"
-              }
-              className="sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black bg-purple-500 text-white"
-            >
-              Start Pro
-            </a>
-          )}
+          ) : (() => {
+            const quarterlyPlan = plans.find((p) => p.key === "quarterly" && p.productId);
+            if (!quarterlyPlan) {
+              console.error("[pricing] missing Dodo product ID for plan", "quarterly");
+              return (
+                <button
+                  disabled
+                  className="sm:hidden inline-flex flex-col items-center justify-center gap-0.5 rounded-xl px-5 py-3 text-sm font-black bg-purple-500/40 text-white/50 cursor-not-allowed"
+                >
+                  <span>Start Pro</span>
+                  <span className="text-[10px] font-normal text-white/40">Checkout temporarily unavailable</span>
+                </button>
+              );
+            }
+            return (
+              <a
+                href={buildCheckoutUrl({
+                  productId: quarterlyPlan.productId,
+                  email: userEmail,
+                  userId: userId ?? undefined,
+                  plan: "quarterly",
+                })}
+                className="sm:hidden inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black bg-purple-500 text-white"
+              >
+                Start Pro
+              </a>
+            );
+          })()}
         </div>
 
         {/* Value Proposition */}
