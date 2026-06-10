@@ -18,33 +18,45 @@ export async function POST(req: NextRequest) {
   const item = SHOP_ITEMS[itemId];
   if (!item) return NextResponse.json({ error: "Unknown item" }, { status: 400 });
 
+  // Read user for business-rule checks (max freezes, boost active, etc.)
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-  if (user.gems < item.cost) {
-    return NextResponse.json({ error: "Not enough gems" }, { status: 400 });
-  }
 
   if (itemId === "streak_freeze") {
     if (user.streakFreezes >= 5) {
       return NextResponse.json({ error: "Already at max streak freezes (5)" }, { status: 400 });
     }
-    const updated = await prisma.user.update({
-      where: { id: userId },
+    // Atomically decrement gems only if balance is sufficient
+    const result = await prisma.user.updateMany({
+      where: { id: userId, gems: { gte: item.cost } },
       data: { gems: { decrement: item.cost }, streakFreezes: { increment: 1 } },
     });
-    return NextResponse.json({ gems: updated.gems, streakFreezes: updated.streakFreezes });
+    if (result.count === 0) {
+      return NextResponse.json({ error: "Not enough gems" }, { status: 400 });
+    }
+    const updated = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { gems: true, streakFreezes: true },
+    });
+    return NextResponse.json({ gems: updated!.gems, streakFreezes: updated!.streakFreezes });
   }
 
   if (itemId === "xp_boost") {
     if (user.xpBoostActive) {
       return NextResponse.json({ error: "XP boost already active" }, { status: 400 });
     }
-    const updated = await prisma.user.update({
-      where: { id: userId },
+    const result = await prisma.user.updateMany({
+      where: { id: userId, gems: { gte: item.cost } },
       data: { gems: { decrement: item.cost }, xpBoostActive: true },
     });
-    return NextResponse.json({ gems: updated.gems, xpBoostActive: updated.xpBoostActive });
+    if (result.count === 0) {
+      return NextResponse.json({ error: "Not enough gems" }, { status: 400 });
+    }
+    const updated = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { gems: true, xpBoostActive: true },
+    });
+    return NextResponse.json({ gems: updated!.gems, xpBoostActive: updated!.xpBoostActive });
   }
 
   if (itemId === "streak_repair") {
@@ -57,8 +69,8 @@ export async function POST(req: NextRequest) {
     if (hoursAgo > 48) {
       return NextResponse.json({ error: "Streak repair window has expired (48h)" }, { status: 400 });
     }
-    const updated = await prisma.user.update({
-      where: { id: userId },
+    const result = await prisma.user.updateMany({
+      where: { id: userId, gems: { gte: item.cost } },
       data: {
         gems: { decrement: item.cost },
         streakCount: user.lostStreakVal,
@@ -67,7 +79,14 @@ export async function POST(req: NextRequest) {
         lostStreakVal: 0,
       },
     });
-    return NextResponse.json({ gems: updated.gems, streakCount: updated.streakCount });
+    if (result.count === 0) {
+      return NextResponse.json({ error: "Not enough gems" }, { status: 400 });
+    }
+    const updated = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { gems: true, streakCount: true },
+    });
+    return NextResponse.json({ gems: updated!.gems, streakCount: updated!.streakCount });
   }
 
   return NextResponse.json({ error: "Unhandled item" }, { status: 400 });
