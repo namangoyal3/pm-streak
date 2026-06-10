@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isUserPro } from "@/lib/entitlements";
+import { assertCronAuth } from "@/lib/cron-auth";
 
 /**
  * Monthly credit refresh cron.
@@ -8,10 +9,8 @@ import { isUserPro } from "@/lib/entitlements";
  * Free users: 10 credits. Pro users: 50 credits.
  */
 export async function GET(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const deny = assertCronAuth(req);
+  if (deny) return deny;
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);

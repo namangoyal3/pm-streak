@@ -1,9 +1,11 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "pm-streak-secret-key-change-in-production"
-);
+const rawSecret = process.env.JWT_SECRET;
+if (!rawSecret) {
+  throw new Error("JWT_SECRET env var is required");
+}
+const JWT_SECRET = new TextEncoder().encode(rawSecret);
 
 export async function signToken(userId: string): Promise<string> {
   return new SignJWT({ userId })

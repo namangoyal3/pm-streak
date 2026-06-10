@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { agentSwarm } from "@/lib/agentic-site";
 
 const requiredEnv = [
@@ -16,7 +16,12 @@ const requiredEnv = [
   "CRON_SECRET",
 ];
 
-export async function GET() {
+const isAllowed = (req: NextRequest) =>
+  req.headers.get("x-vercel-cron") === "1" ||
+  req.headers.get("authorization") === `Bearer ${process.env.CRON_SECRET}`;
+
+export async function GET(req: NextRequest) {
+  if (!isAllowed(req)) return NextResponse.json({ ok: false }, { status: 401 });
   const env = Object.fromEntries(requiredEnv.map((key) => [key, Boolean(process.env[key])]));
   const missing = requiredEnv.filter((key) => !process.env[key]);
   return NextResponse.json(

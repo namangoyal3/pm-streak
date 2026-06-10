@@ -4,7 +4,9 @@ import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 function isAdminEmail(email: string): boolean {
-  return email === (process.env.ADMIN_EMAIL || "namangoyal21197@gmail.com");
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return false;
+  return email === adminEmail;
 }
 
 export default async function AdminLayout({

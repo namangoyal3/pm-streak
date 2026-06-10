@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { JOB_SOURCES, isPMJob, type NormJob } from "@/lib/job-scraper";
+import { assertCronAuth } from "@/lib/cron-auth";
 
 /**
  * PM job scraper cron endpoint.
@@ -11,10 +12,8 @@ import { JOB_SOURCES, isPMJob, type NormJob } from "@/lib/job-scraper";
  * Optional: ?source=linkedin to run a single source.
  */
 export async function GET(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const deny = assertCronAuth(req);
+  if (deny) return deny;
 
   const { searchParams } = new URL(req.url);
   const sourceArg = searchParams.get("source");

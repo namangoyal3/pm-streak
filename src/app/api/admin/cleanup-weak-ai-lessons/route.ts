@@ -1,31 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin";
 import {
   applyWeakAiLessonCleanup,
   previewWeakAiLessons,
 } from "@/lib/ai-lesson-cleanup";
 import { generateLesson } from "@/lib/lesson-generator";
 
-function isAdmin(email: string): boolean {
-  const adminEmail = process.env.ADMIN_EMAIL || "namangoyal21197@gmail.com";
-  return email === adminEmail;
-}
-
 export async function POST(req: NextRequest) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  const currentUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { email: true },
-  });
-
-  if (!currentUser || !isAdmin(currentUser.email)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   const body = (await req.json().catch(() => ({}))) as {
     apply?: boolean;

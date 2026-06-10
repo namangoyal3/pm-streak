@@ -85,8 +85,14 @@ interface CleanupPreview {
   sampleTitles: string[];
 }
 
-function isAdminEmail(email: string): boolean {
-  return email === "namangoyal21197@gmail.com";
+// Admin access is enforced server-side by src/app/admin/layout.tsx.
+// This client check is retained only to catch session expiry; admin gating
+// is not duplicated here to avoid hardcoding the admin email in the bundle.
+function isAdminEmail(_email: string): boolean {
+  // Always return true — the server layout already redirected non-admins before
+  // this page was served. This function exists only to satisfy the redirect on
+  // session expiry (meRes.ok check above handles that case).
+  return true;
 }
 
 function formatDate(iso: string): string {
