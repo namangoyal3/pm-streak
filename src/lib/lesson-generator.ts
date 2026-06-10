@@ -2,7 +2,7 @@ import { prisma } from "./prisma";
 import { buildSourceTranscript } from "./podcast-quiz-helpers";
 import { generateActionablePMLesson, SearchResult } from "./llm-lessons";
 export type { SearchResult };
-import { spendCredits, CREDIT_COSTS } from "./credits";
+import { spendCredits, grantCredits, CREDIT_COSTS } from "./credits";
 import { isUserPro } from "./entitlements";
 
 type GenerationMode = "explore" | "deep_dive";
@@ -250,6 +250,7 @@ export async function generateLesson({
 
   // Monetization: credit gate for free users (2 credits per AI lesson)
   const pro = await isUserPro(userId);
+  let creditsSpent = false;
   if (!bypassDailyLimit && !pro) {
     const ok = await spendCredits(userId, CREDIT_COSTS.ai_lesson, "ai_lesson");
     if (!ok) {
@@ -257,76 +258,98 @@ export async function generateLesson({
         "Not enough credits to generate an AI lesson. Upgrade to Pro for unlimited lessons or wait for your monthly refresh."
       );
     }
+    creditsSpent = true;
   }
 
-  const [searchResults, sourceLesson, maxDay] = await Promise.all([
-    searchLennyTranscripts(normalizedTopic),
-    resolveSourceLesson(sourceLessonId),
-    prisma.lesson.aggregate({ _max: { dayNumber: true } }),
-  ]);
+  let searchResults: Awaited<ReturnType<typeof searchLennyTranscripts>>;
+  let sourceLesson: Awaited<ReturnType<typeof resolveSourceLesson>>;
+  let maxDay: { _max: { dayNumber: number | null } };
+  try {
+    [searchResults, sourceLesson, maxDay] = await Promise.all([
+      searchLennyTranscripts(normalizedTopic),
+      resolveSourceLesson(sourceLessonId),
+      prisma.lesson.aggregate({ _max: { dayNumber: true } }),
+    ]);
+  } catch (err) {
+    if (creditsSpent) {
+      await grantCredits(userId, CREDIT_COSTS.ai_lesson, "bonus", {
+        reason: "refund_generation_failure",
+      });
+    }
+    throw err;
+  }
 
-  const category =
-    sourceLesson?.category ??
-    (await ensureAiCategory());
+  try {
+    const category =
+      sourceLesson?.category ??
+      (await ensureAiCategory());
 
-  const title =
-    generationMode === "deep_dive"
-      ? `${normalizedTopic} — Deeper Dive`
-      : `${normalizedTopic.charAt(0).toUpperCase() + normalizedTopic.slice(1)} — Custom Lesson`;
+    const title =
+      generationMode === "deep_dive"
+        ? `${normalizedTopic} — Deeper Dive`
+        : `${normalizedTopic.charAt(0).toUpperCase() + normalizedTopic.slice(1)} — Custom Lesson`;
 
-  const slug = `ai-${slugifyTopic(normalizedTopic).slice(0, 40)}-${generationMode}-${Date.now()}`;
+    const slug = `ai-${slugifyTopic(normalizedTopic).slice(0, 40)}-${generationMode}-${Date.now()}`;
 
-  const llmResult = await generateActionablePMLesson(normalizedTopic, searchResults);
-  const description =
-    llmResult.description ||
-    (generationMode === "deep_dive"
-      ? `A deeper follow-up lesson on ${normalizedTopic}`
-      : `Insights on ${normalizedTopic} synthesized from Lenny's Podcast transcripts.`);
+    const llmResult = await generateActionablePMLesson(normalizedTopic, searchResults);
+    const description =
+      llmResult.description ||
+      (generationMode === "deep_dive"
+        ? `A deeper follow-up lesson on ${normalizedTopic}`
+        : `Insights on ${normalizedTopic} synthesized from Lenny's Podcast transcripts.`);
 
-  const content = llmResult.content;
-  const questions = llmResult.questions;
-  const sourceTranscript = buildSourceTranscript(normalizedTopic, searchResults);
+    const content = llmResult.content;
+    const questions = llmResult.questions;
+    const sourceTranscript = buildSourceTranscript(normalizedTopic, searchResults);
 
-  const leadResult = searchResults[0];
+    const leadResult = searchResults[0];
 
-  const lesson = await prisma.lesson.create({
-    data: {
-      title,
-      slug,
-      description,
-      content,
-      xpReward: 15,
-      difficulty: generationMode === "deep_dive" ? 3 : 2,
-      dayNumber: (maxDay._max.dayNumber ?? 22) + 1,
-      categoryId: category.id,
-      guestName: sourceLesson?.guestName ?? leadResult.guest,
-      episodeTitle: sourceLesson?.episodeTitle ?? leadResult.episodeTitle,
-      youtubeId: sourceLesson?.youtubeId ?? null,
-      youtubeStart: sourceLesson?.youtubeStart ?? null,
-      youtubeEnd: sourceLesson?.youtubeEnd ?? null,
-      sourceTranscript,
-      aiGenerated: true,
-      generatedForUserId: userId,
-      topicKey,
-      generationMode,
-      sourceLessonId,
-    },
-  });
-
-  for (let i = 0; i < questions.length; i++) {
-    const question = questions[i];
-    await prisma.question.create({
+    const lesson = await prisma.lesson.create({
       data: {
-        lessonId: lesson.id,
-        questionText: question.questionText,
-        options: JSON.stringify(question.options),
-        correctIndex: question.correctIndex,
-        explanation: question.explanation,
-        xpReward: 5,
-        sortOrder: i,
+        title,
+        slug,
+        description,
+        content,
+        xpReward: 15,
+        difficulty: generationMode === "deep_dive" ? 3 : 2,
+        dayNumber: (maxDay._max.dayNumber ?? 22) + 1,
+        categoryId: category.id,
+        guestName: sourceLesson?.guestName ?? leadResult.guest,
+        episodeTitle: sourceLesson?.episodeTitle ?? leadResult.episodeTitle,
+        youtubeId: sourceLesson?.youtubeId ?? null,
+        youtubeStart: sourceLesson?.youtubeStart ?? null,
+        youtubeEnd: sourceLesson?.youtubeEnd ?? null,
+        sourceTranscript,
+        aiGenerated: true,
+        generatedForUserId: userId,
+        topicKey,
+        generationMode,
+        sourceLessonId,
       },
     });
-  }
 
-  return lesson;
+    for (let i = 0; i < questions.length; i++) {
+      const question = questions[i];
+      await prisma.question.create({
+        data: {
+          lessonId: lesson.id,
+          questionText: question.questionText,
+          options: JSON.stringify(question.options),
+          correctIndex: question.correctIndex,
+          explanation: question.explanation,
+          xpReward: 5,
+          sortOrder: i,
+        },
+      });
+    }
+
+    return lesson;
+  } catch (err) {
+    if (creditsSpent) {
+      await grantCredits(userId, CREDIT_COSTS.ai_lesson, "bonus", {
+        reason: "refund_generation_failure",
+      });
+    }
+    throw err;
+  }
 }
