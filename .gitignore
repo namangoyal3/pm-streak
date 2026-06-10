@@ -14,3 +14,28 @@ next-env.d.ts
 .gstack/
 .vercel
 .env*.local
+
+# Secrets
+.env.backup
+.env.prod.test
+.env.*.test
+
+# Logs
+*.log
+nohup.out
+
+# Graphify scratch
+graphify-out/
+src/graphify-out/
+.graphify_*.json
+
+# GEO drafts (not published content)
+seo-drafts/
+
+# Screenshots
+local-screenshots/
+screenshots/
+
+# Article scratch files
+article*.json
+publish_article*.json
