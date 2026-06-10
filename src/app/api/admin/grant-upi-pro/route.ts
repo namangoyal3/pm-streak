@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin";
 import { grantUpiIndiaPro } from "@/lib/billing/upi-india-server";
-
-function isAdmin(email: string): boolean {
-  return email === (process.env.ADMIN_EMAIL || "namangoyal21197@gmail.com");
-}
 
 /**
  * Record a confirmed India UPI payment and activate Pro for the period.
@@ -13,18 +9,8 @@ function isAdmin(email: string): boolean {
  * then call this from the dashboard or via this API.
  */
 export async function POST(req: NextRequest) {
-  const adminId = await getCurrentUserId();
-  if (!adminId) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  const admin = await prisma.user.findUnique({
-    where: { id: adminId },
-    select: { email: true },
-  });
-  if (!admin || !isAdmin(admin.email)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   let body: {
     userId?: string;

@@ -13,11 +13,12 @@ type WebhookBody = Record<string, unknown>;
 
 export async function POST(req: NextRequest) {
   const token = process.env.REVENUECAT_WEBHOOK_AUTH_TOKEN;
-  if (token) {
-    const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${token}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!token) {
+    return NextResponse.json({ error: "webhook not configured" }, { status: 500 });
+  }
+  const auth = req.headers.get("authorization");
+  if (auth !== `Bearer ${token}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   let raw: string;

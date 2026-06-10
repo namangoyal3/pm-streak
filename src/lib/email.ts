@@ -30,7 +30,10 @@ if (!FROM) {
 // ── unsubscribe token ──────────────────────────────────────────────────────
 
 export function generateUnsubscribeToken(userId: string): string {
-  const secret = process.env.UNSUBSCRIBE_SECRET || "pm-streak-unsub-secret";
+  const secret = process.env.UNSUBSCRIBE_SECRET;
+  if (!secret) {
+    throw new Error("UNSUBSCRIBE_SECRET env var is required");
+  }
   return crypto.createHmac("sha256", secret).update(userId).digest("hex").slice(0, 32);
 }
 

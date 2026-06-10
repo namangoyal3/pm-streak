@@ -1,21 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createCouponData } from "@/lib/coupon";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireAdmin } from "@/lib/admin";
 import DodoPayments from "dodopayments";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "namangoyal21197@gmail.com";
-
-function isAdmin(email: string | null): boolean {
-  return email === ADMIN_EMAIL;
-}
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !isAdmin(user.email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const guard = await requireAdmin();
+    if (!guard.ok) return guard.response;
 
     const coupons = await prisma.coupon.findMany({
       orderBy: { createdAt: "desc" }
@@ -30,15 +22,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !isAdmin(user.email)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const guard = await requireAdmin();
+    if (!guard.ok) return guard.response;
 
     const body = await req.json();
     const { email, discountPercent, expiresInMinutes = 5, isGlobal = false, maxUses = 1, customCode } = body;
@@ -122,10 +107,8 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !isAdmin(user.email)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const guard = await requireAdmin();
+    if (!guard.ok) return guard.response;
 
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");

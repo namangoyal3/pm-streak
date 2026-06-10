@@ -17,22 +17,30 @@ import {
   sendChallengeReceivedEmail,
   sendChallengeAcceptedEmail,
 } from "@/lib/email";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "namangoyal21197@gmail.com";
 
 export async function POST(req: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return NextResponse.json({ error: "Server misconfigured: CRON_SECRET not set" }, { status: 500 });
+  }
   const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    return NextResponse.json({ error: "Server misconfigured: ADMIN_EMAIL not set" }, { status: 500 });
   }
 
   // Find admin user
   const user = await prisma.user.findFirst({
-    where: { email: ADMIN_EMAIL },
+    where: { email: adminEmail },
     select: { id: true, email: true, name: true, plan: true, streakCount: true, xp: true, credits: true },
   });
 
   if (!user) {
-    return NextResponse.json({ error: `User ${ADMIN_EMAIL} not found in DB` }, { status: 404 });
+    return NextResponse.json({ error: `User ${adminEmail} not found in DB` }, { status: 404 });
   }
 
   const adminUser = user;

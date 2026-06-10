@@ -7,21 +7,12 @@
  *   - Recent sends list (paginated)
  */
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-function isAdmin(email: string): boolean {
-  return email === (process.env.ADMIN_EMAIL || "namangoyal21197@gmail.com");
-}
+import { requireAdmin } from "@/lib/admin";
 
 export async function GET(req: NextRequest) {
-  const userId = await getCurrentUserId();
-  if (!userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-
-  const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-  if (!currentUser || !isAdmin(currentUser.email)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
 
   const { searchParams } = new URL(req.url);
   const days = parseInt(searchParams.get("days") || "30");
