@@ -16,8 +16,9 @@ export async function createOpportunity(data: {
 }
 
 export async function listUnaddressedOpportunities(limit = 50) {
+  // Scout writes intent_score on a 0-100 scale, so the floor is 65 (not 0.65).
   return prisma.geoOpportunity.findMany({
-    where: { addressed: false, intentScore: { gte: 0.65 } },
+    where: { addressed: false, intentScore: { gte: 65 } },
     orderBy: { intentScore: "desc" },
     take: limit,
   });

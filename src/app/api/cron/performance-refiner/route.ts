@@ -54,9 +54,15 @@ ${oldArticle.body.substring(0, 500)}...
 
     // Replace the first 500 characters roughly with the new rewrite
     // For MVP, we will prepend the new intro and drop the first two paragraphs manually.
-    const bodyParts = oldArticle.body.split("\\n\\n");
+    const bodyParts = oldArticle.body.split("\n\n");
     bodyParts.splice(0, 2, rewrite);
-    const newBody = bodyParts.join("\\n\\n");
+    const newBody = bodyParts.join("\n\n");
+
+    // Guard: never replace content with something less than half the original size.
+    if (newBody.length < oldArticle.body.length * 0.5) {
+      console.warn(`[performance-refiner] Skipping update for ${oldArticle.slug}: newBody (${newBody.length} chars) is less than 50% of original (${oldArticle.body.length} chars). Rewrite may be truncated.`);
+      return NextResponse.json({ ok: false, reason: "Rewrite too short — skipped to avoid content loss." });
+    }
 
     // 4. Update the article and bump the updatedAt timestamp
     await prisma.article.update({

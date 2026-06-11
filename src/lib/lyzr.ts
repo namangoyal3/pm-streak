@@ -14,24 +14,54 @@ export class LyzrError extends Error {
   }
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function fetchJson(path: string, init: RequestInit, timeoutMs = 60_000) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const res = await fetch(`${BASE}${path}`, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.LYZR_API_KEY!,
-        ...init.headers,
-      },
-      signal: ctrl.signal,
-    });
-    if (!res.ok) throw new LyzrError(path, res.status, await res.text());
-    return res.json();
-  } finally {
-    clearTimeout(t);
+  const MAX_ATTEMPTS = 3;
+  let lastError: LyzrError | undefined;
+
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    if (attempt > 0) {
+      await sleep(500 * 2 ** (attempt - 1));
+    }
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(`${BASE}${path}`, {
+        ...init,
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.LYZR_API_KEY!,
+          ...init.headers,
+        },
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      if (!res.ok) {
+        const body = await res.text();
+        lastError = new LyzrError(path, res.status, body);
+        // Do not retry 4xx errors
+        if (res.status >= 400 && res.status < 500) throw lastError;
+        // Retry on 5xx
+        continue;
+      }
+      return res.json();
+    } catch (err) {
+      clearTimeout(t);
+      if (err instanceof LyzrError) throw err;
+      // Abort = timeout
+      if (err instanceof Error && (err.name === "AbortError" || err.name === "DOMException")) {
+        lastError = new LyzrError(path, 0, "timeout");
+      } else {
+        lastError = new LyzrError(path, 0, String(err));
+      }
+      // Retry on network/timeout errors
+    }
   }
+
+  throw lastError ?? new LyzrError(path, 0, "unknown error");
 }
 
 export async function callAgent(
@@ -82,10 +112,16 @@ export async function getAgent(agentId: string) {
       headers: { "x-api-key": process.env.LYZR_API_KEY! },
       signal: ctrl.signal,
     });
+    clearTimeout(t);
     if (!res.ok) throw new LyzrError(agentId, res.status, await res.text());
     return res.json();
-  } finally {
+  } catch (err) {
     clearTimeout(t);
+    if (err instanceof LyzrError) throw err;
+    if (err instanceof Error && (err.name === "AbortError" || err.name === "DOMException")) {
+      throw new LyzrError(agentId, 0, "timeout");
+    }
+    throw new LyzrError(agentId, 0, String(err));
   }
 }
 

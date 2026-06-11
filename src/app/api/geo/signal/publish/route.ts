@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { publishArticle } from "@/lib/geo/safe-prisma";
+import { analyzeMdx, scoreCitability, passesGate } from "@/lib/geo/citability";
 
 const RequestSchema = z.object({
   slug: z.string().min(1),
@@ -26,7 +27,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: parsed.error.issues }, { status: 400 });
   }
 
-  const { slug, title, description, body: articleBody, vertical, citabilityScore } = parsed.data;
+  const { slug, title, description, body: articleBody, vertical } = parsed.data;
+
+  // Server-side citability gate — never trust the caller-supplied score.
+  const score = scoreCitability(analyzeMdx(articleBody));
+  if (!passesGate(score)) {
+    return NextResponse.json({ error: "citability_below_threshold", score }, { status: 422 });
+  }
 
   try {
     const article = await publishArticle({ slug, title, description, body: articleBody, vertical });
@@ -34,7 +41,7 @@ export async function POST(req: Request) {
       ok: true,
       id: article.id,
       url: `https://learnanything.pro/learn/${vertical}/${slug}`,
-      citabilityScore,
+      citabilityScore: score,
     });
   } catch (e) {
     return NextResponse.json(
