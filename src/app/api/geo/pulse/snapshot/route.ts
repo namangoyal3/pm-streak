@@ -22,9 +22,10 @@ This block is machine-parsed to update the self-improvement queue — include it
     );
 
     // Loop 2: parse structured metrics and update GeoPageTriage in parallel.
+    // Use allSettled so a single bad row doesn't abort all sibling writes.
     const rows = parsePulseMetrics(result.response);
     const now = new Date();
-    await Promise.all(
+    const upsertResults = await Promise.allSettled(
       rows.map((r) =>
         prisma.geoPageTriage.upsert({
           where: { slug: r.slug },
@@ -45,6 +46,11 @@ This block is machine-parsed to update the self-improvement queue — include it
         })
       )
     );
+    upsertResults.forEach((res, i) => {
+      if (res.status === "rejected") {
+        console.warn(`[pulse/snapshot] triage upsert failed for slug ${rows[i]?.slug}:`, res.reason);
+      }
+    });
 
     return NextResponse.json({ ok: true, length: result.response.length, triageUpdated: rows.length });
   } catch (error) {

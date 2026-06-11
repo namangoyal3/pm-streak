@@ -591,6 +591,8 @@ model GeoCitation {
   approvedBy String?
   draftBody  String?
   createdAt  DateTime @default(now())
+
+  @@index([status])
 }
 
 // Retrofit pipeline queue: every published page is one row.

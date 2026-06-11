@@ -22,8 +22,9 @@ This block is machine-parsed to seed new article opportunities into Scout's queu
     );
 
     // Loop 3: parse gap rows and queue them as Scout opportunities.
+    // Use allSettled so a single bad row doesn't abort all sibling inserts.
     const gaps = parseRivalGaps(result.response);
-    await Promise.all(
+    const insertResults = await Promise.allSettled(
       gaps.map((g) =>
         createOpportunity({
           query: g.query,
@@ -34,6 +35,11 @@ This block is machine-parsed to seed new article opportunities into Scout's queu
         })
       )
     );
+    insertResults.forEach((res, i) => {
+      if (res.status === "rejected") {
+        console.warn(`[rival/run] createOpportunity failed for query "${gaps[i]?.query}":`, res.reason);
+      }
+    });
 
     return NextResponse.json({ ok: true, length: result.response.length, opportunitiesQueued: gaps.length });
   } catch (error) {
