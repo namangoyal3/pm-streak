@@ -45,6 +45,9 @@ export type TickOptions = {
 
 const STALE_MS = 30 * 60 * 1000;
 
+// Leave ~50s headroom under the 300s Vercel function limit.
+const BUDGET_MS = 250_000;
+
 export async function runTick(
   prisma: PrismaClient,
   opts: TickOptions = {}
@@ -59,15 +62,29 @@ export async function runTick(
     data: { jobStatus: "pending" },
   });
 
-  // 2. Pick the next batch.
-  const candidates = await prisma.geoPageTriage.findMany({
+  // 2. Pick the next batch — select candidate slugs then atomically claim them
+  // to avoid double-claiming across concurrent ticks.
+  const candidateSlugs = await prisma.geoPageTriage.findMany({
     where: { jobStatus: "pending" },
     orderBy: [{ attempts: "asc" }, { updatedAt: "asc" }],
     take: quota,
+    select: { slug: true },
+  });
+  const slugs = candidateSlugs.map((c) => c.slug);
+
+  // Atomic claim: only rows still 'pending' at this moment are claimed.
+  const claimed = await prisma.geoPageTriage.updateMany({
+    where: { slug: { in: slugs }, jobStatus: "pending" },
+    data: { jobStatus: "in_progress", updatedAt: new Date() },
+  });
+
+  // Re-fetch the rows that were actually claimed.
+  const candidates = await prisma.geoPageTriage.findMany({
+    where: { slug: { in: slugs }, jobStatus: "in_progress" },
   });
 
   const result: TickResult = {
-    picked: candidates.length,
+    picked: claimed.count,
     decisions: [],
     shipped: 0,
     failed: 0,
@@ -75,12 +92,14 @@ export async function runTick(
     errors: [],
   };
 
+  // Wall-clock budget guard: break early if we're close to the function time limit.
+  const tickStart = Date.now();
+
   for (const row of candidates) {
-    // Reserve the row.
-    await prisma.geoPageTriage.update({
-      where: { slug: row.slug },
-      data: { jobStatus: "in_progress" },
-    });
+    // Break if we're close to the function time limit to allow a clean return.
+    if (Date.now() - tickStart > BUDGET_MS) break;
+
+    // Row is already in_progress (claimed above).
 
     const decision = decide({
       slug: row.slug,
@@ -150,7 +169,8 @@ async function dispatch(
         { timeoutMs: 60_000 }
       );
       // Leave it pending so the next tick re-evaluates with fresh data.
-      return { jobStatus: "pending", tier: d.tier };
+      // Increment attempts so the MAX_ATTEMPTS guard can eventually skip a stuck row.
+      return { jobStatus: "pending", tier: d.tier, attempts: { increment: 1 } };
     }
 
     case "inject_schema":
@@ -178,7 +198,8 @@ async function dispatch(
         `retrofit-${d.next_action}-${row.slug}`,
         { timeoutMs: 240_000 }
       );
-      const m = out.response.match(/https:\/\/github\.com\/[^\s)\"']+/);
+      // Only accept a real PR URL (owner/repo/pull/NNN) — not just any github.com link.
+      const m = out.response.match(/https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+/);
       const prUrl = m ? m[0] : null;
       if (prUrl) {
         return {

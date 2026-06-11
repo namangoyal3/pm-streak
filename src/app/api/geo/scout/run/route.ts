@@ -50,7 +50,7 @@ Only include queries where intent_score > 50 and pm-streak is NOT in the current
     const errors: string[] = [];
 
     for (const row of opportunities) {
-      const query = row.query ?? row.query;
+      const query = row.query;
       if (!query) continue;
       try {
         await createOpportunity({

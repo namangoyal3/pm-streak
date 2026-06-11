@@ -3,7 +3,7 @@
 // Each tick:
 //  1. Recover stale in_progress opportunities (>30 min) → reset to unaddressed.
 //  2. Fetch internal links once (top-3 by citability ≥ 75) — reused for all opportunities.
-//  3. Pick up to `quota` unaddressed opportunities (intentScore ≥ 0.65, ordered desc).
+//  3. Pick up to `quota` unaddressed opportunities (intentScore ≥ 65, ordered desc).
 //  4. For each: mark in_progress → duplicate check → Blueprint → Forge (enriched) →
 //     quality gate (expand once on fail) → publishArticle → markOpportunityAddressed.
 //  5. On any failure: attempts++, lastError logged, stays unaddressed (max 3 attempts).
@@ -24,6 +24,8 @@ import { runForge } from "./forge-runner";
 
 const STALE_MS = 30 * 60 * 1000;
 const MAX_ATTEMPTS = 3;
+// Leave ~50s headroom under the 300s Vercel function limit.
+const BUDGET_MS = 250_000;
 const FAQ_REGEX = /##\s+(faq|frequently asked questions)/i;
 const HERO_REGEX = /picsum\.photos\/seed\/|\/images\//;
 const MIN_WORD_COUNT_PILLAR = 1200;
@@ -124,7 +126,12 @@ export async function runCreateTick(
   const opportunities = await listUnaddressedOpportunities(quota);
   result.picked = opportunities.length;
 
+  // Wall-clock budget guard: break early if we're close to the function time limit.
+  const tickStart = Date.now();
+
   for (const opp of opportunities) {
+    // Break if we're close to the function time limit to allow a clean return.
+    if (Date.now() - tickStart > BUDGET_MS) break;
     if (opp.attempts >= MAX_ATTEMPTS) {
       result.skipped++;
       result.decisions.push({ query: opp.query, action: "permanently_skipped" });
