@@ -60,7 +60,7 @@ export default function Navbar({ streakCount, xp, gems, credits, avatarUrl, name
     { href: "/dashboard", label: "Learn", icon: BookOpen, locked: false },
     {
       href: "/explore",
-      label: "Learn",
+      label: "Explore",
       icon: Sparkles,
       locked: false,
       aiCapsule: true,

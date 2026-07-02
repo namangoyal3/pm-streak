@@ -660,11 +660,11 @@ export default function DashboardPage() {
             {/* ── Stats Row ── */}
             <div className="grid grid-cols-3 gap-2">
               {[
-                { icon: <Zap size={16} className="text-[var(--gold-primary)]" />, value: user.xp, label: "XP", color: "text-[var(--gold-primary)]", bg: "bg-[var(--gold-primary)]/8 border-[var(--gold-primary)]/15" },
-                { icon: <Trophy size={16} className="text-[var(--orange-primary)]" />, value: user.longestStreak, label: "Best", color: "text-[var(--orange-primary)]", bg: "bg-[var(--orange-primary)]/8 border-[var(--orange-primary)]/15" },
-                { icon: <BookOpen size={16} className="text-[var(--blue-primary)]" />, value: totalCompleted, label: "Done", color: "text-[var(--blue-primary)]", bg: "bg-[var(--blue-primary)]/8 border-[var(--blue-primary)]/15" },
-              ].map(({ icon, value, label, color, bg }) => (
-                <div key={label} className={cn("rounded-[var(--ds-radius-lg)] border-2 p-2.5 sm:p-3 text-center", bg)}>
+                { icon: <Zap size={16} className="text-[var(--gold-primary)]" />, value: user.xp, label: "XP", color: "text-[var(--gold-primary)]" },
+                { icon: <Trophy size={16} className="text-[var(--orange-primary)]" />, value: user.longestStreak, label: "Best", color: "text-[var(--orange-primary)]" },
+                { icon: <BookOpen size={16} className="text-[var(--blue-primary)]" />, value: totalCompleted, label: "Done", color: "text-[var(--blue-primary)]" },
+              ].map(({ icon, value, label, color }) => (
+                <div key={label} className="rounded-[var(--ds-radius-lg)] border-2 border-[var(--border-color)] bg-[var(--bg-card)] shadow-[var(--shadow-ds-card)] p-2.5 sm:p-3 text-center">
                   <div className="flex items-center justify-center mb-1">{icon}</div>
                   <div className={cn("text-lg sm:text-xl font-black tabular-nums", color)}>{value}</div>
                   <div className="text-[9px] text-[var(--text-secondary)] font-bold uppercase tracking-tight">{label}</div>
@@ -872,29 +872,29 @@ export default function DashboardPage() {
                       <Zap size={16} className="text-[var(--purple-primary)]" />
                       <span className="text-sm font-black text-white">Level Up to Pro</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-red-500/20 px-2.5 py-1 rounded-full">
-                      <span className="text-[10px] font-black text-red-300">70% OFF</span>
+                    <div className="flex items-center gap-1 bg-[var(--purple-primary)]/15 px-2.5 py-1 rounded-full">
+                      <span className="text-[10px] font-black text-[var(--purple-primary)]">70% OFF</span>
                     </div>
                   </div>
                   
                   <div className="mb-3">
                     <div className="flex items-baseline gap-1 mb-1">
                       <span className="text-white/40 line-through text-xs">₹830</span>
-                      <span className="text-lg font-black text-green-400">₹249</span>
+                      <span className="text-lg font-black text-[var(--green-primary)]">₹249</span>
                       <span className="text-white/50 text-xs">/month</span>
                     </div>
                     
                     <div className="space-y-1.5 text-[10px] text-white/70">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--green-primary)]"></div>
                         <span>Unlock <span className="font-bold text-white">292+</span> archive lessons</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--green-primary)]"></div>
                         <span><span className="font-bold text-white">100</span> credits/month (vs 5 free)</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--green-primary)]"></div>
                         <span>Unlimited AI interview prep</span>
                       </div>
                     </div>
@@ -903,13 +903,13 @@ export default function DashboardPage() {
                   <Link
                     href="/pricing"
                     onClick={() => conversionFunnel.dashboardUpgradeCtaClicked("dashboard_card")}
-                    className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-[var(--purple-primary)] text-black text-xs font-black uppercase tracking-wider hover:bg-[var(--purple-primary)]/90 transition-colors"
+                    className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-[var(--purple-primary)] text-white text-xs font-black uppercase tracking-wider hover:opacity-90 transition-colors"
                   >
                     <Star size={12} /> Upgrade Now - Limited Time
                   </Link>
                   
                   <div className="mt-2 text-center">
-                    <span className="text-[8px] text-white/40">Join 500+ PMs already learning with Pro</span>
+                    <span className="text-[8px] text-white/40">Join 200+ PMs already learning with Pro</span>
                   </div>
                 </div>
               ) : (
