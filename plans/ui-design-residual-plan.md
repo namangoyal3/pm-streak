@@ -108,3 +108,15 @@ Hard rejections: none triggered.
 (3) apply existing .ds-focus-ring.
 [Full finding list with file:line lives in the review transcript; carry into
 the eng plan as a checklist.]
+
+## Implementation status (2026-07-03, commit bfcb8b8)
+DONE: P0.1 contrast (D2=black-on-green, 951 strings/465 files), P0.2 partial
+(shop buttons, quiz aria-live+focus, focus ring global, icon labels, stat
+labels, rank sr-text), P0.3 motion (MotionConfig + reduce block), P0.4 partial
+(nav labels 10px, ProBanner 32px), P0.5 partial (h1s, main landmarks,
+aria-current), P1 lesson skeleton + loading roles, P2 onboarding disabled
+state + h1s, P4 DESIGN.md a11y/skeleton sections + social purple fix.
+REMAINING (lower severity): dashboard section skeletons, modal focus
+traps/Escape, aria-expanded on 8 toggles, full 10px-type census sweep beyond
+nav, StreakCalendar cell labels, tab aria-pressed, ol/ul list semantics,
+zero-XP leaderboard own-row verification.
