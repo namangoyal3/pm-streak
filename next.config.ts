@@ -7,6 +7,15 @@ import type { NextConfig } from "next";
  */
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(process.cwd()),
+  async rewrites() {
+    return [
+      {
+        // Perisclaw waitlist landing is a static file in public/; serve it at a clean URL.
+        source: "/perisclaw",
+        destination: "/perisclaw/index.html",
+      },
+    ];
+  },
   async redirects() {
     return [
       {
