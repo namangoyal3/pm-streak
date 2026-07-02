@@ -83,7 +83,7 @@ export default function DailyChallengePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
         <Trophy size={64} className="text-[var(--gold-primary)] mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Daily Challenge Complete!</h1>
+        <h1 className="text-2xl font-black tracking-tight mb-2">Daily Challenge Complete!</h1>
         <p className="text-[var(--text-secondary)] mb-2">
           You earned {challenge.xpEarned} XP today.
         </p>
@@ -92,7 +92,7 @@ export default function DailyChallengePage() {
         </p>
         <Link
           href="/dashboard"
-          className="px-6 py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors"
+          className="px-6 py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all"
         >
           Back to Dashboard
         </Link>
@@ -110,13 +110,13 @@ export default function DailyChallengePage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <Calendar size={14} className="text-[var(--orange-primary)]" />
-              <span className="text-xs text-[var(--orange-primary)] font-bold uppercase">
+              <span className="text-xs text-[var(--orange-primary)] font-black uppercase tracking-widest">
                 Daily Challenge
               </span>
             </div>
             <h1 className="text-sm font-bold truncate">{challenge.lesson.title}</h1>
           </div>
-          <div className="flex items-center gap-1 text-xs font-bold text-[var(--gold-primary)] bg-[var(--gold-primary)]/10 px-2 py-1 rounded-full">
+          <div className="flex items-center gap-1 text-xs font-black tabular-nums text-[var(--gold-primary)] bg-[var(--gold-primary)]/10 border border-[var(--gold-primary)]/25 px-2 py-1 rounded-full">
             <Zap size={12} /> 2x XP
           </div>
         </div>

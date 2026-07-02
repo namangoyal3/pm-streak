@@ -56,13 +56,13 @@ export default async function LearnPage() {
   if (articles.length === 0) {
     return (
       <main className="min-h-screen bg-[var(--bg-primary)] text-white px-4 py-16 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-black mb-4">Learn</h1>
+        <h1 className="text-3xl font-black tracking-tight mb-4">Learn</h1>
         <p className="text-[var(--text-secondary)]">
           Articles coming soon — new expert-reviewed PM guides publish weekly.
         </p>
         <Link
           href="/dashboard"
-          className="mt-8 inline-block text-sm text-[var(--text-secondary)] hover:text-white"
+          className="mt-8 inline-block text-sm font-bold text-[var(--text-secondary)] hover:text-white transition-colors"
         >
           Back to app
         </Link>
@@ -88,8 +88,8 @@ export default async function LearnPage() {
       <JsonLd data={learnBreadcrumbs} />
       <JsonLd data={pmCourse} />
       <div className="mb-10">
-        <h1 className="text-3xl font-black mb-2">Learn</h1>
-        <p className="text-[var(--text-secondary)] text-base">
+        <h1 className="text-3xl font-black tracking-tight mb-2">Learn</h1>
+        <p className="text-[var(--text-secondary)] text-sm">
           Practical articles on product management, career growth, and PM skills. New content added weekly.
         </p>
       </div>
@@ -98,7 +98,7 @@ export default async function LearnPage() {
         const verticalArticles = articles.filter((a) => a.vertical === vertical);
         return (
           <section key={vertical} className="mb-12">
-            <h2 className="text-lg font-bold mb-4 text-[var(--text-secondary)] uppercase tracking-wider text-xs">
+            <h2 className="text-xs font-black uppercase tracking-widest text-[var(--green-primary)] mb-4">
               {VERTICAL_LABELS[vertical] ?? vertical}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -108,9 +108,9 @@ export default async function LearnPage() {
                   <Link
                     key={article.id}
                     href={`/learn/${article.vertical}/${article.slug}`}
-                    className="block bg-[var(--bg-secondary)] rounded-2xl p-5 hover:bg-[var(--bg-tertiary)] transition-colors"
+                    className="block bg-[var(--bg-card)] rounded-2xl border-2 border-b-4 border-[var(--border-color)] p-5 hover:bg-[var(--bg-secondary)] active:border-b-2 active:translate-y-[2px] transition-all"
                   >
-                    <p className="text-xs text-[var(--green-primary)] font-bold mb-2 uppercase tracking-wide">
+                    <p className="text-[10px] text-[var(--text-secondary)] font-black mb-2 uppercase tracking-wide">
                       {VERTICAL_LABELS[vertical] ?? vertical} &middot; {readTime} min read
                     </p>
                     <h3 className="text-base font-bold mb-1 leading-snug">{article.title}</h3>
@@ -123,13 +123,13 @@ export default async function LearnPage() {
         );
       })}
 
-      <div className="mt-16 border-t border-[var(--bg-tertiary)] pt-8 text-center">
+      <div className="mt-16 border-t-2 border-[var(--border-color)] pt-8 text-center">
         <p className="text-[var(--text-secondary)] text-sm mb-4">
           Want to apply what you learn? Practice daily with PM Streak.
         </p>
         <Link
           href="/signup"
-          className="inline-block bg-[var(--green-primary)] text-white font-black px-6 py-3 rounded-2xl text-sm hover:opacity-90 transition-opacity"
+          className="inline-block rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black px-6 py-3 text-sm uppercase tracking-wide transition-all"
         >
           Start your PM streak
         </Link>

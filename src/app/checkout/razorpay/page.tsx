@@ -38,16 +38,16 @@ export default async function RazorpayCheckoutPage({
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] text-white">
         <div className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center px-4 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.28em] text-amber-300">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-[var(--orange-primary)]/30 bg-[var(--orange-primary)]/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-[var(--orange-primary)]">
             <ShieldCheck size={12} /> Razorpay not configured
           </div>
           <h1 className="text-3xl font-black tracking-tight">Checkout is not ready yet</h1>
-          <p className="mt-3 max-w-lg text-sm text-white/60">
+          <p className="mt-3 max-w-lg text-sm text-[var(--text-secondary)]">
             Add `NEXT_PUBLIC_RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to enable live Razorpay payments.
           </p>
           <Link
             href="/pricing"
-            className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-black transition-colors hover:bg-white/90"
+            className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition-all"
           >
             <ArrowLeft size={16} /> Back to pricing
           </Link>
@@ -98,14 +98,14 @@ export default async function RazorpayCheckoutPage({
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] text-white">
         <div className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center px-4 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.28em] text-red-300">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-[var(--red-primary)]/30 bg-[var(--red-primary)]/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-[var(--red-primary)]">
             <AlertTriangle size={12} /> Checkout error
           </div>
           <h1 className="text-3xl font-black tracking-tight">We could not prepare your payment</h1>
-          <p className="mt-3 max-w-lg text-sm text-white/60">{message}</p>
+          <p className="mt-3 max-w-lg text-sm text-[var(--text-secondary)]">{message}</p>
           <Link
             href="/pricing"
-            className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-black transition-colors hover:bg-white/90"
+            className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition-all"
           >
             <ArrowLeft size={16} /> Back to pricing
           </Link>

@@ -92,7 +92,7 @@ export default function OnboardingPage() {
                 className="text-center"
               >
                 <Flame size={56} className="mx-auto text-[var(--orange-primary)] streak-flame mb-5" />
-                <h1 className="text-2xl font-bold mb-0.5">
+                <h1 className="text-2xl font-black tracking-tight mb-0.5">
                   Welcome to <span className="text-[var(--green-primary)]">PM</span> Streak
                 </h1>
                 <p className="text-[10px] font-bold text-[var(--text-secondary)] tracking-wide mb-2">by learnanything.pro</p>
@@ -104,7 +104,7 @@ export default function OnboardingPage() {
                 </p>
                 <button
                   onClick={() => setStep("why")}
-                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all flex items-center justify-center gap-2"
                 >
                   Let&apos;s Go <ArrowRight size={16} />
                 </button>
@@ -118,7 +118,7 @@ export default function OnboardingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
               >
-                <h2 className="text-xl font-bold mb-1">Why are you here?</h2>
+                <h2 className="text-xl font-black tracking-tight mb-1">Why are you here?</h2>
                 <p className="text-sm text-[var(--text-secondary)] mb-5">Pick one main goal</p>
                 <div className="space-y-2.5 mb-7">
                   {WHY_OPTIONS.map((opt) => (
@@ -126,10 +126,10 @@ export default function OnboardingPage() {
                       key={opt.id}
                       onClick={() => setSelectedWhy(opt.id)}
                       className={cn(
-                        "w-full p-3.5 rounded-2xl border-2 text-left text-sm font-medium transition-all flex items-center gap-3",
+                        "w-full p-3.5 rounded-2xl border-2 border-b-4 active:border-b-2 active:translate-y-[2px] text-left text-sm font-bold transition-all flex items-center gap-3",
                         selectedWhy === opt.id
                           ? "border-[var(--green-primary)] bg-[var(--green-primary)]/10"
-                          : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]"
+                          : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]/50"
                       )}
                     >
                       <span className="text-xl">{opt.icon}</span>
@@ -141,7 +141,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep("streak")}
                   disabled={!selectedWhy}
-                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -157,7 +157,7 @@ export default function OnboardingPage() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Target size={20} className="text-[var(--orange-primary)]" />
-                  <h2 className="text-xl font-bold">Set your streak goal</h2>
+                  <h2 className="text-xl font-black tracking-tight">Set your streak goal</h2>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
                   How many consecutive days do you want to learn?
@@ -168,10 +168,10 @@ export default function OnboardingPage() {
                       key={g.days}
                       onClick={() => setStreakGoal(g.days)}
                       className={cn(
-                        "w-full p-3.5 rounded-2xl border-2 text-left transition-all",
+                        "w-full p-3.5 rounded-2xl border-2 border-b-4 active:border-b-2 active:translate-y-[2px] text-left transition-all",
                         streakGoal === g.days
                           ? "border-[var(--orange-primary)] bg-[var(--orange-primary)]/10"
-                          : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]"
+                          : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]/50"
                       )}
                     >
                       <div className="flex items-center justify-between">
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep("goal")}
                   disabled={!streakGoal}
-                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -206,7 +206,7 @@ export default function OnboardingPage() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Zap size={20} className="text-[var(--gold-primary)]" />
-                  <h2 className="text-xl font-bold">Daily pace</h2>
+                  <h2 className="text-xl font-black tracking-tight">Daily pace</h2>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
                   How much do you want to learn each day?
@@ -217,10 +217,10 @@ export default function OnboardingPage() {
                       key={g.count}
                       onClick={() => setDailyGoal(g.count)}
                       className={cn(
-                        "w-full p-3.5 rounded-2xl border-2 text-left transition-all relative overflow-hidden",
+                        "w-full p-3.5 rounded-2xl border-2 border-b-4 active:border-b-2 active:translate-y-[2px] text-left transition-all relative overflow-hidden",
                         dailyGoal === g.count
                           ? "border-[var(--gold-primary)] bg-[var(--gold-primary)]/10"
-                          : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]"
+                          : "border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-secondary)]/50"
                       )}
                     >
                       <div className="flex items-center justify-between">
@@ -230,7 +230,7 @@ export default function OnboardingPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           {g.tagline === "Most popular" && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--green-primary)]/20 text-[var(--green-primary)] font-bold">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--green-primary)]/20 text-[var(--green-primary)] font-black uppercase tracking-wide">
                               Popular
                             </span>
                           )}
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep("ready")}
                   disabled={!dailyGoal}
-                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -265,7 +265,7 @@ export default function OnboardingPage() {
                 >
                   <Trophy size={64} className="mx-auto text-[var(--gold-primary)] mb-4" />
                 </motion.div>
-                <h2 className="text-2xl font-bold mb-2">You&apos;re all set!</h2>
+                <h2 className="text-2xl font-black tracking-tight mb-2">You&apos;re all set!</h2>
                 <p className="text-sm text-[var(--text-secondary)] mb-5">
                   Your goal: <strong className="text-white">{streakGoal}-day streak</strong>,{" "}
                   <strong className="text-white">{dailyGoal} lesson{(dailyGoal ?? 1) > 1 ? "s" : ""}/day</strong>
@@ -274,7 +274,7 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={() => setShowReadyDetails((prev) => !prev)}
-                  className="w-full mb-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center justify-between"
+                  className="w-full mb-4 rounded-xl border-2 border-b-4 border-[var(--border-color)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center justify-between active:border-b-2 active:translate-y-[2px] transition-all"
                 >
                   <span className="text-xs font-black">How PM Streak works</span>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
@@ -283,7 +283,7 @@ export default function OnboardingPage() {
                 </button>
 
                 {showReadyDetails && (
-                  <div className="bg-[var(--bg-card)] rounded-2xl p-4 mb-6 space-y-3 text-left">
+                  <div className="bg-[var(--bg-card)] rounded-2xl border-2 border-[var(--border-color)] p-4 mb-6 space-y-3 text-left">
                     <div className="flex items-center gap-3 text-sm">
                       <Flame size={18} className="text-[var(--orange-primary)] flex-shrink-0" />
                       <div>
@@ -311,7 +311,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleFinish}
                   disabled={saving}
-                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors disabled:opacity-50"
+                  className="w-full py-3.5 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all disabled:opacity-50"
                 >
                   {saving ? "Starting..." : "Commit to My Goal"}
                 </button>

@@ -40,7 +40,7 @@ function InviteContent() {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6">
       <div className="w-full max-w-sm text-center">
         <Flame size={52} className="text-[var(--orange-primary)] streak-flame mx-auto mb-3" />
-        <h1 className="text-3xl font-bold mb-0.5">
+        <h1 className="text-3xl font-black tracking-tight mb-0.5">
           <span className="text-[var(--green-primary)]">PM</span> Streak
         </h1>
         <p className="text-[10px] font-bold text-[var(--text-secondary)] tracking-wide mb-2">by learnanything.pro</p>
@@ -48,7 +48,7 @@ function InviteContent() {
           Your friend invited you to learn product management in 2-3 minutes a day
         </p>
 
-        <div className="bg-[var(--bg-card)] rounded-2xl p-4 mb-5 text-left space-y-3">
+        <div className="bg-[var(--bg-card)] rounded-2xl border-2 border-[var(--border-color)] p-4 mb-5 text-left space-y-3">
           {inviteFeatures.slice(0, 2).map((feature) => (
             <div key={feature.title} className="flex items-start gap-3">
               <div className={cn("w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5", feature.iconBg)}>
@@ -63,7 +63,7 @@ function InviteContent() {
             </div>
           ))}
           <details className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/40 p-3">
-            <summary className="cursor-pointer text-xs font-black text-[var(--text-secondary)] list-none">
+            <summary className="cursor-pointer text-xs font-black uppercase tracking-wide text-[var(--text-secondary)] list-none">
               Show more features
             </summary>
             <div className="mt-3 space-y-3">
@@ -86,14 +86,14 @@ function InviteContent() {
 
         <Link
           href={ref ? `/?ref=${encodeURIComponent(ref)}` : "/"}
-          className="block w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] text-white font-bold text-sm transition-colors mb-3 text-center"
+          className="block w-full py-3 rounded-2xl bg-[var(--green-primary)] hover:bg-[var(--green-dark)] border-b-4 border-[var(--green-dark)] active:border-b-2 active:translate-y-[2px] text-white font-black text-sm uppercase tracking-wide transition-all mb-3 text-center"
         >
           Be a 10x PM Now
         </Link>
 
         <Link
           href="/login"
-          className="block text-sm text-[var(--text-secondary)] hover:text-white"
+          className="block text-sm font-bold text-[var(--text-secondary)] hover:text-white transition-colors"
         >
           Already have an account? Log in
         </Link>
