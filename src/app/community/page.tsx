@@ -2,7 +2,7 @@ import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isProEffective } from "@/lib/entitlements";
 import Link from "next/link";
-import { Users, MessageSquare, Lock, Check } from "lucide-react";
+import { Users, MessageSquare, Lock, Check, ArrowLeft } from "lucide-react";
 
 export default async function CommunityPage() {
   const userId = await getCurrentUserId();
@@ -21,8 +21,16 @@ export default async function CommunityPage() {
   const whatsappLink = "https://chat.whatsapp.com/Jp8Jyy8Jgap0wR4vw9ScET?mode=gi_t";
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-white p-4 sm:p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-white">
+      <header className="sticky top-0 z-50 border-b-2 border-[var(--border-color)] bg-[var(--bg-secondary)]">
+        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
+          <Link href="/dashboard" className="text-[var(--text-secondary)] hover:text-white p-2 -ml-2 rounded-xl">
+            <ArrowLeft size={20} />
+          </Link>
+          <span className="text-sm font-black">PM Community</span>
+        </div>
+      </header>
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-3">PM Community</h1>
@@ -38,7 +46,7 @@ export default async function CommunityPage() {
             <h2 className="text-2xl font-black tracking-tight mb-3">Exclusive Pro Community</h2>
             <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-md mx-auto">
               The WhatsApp community is exclusively for PM Streak Pro members.
-              Upgrade to connect with 500+ PMs, get job referrals, and join weekly discussions.
+              Upgrade to connect with 200+ PMs, get job referrals, and join weekly discussions.
             </p>
             <Link
               href="/pricing"
@@ -57,7 +65,7 @@ export default async function CommunityPage() {
             <div className="grid sm:grid-cols-2 gap-6 mb-8">
               <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 border-2 border-[var(--border-color)]">
                 <Users className="w-10 h-10 text-[var(--blue-primary)] mb-4" />
-                <h3 className="text-xl font-black tracking-tight tabular-nums mb-2">500+ PMs</h3>
+                <h3 className="text-xl font-black tracking-tight tabular-nums mb-2">200+ PMs</h3>
                 <p className="text-sm text-[var(--text-secondary)]">Active product managers from top tech companies</p>
               </div>
 

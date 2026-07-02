@@ -196,7 +196,7 @@ export default function SocialPage() {
                 <div className={cn("space-y-2", showFriendsList ? "block" : "hidden", "sm:block")}>
                   {friends.map((f) => (
                     <div key={f.id} className="bg-[var(--bg-card)] rounded-2xl border-2 border-[var(--border-color)] p-3 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--purple-primary)] to-[var(--blue-primary)] flex items-center justify-center font-black text-white text-sm">
+                      <div className="w-10 h-10 rounded-xl bg-[var(--green-primary)] flex items-center justify-center font-black text-white text-sm">
                         {f.name.charAt(0)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -270,7 +270,7 @@ export default function SocialPage() {
             <div className="space-y-2">
               {searchResults.map((u) => (
                 <div key={u.id} className="bg-[var(--bg-card)] rounded-2xl border-2 border-[var(--border-color)] p-3 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--blue-primary)] to-[var(--green-primary)] flex items-center justify-center font-black text-white text-sm">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--green-primary)] flex items-center justify-center font-black text-white text-sm">
                     {u.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">

@@ -2,7 +2,7 @@ import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isProEffective } from "@/lib/entitlements";
 import Link from "next/link";
-import { Notebook, Plus, Search, Filter, Lock, Check, Edit, Trash2 } from "lucide-react";
+import { Notebook, Plus, Search, Filter, Lock, Check, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { NoteEditor } from "./NoteEditor";
 import { NoteList } from "./NoteList";
 
@@ -29,8 +29,16 @@ export default async function NotesPage() {
   const hasNotes = notes.length > 0;
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-white p-4 sm:p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-white">
+      <header className="sticky top-0 z-50 border-b-2 border-[var(--border-color)] bg-[var(--bg-secondary)]">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
+          <Link href="/dashboard" className="text-[var(--text-secondary)] hover:text-white p-2 -ml-2 rounded-xl">
+            <ArrowLeft size={20} />
+          </Link>
+          <span className="text-sm font-black">Notes &amp; Recaps</span>
+        </div>
+      </header>
+      <div className="max-w-6xl mx-auto p-4 sm:p-6">
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">

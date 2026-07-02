@@ -14,7 +14,7 @@ function InviteContent() {
       icon: <BookOpen size={16} className="text-[var(--green-primary)]" />,
       iconBg: "bg-[var(--green-primary)]/10",
       title: "Daily Micro-Lessons",
-      desc: "Learn from 300+ Lenny&apos;s Podcast episodes. Frameworks from Shreyas Doshi, Julie Zhuo, Brian Chesky, and more.",
+      desc: "Learn from 300+ episodes of Lenny's Podcast. Frameworks from Shreyas Doshi, Julie Zhuo, Brian Chesky, and more.",
     },
     {
       icon: <Flame size={16} className="text-[var(--orange-primary)]" />,

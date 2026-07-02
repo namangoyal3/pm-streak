@@ -120,7 +120,7 @@ export default function LeaderboardPage() {
                 )}
               >
                 <div className="w-8 flex justify-center">{getRankIcon(entry.rank)}</div>
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--blue-primary)] to-[var(--purple-primary)] flex items-center justify-center text-sm font-black text-white">
+                <div className="w-9 h-9 rounded-xl bg-[var(--green-primary)] flex items-center justify-center text-sm font-black text-white">
                   {entry.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
