@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        // Perisclaw waitlist landing is a static file in public/; serve it at a clean URL.
-        source: "/perisclaw",
-        destination: "/perisclaw/index.html",
+        // Job-outreach waitlist landing is a static file in public/; serve it at a clean URL.
+        source: "/job-outreach",
+        destination: "/job-outreach/index.html",
       },
     ];
   },

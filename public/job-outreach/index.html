@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Perisclaw — Automated Job Outreach to Hiring Managers</title>
+<title>Outreach Autopilot — Automated Job Outreach to Hiring Managers</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Perisclaw finds roles that fit you, verifies the hiring manager's work email, and sends a short personal note with your resume attached. Join the waitlist.">
-<link rel="canonical" href="https://learnanything.pro/perisclaw">
+<meta name="description" content="Outreach Autopilot finds roles that fit you, verifies the hiring manager's work email, and sends a short personal note with your resume attached. Join the waitlist.">
+<link rel="canonical" href="https://learnanything.pro/job-outreach">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Perisclaw">
-<meta property="og:title" content="Perisclaw — Automated Job Outreach to Hiring Managers">
-<meta property="og:description" content="Applications go to portals. Interviews come from people. Perisclaw reaches the hiring manager for you, with your resume attached.">
-<meta property="og:url" content="https://learnanything.pro/perisclaw">
-<meta property="og:image" content="https://learnanything.pro/perisclaw/og.png">
+<meta property="og:site_name" content="learnanything.pro">
+<meta property="og:title" content="Outreach Autopilot — Automated Job Outreach to Hiring Managers">
+<meta property="og:description" content="Applications go to portals. Interviews come from people. Outreach Autopilot reaches the hiring manager for you, with your resume attached.">
+<meta property="og:url" content="https://learnanything.pro/job-outreach">
+<meta property="og:image" content="https://learnanything.pro/job-outreach/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
   @font-face {
@@ -277,7 +277,7 @@
 <body>
 <div class="wrap">
   <header>
-    <a class="brand" href="/perisclaw">perisclaw<span class="dot">.</span></a>
+    <a class="brand" href="/job-outreach">outreach autopilot<span class="dot">.</span></a>
     <nav aria-label="Main">
       <a href="#how">How it works</a>
       <a href="#faq">FAQ</a>
@@ -291,7 +291,7 @@
         <p class="eyebrow">Job outreach, automated</p>
         <h1 id="hero-h">Skip the application black hole.</h1>
         <p class="lede">Applications go to portals. Interviews come from people.
-        Perisclaw finds roles that fit your profile, verifies the hiring manager's
+        It finds roles that fit your profile, verifies the hiring manager's
         work email, and sends them a short personal note with your resume attached.
         Replies land in your inbox.</p>
         <form class="signup js-signup" data-source="v2-hero" novalidate>
@@ -303,7 +303,7 @@
         <p class="form-msg" role="status" aria-live="polite"></p>
       </div>
 
-      <div class="feed" role="img" aria-label="Example of the Perisclaw activity feed: outreach emails being queued, verified, and sent">
+      <div class="feed" role="img" aria-label="Example of the activity feed: outreach emails being queued, verified, and sent">
         <div class="feed-head">
           <span>Today's outreach</span>
           <span class="live"><span class="live-dot"></span>Sending</span>
@@ -323,7 +323,7 @@
         <div class="tile t-green" aria-hidden="true">1</div>
         <div>
           <h3>Find</h3>
-          <p>Every morning, Perisclaw scans new postings across the major job boards
+          <p>Every morning, the autopilot scans new postings across the major job boards
           and scores each one against your profile. Weak fits are dropped before you
           ever see them.</p>
         </div>
@@ -407,7 +407,7 @@
     <details>
       <summary>Is this the same as auto-applying to jobs?</summary>
       <p>No. Auto-apply tools submit forms into applicant tracking systems, where
-      most applications are never read by a human. Perisclaw emails the person
+      most applications are never read by a human. The autopilot emails the person
       doing the hiring directly — that's where interviews come from.</p>
     </details>
     <details>
@@ -449,7 +449,7 @@
   </section>
 
   <footer>
-    <span>© 2026 Perisclaw</span>
+    <span>© 2026 learnanything.pro</span>
     <span>Your email is stored for the waitlist and used for nothing else.</span>
   </footer>
 </div>
@@ -518,7 +518,7 @@
         const r = await fetch('/api/leads', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, articleSlug: 'perisclaw-waitlist', vertical: 'perisclaw' }),
+          body: JSON.stringify({ email, articleSlug: 'job-outreach-waitlist', vertical: 'job-outreach' }),
         });
         const data = await r.json().catch(() => ({}));
         if (r.ok && data.success) {
