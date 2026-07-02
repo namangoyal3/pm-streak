@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import JsonLd, { breadcrumbSchema, faqSchema, howToSchema, speakableSchema, SITE_URL } from "@/components/JsonLd";
 import { extractFaqPairs, extractHowToSteps } from "@/lib/geo/markdown-faq";
+import ArticleConversionWrapper from "@/components/ArticleConversionWrapper";
 
 // Articles are added by the SEO agent without deploys — render on-demand but cache for 24h
 export const revalidate = 86400;
@@ -191,7 +192,7 @@ export default async function ArticlePage({ params }: Props) {
           </header>
 
           {/* Article body */}
-          <article className={`prose-article ${article.pageType === "framework" ? "prose-framework" : ""}`}>
+          <article data-article-body className={`prose-article ${article.pageType === "framework" ? "prose-framework" : ""}`}>
             <ReactMarkdown
               components={{
                 h2: ({ children }) => (
@@ -267,19 +268,13 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           )}
 
-          {/* CTA */}
-          <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 my-10 text-center">
-            <p className="font-black text-lg mb-1">Practice what you just learned</p>
-            <p className="text-[var(--text-secondary)] text-sm mb-4">
-              PM Streak gives you daily 3-minute lessons with streaks, XP, and a leaderboard.
-            </p>
-            <Link
-              href="/signup"
-              className="inline-block bg-[var(--green-primary)] text-white font-black px-6 py-3 rounded-2xl text-sm hover:opacity-90 transition-opacity"
-            >
-              Start your streak &mdash; it&apos;s free
-            </Link>
-          </div>
+          {/* CTA + Lead Capture */}
+          <ArticleConversionWrapper
+            slug={slug}
+            vertical={vertical}
+            wordCount={article.wordCount}
+            pageType={article.pageType}
+          />
 
           {/* Related articles */}
           {related.length > 0 && (
