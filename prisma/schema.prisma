@@ -616,6 +616,11 @@ model GeoPageTriage {
   currentSeoScore     Int?
   ga4Sessions30d      Int?
   attributedLeads30d  Int?
+  gscImpressions28d   Int?
+  gscClicks28d        Int?
+  gscCtr28d           Float?
+  gscAvgPosition28d   Float?
+  topQueries          Json?     // [{ query, impressions, clicks, avgPosition }]
   hasArticleSchema    Boolean   @default(false)
   hasFaqSchema        Boolean   @default(false)
   hasFaqSection       Boolean   @default(false)

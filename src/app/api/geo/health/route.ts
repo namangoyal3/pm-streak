@@ -19,11 +19,20 @@ const requiredEnv = [
 export async function GET() {
   const env = Object.fromEntries(requiredEnv.map((key) => [key, Boolean(process.env[key])]));
   const missing = requiredEnv.filter((key) => !process.env[key]);
+  const ga4 = {
+    client: Boolean(process.env.NEXT_PUBLIC_GA_ID),
+    server_events: Boolean(process.env.GA4_MEASUREMENT_SECRET),
+    posthog: Boolean(process.env.NEXT_PUBLIC_POSTHOG_KEY),
+    indexnow: Boolean(process.env.INDEXNOW_KEY),
+    gsc: Boolean(process.env.GA4_SERVICE_ACCOUNT_KEY) && Boolean(process.env.GSC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL),
+  };
+
   return NextResponse.json(
     {
       ok: missing.length === 0,
       missing,
       env,
+      ga4,
       agents: agentSwarm.map(({ id, name, visibility, trigger, cadence }) => ({
         id,
         name,
