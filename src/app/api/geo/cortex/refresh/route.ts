@@ -66,3 +66,8 @@ export async function POST(req: Request) {
     );
   }
 }
+
+// Vercel cron invocations are GET — delegate to the real handler.
+export async function GET(req: Request) {
+  return POST(req);
+}

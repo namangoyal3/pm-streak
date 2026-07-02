@@ -20,6 +20,7 @@ import {
   selectInternalLinks,
 } from "./safe-prisma";
 import { analyzeMdx, passesGate, scoreCitability } from "./citability";
+import { decidePublish, judgeCitability } from "./publish-gate";
 import { runForge } from "./forge-runner";
 
 const STALE_MS = 30 * 60 * 1000;
@@ -27,13 +28,14 @@ const MAX_ATTEMPTS = 3;
 // Leave ~50s headroom under the 300s Vercel function limit.
 const BUDGET_MS = 250_000;
 const FAQ_REGEX = /##\s+(faq|frequently asked questions)/i;
-const HERO_REGEX = /picsum\.photos\/seed\/|\/images\//;
+const HERO_REGEX = /\/api\/og\?|picsum\.photos\/seed\/|\/images\//;
 const MIN_WORD_COUNT_PILLAR = 1200;
 const MIN_WORD_COUNT = 600;
 
 export type CreateResult = {
   picked: number;
-  created: number;
+  created: number; // auto-published
+  drafted: number; // created unpublished, held for human review
   failed: number;
   skipped: number;
   errors: { query: string; message: string }[];
@@ -88,6 +90,10 @@ INTERNAL LINK ENRICHMENT:
 Link naturally to these existing PM Streak pages where topically relevant:
 ${linkHints || "  (none available yet)"}
 
+IMAGES:
+- For any hero/illustrative image use the branded generator: ![<title>](/api/og?title=<url-encoded title>)
+- NEVER use stock photo services (picsum, unsplash, pexels)
+
 EXTRA CITABILITY SIGNALS (include ALL of these):
 - Add a "## What is [Topic]" definition section near the top
 - Add inline citations using [1], [2], [3] notation; include a ## References section at the bottom
@@ -108,6 +114,7 @@ export async function runCreateTick(
   const result: CreateResult = {
     picked: 0,
     created: 0,
+    drafted: 0,
     failed: 0,
     skipped: 0,
     errors: [],
@@ -239,7 +246,17 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
         continue;
       }
 
-      // 8. Publish to DB.
+      // 8. Publish decision: LLM judge (GEO-01) + auto-merge threshold + review
+      // sample (GEO-03). Anything not auto-publishable is created as a draft —
+      // never dropped, never silently published.
+      const score = scoreCitability(factors);
+      const judge = await judgeCitability(body);
+      const decision = decidePublish({
+        citabilityScore: score,
+        judge,
+        publishedThisTick: result.created,
+      });
+
       const meta = forgeOut.schema_meta as { meta?: { title?: string; description?: string } } | null;
       await publishArticle({
         slug,
@@ -248,6 +265,7 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
         body,
         vertical: "pm",
         publishedAt: new Date(),
+        published: decision.publish,
       });
 
       // Also write MDX to seo-articles/ on disk for backup + indexing.
@@ -262,8 +280,13 @@ Return JSON with: title, page_type (pillar|comparison|use-case|glossary), target
       // 9. Mark addressed.
       await markOpportunityAddressed(opp.id, slug);
 
-      result.created++;
-      result.decisions.push({ query: opp.query, action: "created", slug });
+      if (decision.publish) {
+        result.created++;
+        result.decisions.push({ query: opp.query, action: "created", slug });
+      } else {
+        result.drafted++;
+        result.decisions.push({ query: opp.query, action: `drafted:${decision.reason}`, slug });
+      }
     } catch (e) {
       const message = e instanceof Error ? e.message.slice(0, 500) : String(e);
       await prisma.geoOpportunity.update({

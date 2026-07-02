@@ -118,32 +118,8 @@ export async function POST(req: Request) {
   }
 }
 
-// GET → dry-run: returns counts without writing.
+// Vercel cron invocations are GET — this must run the REAL inventory, not a
+// dry-run (the old dry-run GET made the scheduled cron a no-op).
 export async function GET(req: Request) {
-  if (!isAllowed(req)) return NextResponse.json({ ok: false }, { status: 401 });
-
-  const repoRoot = process.cwd();
-
-  const articleRows = await prisma.article.findMany({
-    where: { published: true },
-    select: { slug: true, body: true, seoScore: true, geoScore: true },
-  });
-  const articles = articleRows.map((r) =>
-    articleToInventory({ slug: r.slug, body: r.body ?? "", seoScore: r.seoScore ?? null, geoScore: r.geoScore ?? null })
-  );
-  const routes = inventoryRoutes(join(repoRoot, "src", "app"));
-  const mdx = [
-    ...inventoryMdx(join(repoRoot, "seo-articles"), "mdx"),
-    ...inventoryMdx(join(repoRoot, "seo-drafts"), "mdx"),
-  ];
-  const merged = mergeInventories(articles, routes, mdx);
-  const existing = await prisma.geoPageTriage.count();
-
-  return NextResponse.json({
-    ok: true,
-    dry_run: true,
-    sources: { articles: articles.length, routes: routes.length, mdx: mdx.length },
-    merged: merged.length,
-    existing_triage_rows: existing,
-  });
+  return POST(req);
 }

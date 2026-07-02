@@ -10,6 +10,12 @@ import ArticleConversionWrapper from "@/components/ArticleConversionWrapper";
 // Articles are added by the SEO agent without deploys — render on-demand but cache for 24h
 export const revalidate = 86400;
 
+// E-E-A-T (GEO-06): set GEO_CONTENT_AUTHOR to a real person's name (and
+// optionally GEO_CONTENT_AUTHOR_URL to their profile) to emit a Person author
+// instead of the anonymous Organization byline. Owner-gated by design.
+const AUTHOR_NAME = process.env.GEO_CONTENT_AUTHOR;
+const AUTHOR_URL = process.env.GEO_CONTENT_AUTHOR_URL;
+
 interface Props {
   params: Promise<{ vertical: string; slug: string }>;
 }
@@ -37,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: [{ url: ogImageUrl, width: 1200, height: 630, alt: article.title }],
       ...(article.publishedAt ? { publishedTime: article.publishedAt.toISOString() } : {}),
       modifiedTime: article.updatedAt.toISOString(),
-      authors: ["PM Streak Editorial"],
+      authors: [AUTHOR_NAME ?? "PM Streak Editorial"],
       siteName: "PM Streak",
     },
     twitter: {
@@ -124,11 +130,9 @@ export default async function ArticlePage({ params }: Props) {
         height: 512,
       },
     },
-    author: {
-      "@type": "Organization",
-      name: "PM Streak Editorial",
-      url: SITE_URL,
-    },
+    author: AUTHOR_NAME
+      ? { "@type": "Person", name: AUTHOR_NAME, ...(AUTHOR_URL ? { url: AUTHOR_URL } : {}) }
+      : { "@type": "Organization", name: "PM Streak Editorial", url: SITE_URL },
     keywords: article.tags.join(", "),
     inLanguage: "en-US",
     mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },

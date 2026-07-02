@@ -631,6 +631,9 @@ model GeoPageTriage {
   lastError           String?
   lastShippedPrUrl    String?
   lastShippedAt       DateTime?
+  aiCited             Boolean?  // last citation-probe verdict: page cited by an AI answer engine
+  aiCitedDetails      Json?     // { engine: { cited, query, sourceUrl?, checkedAt } }
+  lastCitationProbeAt DateTime?
   inventoriedAt       DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 

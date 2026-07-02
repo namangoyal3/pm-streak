@@ -23,9 +23,9 @@ export async function POST(req: Request) {
     if (!dryRun) {
       await writeCronLog({
         cronId: "create/tick",
-        status: result.created > 0 ? "ok" : result.failed > 0 ? "error" : "empty",
-        summary: `Created ${result.created}, failed ${result.failed}, skipped ${result.skipped} of ${result.picked}`,
-        details: { quota, picked: result.picked, created: result.created, failed: result.failed, skipped: result.skipped, errors: result.errors.slice(0, 10) },
+        status: result.created > 0 || result.drafted > 0 ? "ok" : result.failed > 0 ? "error" : "empty",
+        summary: `Created ${result.created}, drafted ${result.drafted}, failed ${result.failed}, skipped ${result.skipped} of ${result.picked}`,
+        details: { quota, picked: result.picked, created: result.created, drafted: result.drafted, failed: result.failed, skipped: result.skipped, errors: result.errors.slice(0, 10) },
       });
     }
     return NextResponse.json({
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
       dryRun,
       picked: result.picked,
       created: result.created,
+      drafted: result.drafted,
       failed: result.failed,
       skipped: result.skipped,
       errors: result.errors.slice(0, 5),
@@ -45,11 +46,9 @@ export async function POST(req: Request) {
   }
 }
 
-// GET → dry-run convenience (no body needed).
+// Vercel cron invocations are GET — this must run the REAL tick, not a dry-run
+// (the old dry-run GET made the scheduled cron a no-op). Humans can still
+// dry-run with ?dryRun=1, which POST already honors.
 export async function GET(req: Request) {
-  if (!isAllowed(req)) return NextResponse.json({ ok: false }, { status: 401 });
-  const url = new URL(req.url);
-  const quota = Math.min(10, Math.max(1, Number(url.searchParams.get("quota") ?? 3)));
-  const result = await runCreateTick(prisma, { quota, dryRun: true });
-  return NextResponse.json({ ok: true, dryRun: true, decisions: result.decisions });
+  return POST(req);
 }

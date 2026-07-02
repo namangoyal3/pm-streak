@@ -20,3 +20,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
+
+// Vercel cron invocations are GET — delegate to the real handler.
+export async function GET(req: Request) {
+  return POST(req);
+}
