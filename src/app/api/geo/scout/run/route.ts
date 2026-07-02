@@ -85,3 +85,8 @@ Only include queries where intent_score > 50 and pm-streak is NOT in the current
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
+
+// Vercel cron invocations are GET — delegate to the real handler.
+export async function GET(req: Request) {
+  return POST(req);
+}

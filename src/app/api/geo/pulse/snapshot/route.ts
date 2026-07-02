@@ -118,3 +118,8 @@ This block is machine-parsed to update the self-improvement queue — include it
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
+
+// Vercel cron invocations are GET — delegate to the real handler.
+export async function GET(req: Request) {
+  return POST(req);
+}

@@ -48,16 +48,9 @@ export async function POST(req: Request) {
   }
 }
 
-// GET → dry-run convenience for humans.
+// Vercel cron invocations are GET — this must run the REAL tick, not a dry-run
+// (the old dry-run GET made the scheduled cron a no-op). Humans can still
+// dry-run with ?dryRun=1, which POST already honors.
 export async function GET(req: Request) {
-  if (!isAllowed(req)) return NextResponse.json({ ok: false }, { status: 401 });
-  const url = new URL(req.url);
-  const quota = Math.min(50, Math.max(1, Number(url.searchParams.get("quota") ?? 5)));
-  const result = await runTick(prisma, { quota, dryRun: true });
-  return NextResponse.json({
-    ok: true,
-    quota,
-    dryRun: true,
-    decisions: result.decisions,
-  });
+  return POST(req);
 }

@@ -1,5 +1,14 @@
 # GEO/SEO Agent Subsystem — Improvement Plan
 
+> **STATUS 2026-07-03:** Bundle 1 merged (PR #29). Bundle 2 largely executed on
+> `advisor/geo-bundle2`: GEO-03 governor completed (auto-merge ≥80 enforced,
+> judge gate, review sample, Picsum → /api/og), GEO-01 LLM judge live,
+> GEO-02 Perplexity citation probe cron added, GEO-06 env-gated Person byline.
+> Also fixed: all scheduled geo routes were inert — Vercel crons send GET, but
+> routes were POST-only or dry-ran on GET. Still open: GEO-05 off-page
+> distribution (human workflow), Gemini as second probe engine, feeding probe
+> results into Cortex/Blueprint prompts.
+
 From the 2026-06-11 focused audit of the SEO agent swarm, commit `afc2a77`.
 Four auditors (orchestration, content pipeline, queue/cron, GEO effectiveness),
 findings vetted against source. NOTE: the broad-repo remediation plans live on

@@ -74,6 +74,9 @@
     },
     "src/app/api/geo/tools/gsc-query/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/geo/citation-probe/run/route.ts": {
+      "maxDuration": 300
     }
   },
   "crons": [
@@ -144,6 +147,10 @@
     {
       "path": "/api/geo/create/tick",
       "schedule": "35 3 * * *"
+    },
+    {
+      "path": "/api/geo/citation-probe/run",
+      "schedule": "0 5 * * *"
     }
   ]
 }

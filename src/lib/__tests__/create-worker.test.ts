@@ -29,11 +29,17 @@ vi.mock("../geo/citability", () => ({
   scoreCitability: vi.fn(),
 }));
 
+vi.mock("../geo/publish-gate", () => ({
+  judgeCitability: vi.fn(),
+  decidePublish: vi.fn(),
+}));
+
 // ── Import mocked modules after vi.mock ───────────────────────────────────────
 import * as safePrisma from "../geo/safe-prisma";
 import * as forgeRunner from "../geo/forge-runner";
 import * as lyzr from "@/lib/lyzr";
 import * as citability from "../geo/citability";
+import * as publishGate from "../geo/publish-gate";
 import { runCreateTick } from "../geo/create-worker";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -152,6 +158,9 @@ beforeEach(() => {
   });
   (citability.scoreCitability as ReturnType<typeof vi.fn>).mockReturnValue(80);
   (citability.passesGate as ReturnType<typeof vi.fn>).mockReturnValue(true);
+
+  (publishGate.judgeCitability as ReturnType<typeof vi.fn>).mockResolvedValue({ score: 85, reason: "solid", errored: false });
+  (publishGate.decidePublish as ReturnType<typeof vi.fn>).mockReturnValue({ publish: true, reason: "auto_publish" });
 });
 
 // ── buildForgePrompt tests (pure — no mocks needed) ───────────────────────────
@@ -220,6 +229,22 @@ describe("runCreateTick", () => {
       expect.any(String) // slug
     );
     expect(result.decisions[0].action).toBe("created");
+  });
+
+  it("hold-for-review: publish decision false → drafted, publishArticle called with published:false", async () => {
+    const opp = makeOpportunity();
+    const prisma = makePrisma();
+
+    (safePrisma.listUnaddressedOpportunities as ReturnType<typeof vi.fn>).mockResolvedValue([opp]);
+    (publishGate.decidePublish as ReturnType<typeof vi.fn>).mockReturnValue({ publish: false, reason: "judge_low" });
+
+    const result = await runCreateTick(prisma, {});
+
+    expect(result.created).toBe(0);
+    expect(result.drafted).toBe(1);
+    expect(safePrisma.publishArticle).toHaveBeenCalledWith(expect.objectContaining({ published: false }));
+    expect(safePrisma.markOpportunityAddressed).toHaveBeenCalledOnce();
+    expect(result.decisions[0].action).toBe("drafted:judge_low");
   });
 
   it("duplicate guard: skips runForge and marks addressed when article already exists", async () => {

@@ -119,11 +119,26 @@ export async function updateCitationStatus(id: string, status: string, approvedB
  * - <script type="application/ld+json"> blocks (page injects its own JSON-LD)
  * - Trailing whitespace
  */
-function cleanArticleBody(raw: string): string {
+/**
+ * Replaces stock-photo images (picsum.photos) with branded /api/og images.
+ * Stock hero images across hundreds of auto-generated pages are a
+ * scaled-content-abuse fingerprint; /api/og renders an on-brand card.
+ * Exported for unit tests.
+ */
+export function rewriteStockImages(body: string, title: string): string {
+  const ogUrl = (alt: string) => `/api/og?title=${encodeURIComponent(alt || title)}`;
+  return body
+    .replace(/!\[([^\]]*)\]\(https?:\/\/(?:[a-z0-9.-]*\.)?picsum\.photos[^)]*\)/gi, (_m, alt: string) => `![${alt || title}](${ogUrl(alt)})`)
+    .replace(/(<img\b[^>]*\bsrc=["'])https?:\/\/(?:[a-z0-9.-]*\.)?picsum\.photos[^"']*(["'])/gi, `$1${ogUrl("")}$2`);
+}
+
+function cleanArticleBody(raw: string, title: string): string {
   let body = raw;
 
   // Remove YAML frontmatter
   body = body.replace(/^---[\s\S]*?---\n?/, "");
+
+  body = rewriteStockImages(body, title);
 
   // Remove <script type="application/ld+json">...</script> blocks
   body = body.replace(/<script\s+type=["']application\/ld\+json["'][\s\S]*?<\/script>/gi, "");
@@ -156,33 +171,38 @@ export async function publishArticle(data: {
   body: string;
   vertical?: string;
   publishedAt?: Date;
+  // false → create as an unpublished draft held for human review (GEO-03).
+  // Drafts get no triage row and no IndexNow ping.
+  published?: boolean;
 }) {
-  const { slug, title, description, body, vertical = "pm", publishedAt } = data;
-  const cleanBody = cleanArticleBody(body);
+  const { slug, title, description, body, vertical = "pm", publishedAt, published = true } = data;
+  const cleanBody = cleanArticleBody(body, title);
   const now = new Date();
   const article = await prisma.article.upsert({
     where: { slug },
-    update: { title, description, body: cleanBody, published: true, updatedAt: now, ...(publishedAt ? { publishedAt } : {}) },
-    create: { slug, title, description, body: cleanBody, vertical, published: true, publishedAt: publishedAt ?? now },
+    update: { title, description, body: cleanBody, published, updatedAt: now, ...(published && publishedAt ? { publishedAt } : {}) },
+    create: { slug, title, description, body: cleanBody, vertical, published, publishedAt: published ? publishedAt ?? now : null },
     select: { id: true, slug: true, vertical: true },
   });
 
   // Re-queue for self-improvement triage. Failure must never break publishing.
-  try {
-    await prisma.geoPageTriage.upsert({
-      where: { slug },
-      create: { slug, source: "article", jobStatus: "pending" },
-      update: { jobStatus: "pending", updatedAt: now },
-    });
-  } catch (e) {
-    console.warn(`[publishArticle] triage upsert failed for ${slug}:`, (e as Error).message);
+  if (published) {
+    try {
+      await prisma.geoPageTriage.upsert({
+        where: { slug },
+        create: { slug, source: "article", jobStatus: "pending" },
+        update: { jobStatus: "pending", updatedAt: now },
+      });
+    } catch (e) {
+      console.warn(`[publishArticle] triage upsert failed for ${slug}:`, (e as Error).message);
+    }
   }
 
   // IndexNow ping so search engines crawl the new page immediately.
   // Awaited with a 5s cap: unawaited fetches get dropped when the Vercel
   // function freezes after responding. Must never throw.
   const indexNowKey = process.env.INDEXNOW_KEY;
-  if (indexNowKey) {
+  if (indexNowKey && published) {
     const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
     try {
       await fetch("https://api.indexnow.org/indexnow", {
