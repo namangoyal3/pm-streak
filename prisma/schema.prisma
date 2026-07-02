@@ -551,6 +551,18 @@ model ExperimentEvent {
   @@index([createdAt])
 }
 
+model ArticleLead {
+  id          String   @id @default(cuid())
+  email       String
+  articleSlug String
+  vertical    String
+  source      String   @default("article_inline")
+  createdAt   DateTime @default(now())
+
+  @@unique([email, articleSlug])
+  @@index([createdAt])
+}
+
 // --- GEO Swarm models ---
 
 model GeoOpportunity {

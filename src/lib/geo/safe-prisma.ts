@@ -167,17 +167,38 @@ export async function publishArticle(data: {
     select: { id: true, slug: true, vertical: true },
   });
 
-  // Loop 1: seed/re-queue this article in the self-improvement triage queue.
-  // Wrapped in try/catch — triage failure must never break article publishing.
+  // Re-queue for self-improvement triage. Failure must never break publishing.
   try {
     await prisma.geoPageTriage.upsert({
       where: { slug },
       create: { slug, source: "article", jobStatus: "pending" },
-      // Re-queue shipped articles so they're re-evaluated after content changes.
       update: { jobStatus: "pending", updatedAt: now },
     });
   } catch (e) {
     console.warn(`[publishArticle] triage upsert failed for ${slug}:`, (e as Error).message);
+  }
+
+  // IndexNow ping so search engines crawl the new page immediately.
+  // Awaited with a 5s cap: unawaited fetches get dropped when the Vercel
+  // function freezes after responding. Must never throw.
+  const indexNowKey = process.env.INDEXNOW_KEY;
+  if (indexNowKey) {
+    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
+    try {
+      await fetch("https://api.indexnow.org/indexnow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          host: new URL(siteUrl).host,
+          key: indexNowKey,
+          keyLocation: `${siteUrl}/${indexNowKey}.txt`,
+          urlList: [`${siteUrl}/learn/${article.vertical}/${article.slug}`],
+        }),
+        signal: AbortSignal.timeout(5000),
+      }).catch(() => {});
+    } catch {
+      // intentionally silent
+    }
   }
 
   return article;
