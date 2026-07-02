@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { serverEvents } from "@/lib/ga4-server";
+import { recordAcquisitionEvent } from "@/lib/acquisition";
+import type { NextRequest } from "next/server";
 
 const MARKETING_TRIAL_DAYS = 3;
 
@@ -10,7 +12,7 @@ const MARKETING_TRIAL_DAYS = 3;
  * Grants a 3-day Pro marketing trial. Requires the user to be signed in.
  * Idempotent — if trial is already active, returns success with remaining time.
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   const userId = await getCurrentUserId();
   // Fire trial_start_attempt at the entry of every POST so we can measure
   // how many requests reach the route vs. how many succeed downstream.
@@ -59,5 +61,13 @@ export async function POST() {
   });
 
   await serverEvents.trialStartSuccess(userId, MARKETING_TRIAL_DAYS);
+  await recordAcquisitionEvent({
+    userId,
+    eventName: "trial_started",
+    req,
+    metadata: {
+      trialDays: MARKETING_TRIAL_DAYS,
+    },
+  });
   return NextResponse.json({ ok: true, trialEndsAt: trialEndsAt.toISOString() });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { recordAcquisitionEvent } from "@/lib/acquisition";
 
 export async function POST(req: NextRequest) {
   const userId = await getCurrentUserId();
@@ -14,6 +15,17 @@ export async function POST(req: NextRequest) {
     where: { id: userId },
     data: {
       onboarded: true,
+      dailyGoal: dailyGoal ?? 1,
+      streakGoal: streakGoal ?? 7,
+      learningGoal: learningGoal ?? "staying_sharp",
+    },
+  });
+
+  await recordAcquisitionEvent({
+    userId,
+    eventName: "onboarding_completed",
+    req,
+    metadata: {
       dailyGoal: dailyGoal ?? 1,
       streakGoal: streakGoal ?? 7,
       learningGoal: learningGoal ?? "staying_sharp",

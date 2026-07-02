@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { CORE_LESSON_WHERE } from "@/lib/lesson-access";
+import { trackServerEvent } from "@/lib/ga4-server";
 
 const TRIAL_DAYS = 7;
 
@@ -44,6 +45,12 @@ export async function maybeGrantProTrial(userId: string): Promise<boolean> {
       billingStatus: "trialing",
     },
   });
+
+  trackServerEvent("trial_auto_granted", {
+    user_id: userId,
+    reason: eligibleByLessons ? "3_lessons" : "3_day_streak",
+    trial_days: TRIAL_DAYS,
+  }, userId).catch(() => {});
 
   return true;
 }

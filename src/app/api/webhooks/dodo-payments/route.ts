@@ -6,6 +6,7 @@ import {
   revokeDodoPro,
   findUserByEmail,
 } from "@/lib/billing/dodo-server";
+import { recordUserFunnelEvent } from "@/lib/acquisition";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -149,6 +150,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         nextBillingDate: new Date(sub.next_billing_date),
         customerId: sub.customer.customer_id,
       });
+      await recordUserFunnelEvent({
+        userId,
+        eventName: "payment_completed",
+        metadata: {
+          provider: "dodo",
+          eventType: payload.type,
+          productId: sub.product_id,
+          subscriptionId: sub.subscription_id,
+        },
+      });
       console.log("[dodo-webhook] Pro granted for", sub.customer.email, "until", sub.next_billing_date);
     },
 
@@ -172,6 +183,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         productId: sub.product_id,
         nextBillingDate: new Date(sub.next_billing_date),
         customerId: sub.customer.customer_id,
+      });
+      await recordUserFunnelEvent({
+        userId,
+        eventName: "subscription_renewed",
+        metadata: {
+          provider: "dodo",
+          eventType: payload.type,
+          productId: sub.product_id,
+          subscriptionId: sub.subscription_id,
+        },
       });
       console.log("[dodo-webhook] Pro renewed for", sub.customer.email, "until", sub.next_billing_date);
     },

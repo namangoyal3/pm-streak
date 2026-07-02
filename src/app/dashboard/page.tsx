@@ -524,8 +524,13 @@ export default function DashboardPage() {
       />
 
      
- {/* Trial Active Banner */}
- {user.plan !== 'pro' && user.trialEndsAt && new Date(user.trialEndsAt) > new Date() && (
+ {/* Trial Active Banner with countdown */}
+ {user.plan !== 'pro' && user.trialEndsAt && new Date(user.trialEndsAt) > new Date() && (() => {
+ const now = new Date();
+ const end = new Date(user.trialEndsAt);
+ const daysLeft = Math.max(0, Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+ const hoursLeft = Math.max(0, Math.floor((end.getTime() - now.getTime()) / (1000 * 60 * 60) % 24));
+ return (
  <div className="bg-[var(--bg-card)] border border-[var(--green-primary)]/30 mx-4 mt-4 rounded-2xl px-4 py-3">
  <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
  <div className="flex items-center gap-3">
@@ -534,15 +539,26 @@ export default function DashboardPage() {
  </div>
  <div>
  <p className="text-sm font-black text-white">Your Pro Trial is Active!</p>
- <p className="text-xs text-[var(--text-secondary)]">Full Pro access while your trial is active</p>
+ <p className="text-xs text-[var(--text-secondary)]">
+ {daysLeft > 0
+ ? `${daysLeft} day${daysLeft !== 1 ? 's' : ''}${hoursLeft > 0 ? ` ${hoursLeft}h` : ''} remaining — Full Pro access`
+ : `${hoursLeft}h remaining — Full Pro access`}
+ </p>
  </div>
  </div>
- <Link href="/pricing" className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-primary)]/90 text-black text-sm font-black transition-colors active:scale-95">
+ <div className="flex items-center gap-3">
+ <div className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--orange-primary)]/10 border border-[var(--orange-primary)]/25">
+ <span className="text-xs font-black text-[var(--orange-primary)] tabular-nums">{daysLeft}</span>
+ <span className="text-[9px] font-bold text-[var(--text-secondary)] uppercase">days</span>
+ </div>
+ <Link href="/pricing" className="px-4 py-2 rounded-xl bg-[var(--green-primary)] hover:bg-[var(--green-primary)]/90 text-black text-sm font-black transition-colors active:scale-95 whitespace-nowrap">
  Start Subscription
  </Link>
  </div>
  </div>
- )}
+ </div>
+ );
+ })()}
       {/* Mobile sticky category bar */}
       {categories.length > 0 && (
         <div className="lg:hidden sticky top-14 z-40 bg-[var(--bg-primary)] border-b-2 border-[var(--border-color)] px-4 py-2">

@@ -1,5 +1,7 @@
 import posthog from 'posthog-js'
 
+const ACQUISITION_COOKIE = 'pmstreak_attribution'
+
 export type CampaignSource = string
 export type CampaignMedium = string
 export type CampaignContent = string
@@ -10,6 +12,26 @@ interface UTMParams {
   utm_campaign?: string
   utm_content?: CampaignContent
   utm_term?: string
+}
+
+const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 90
+
+function setAttributionCookie(data: Record<string, unknown>) {
+  if (typeof document === 'undefined') return
+  document.cookie = `${ACQUISITION_COOKIE}=${encodeURIComponent(JSON.stringify(data))}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`
+}
+
+function getAttributionCookie(): Record<string, unknown> | null {
+  if (typeof document === 'undefined') return null
+  const cookie = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${ACQUISITION_COOKIE}=`))
+  if (!cookie) return null
+  try {
+    return JSON.parse(decodeURIComponent(cookie.split('=').slice(1).join('=')))
+  } catch {
+    return null
+  }
 }
 
 export function getUTMParamsFromURL(): UTMParams | null {
@@ -35,20 +57,39 @@ export function getUTMParamsFromURL(): UTMParams | null {
 
 export function captureCampaignData() {
   const params = getUTMParamsFromURL()
+  const existingAttribution = getAttributionCookie()
+  const landingData = {
+    landing_path: window.location.pathname,
+    landing_url: window.location.href,
+    referrer: document.referrer || undefined,
+    captured_at: new Date().toISOString(),
+  }
+
+  if (!existingAttribution) {
+    setAttributionCookie(landingData)
+  }
+
   if (!params || !params.utm_source) return
   
   const campaignData = {
+    ...landingData,
     campaign_source: params.utm_source,
     campaign_medium: params.utm_medium,
     campaign_name: params.utm_campaign,
     campaign_content: params.utm_content,
     campaign_term: params.utm_term,
+    source: params.utm_source,
+    medium: params.utm_medium,
+    campaign: params.utm_campaign,
+    content: params.utm_content,
+    term: params.utm_term,
     campaign_timestamp: new Date().toISOString(),
   }
   
   posthog.capture('campaign_landed', campaignData)
   
   sessionStorage.setItem('pmstreak_campaign', JSON.stringify(campaignData))
+  setAttributionCookie(campaignData)
 }
 
 export function getStoredCampaign() {

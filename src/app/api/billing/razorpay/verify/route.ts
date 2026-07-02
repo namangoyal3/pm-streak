@@ -10,6 +10,7 @@ import {
   type RazorpayPlan,
   verifyRazorpayCheckoutSignature,
 } from "@/lib/billing/razorpay-server";
+import { recordUserFunnelEvent } from "@/lib/acquisition";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -139,6 +140,18 @@ export async function POST(req: NextRequest) {
         throw error;
       }
     }
+
+    await recordUserFunnelEvent({
+      userId,
+      eventName: "payment_completed",
+      metadata: {
+        provider: "razorpay",
+        plan: resolvedPlan,
+        amount: payment.amount,
+        currency: payment.currency,
+        paymentId: payment.id,
+      },
+    });
 
     return NextResponse.json({
       ok: true,

@@ -4,6 +4,7 @@ import { signToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { sendWelcomeEmail } from "@/lib/email";
 import { getCanonicalOrigin } from "@/lib/app-origin";
+import { recordAcquisitionEvent } from "@/lib/acquisition";
 
 export async function GET(req: NextRequest) {
   const origin = getCanonicalOrigin(req.nextUrl.origin);
@@ -70,6 +71,8 @@ export async function GET(req: NextRequest) {
       where: { OR: [{ googleId }, { email }] },
     });
 
+    const isNewUser = !user;
+
     if (!user) {
       // New user — create account
       user = await prisma.user.create({
@@ -100,6 +103,17 @@ export async function GET(req: NextRequest) {
         },
       });
     }
+
+    await recordAcquisitionEvent({
+      userId: user.id,
+      eventName: isNewUser ? "signup_completed" : "login_completed",
+      req,
+      metadata: {
+        method: "google",
+        country: reqCountry || null,
+        onboarded: user.onboarded,
+      },
+    });
 
     const token = await signToken(user.id);
     const cookieStore = await cookies();

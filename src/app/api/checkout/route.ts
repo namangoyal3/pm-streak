@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 import { serverEvents } from "@/lib/ga4-server";
+import { recordAcquisitionEvent } from "@/lib/acquisition";
 
 const DODO_ENV =
   (process.env.DODO_PAYMENTS_ENVIRONMENT as "test_mode" | "live_mode" | undefined) ??
@@ -44,6 +45,17 @@ export async function GET(req: NextRequest) {
   // Fire checkout_initiated at the start of every GET — anonymous users count
   // for funnel observability too.
   await serverEvents.checkoutInitiated(userId, plan ?? "unknown");
+  if (userId) {
+    await recordAcquisitionEvent({
+      userId,
+      eventName: "checkout_initiated",
+      req,
+      metadata: {
+        plan: plan ?? "unknown",
+        gateway: "dodo",
+      },
+    });
+  }
 
   // If no productId provided but plan is, use the base product for that plan
   if (!productId && plan) {
