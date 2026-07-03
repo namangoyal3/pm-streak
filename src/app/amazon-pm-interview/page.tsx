@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Amazon PM Interview Guide (2026) — Leadership Principles, Bar Raiser & Questions",
@@ -98,6 +101,7 @@ const FAQS = [
 ];
 
 export default function AmazonPmInterviewPage() {
+  const dates = pageDates("/amazon-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -105,6 +109,17 @@ export default function AmazonPmInterviewPage() {
         { name: "Amazon PM Interview", url: `${SITE_URL}/amazon-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Amazon PM Interview Guide (2026 Edition)",
+        description:
+          "Crack the Amazon PM interview. Leadership Principles in every answer, the Bar Raiser round, product design questions, and a complete prep plan for Amazon India PM roles.",
+        image: `${SITE_URL}/api/og?title=Amazon+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/amazon-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -114,6 +129,16 @@ export default function AmazonPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Amazon PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            An Amazon PM loop centres on four rounds — product design via Working Backwards, metrics
+            and analytics, a Leadership Principles deep dive, and the Bar Raiser, a trained
+            interviewer from outside your team who holds veto power. Every answer, even in design
+            and metrics rounds, is evaluated against Leadership Principles, so prepared LP stories
+            decide the outcome.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Leadership Principles, the Bar Raiser round, Working Backwards, and everything you need
             to know to pass the most systematised PM interview in the industry.
@@ -184,6 +209,8 @@ export default function AmazonPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="amazon-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Prep for Amazon LP Questions Daily</h2>

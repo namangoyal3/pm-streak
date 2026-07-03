@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Microsoft PM Interview Guide (2026) — Questions, Rounds & Prep",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function MicrosoftPmInterviewPage() {
+  const dates = pageDates("/microsoft-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,17 @@ export default function MicrosoftPmInterviewPage() {
         { name: "Microsoft PM Interview", url: `${SITE_URL}/microsoft-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Microsoft PM Interview Guide (2026 Edition)",
+        description:
+          "Crack the Microsoft PM interview. All rounds including design, strategy, and behavioural, real questions, what Microsoft PMs say the bar is, and a complete prep plan.",
+        image: `${SITE_URL}/api/og?title=Microsoft+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/microsoft-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +126,16 @@ export default function MicrosoftPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Microsoft PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Microsoft&apos;s PM interview starts with a recruiter screen and phone screen, then 4–5
+            onsite rounds covering product design, strategy and market entry, estimation, and
+            behavioural questions built around growth mindset. No coding is required — technical
+            fluency is tested through system-design discussion — and accessibility plus enterprise
+            user empathy carry unusual weight in design answers.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             All Microsoft PM interview rounds, real questions across Teams, Azure, LinkedIn and more,
             and what the growth mindset culture means for your answers.
@@ -189,6 +214,8 @@ export default function MicrosoftPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="microsoft-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for the Microsoft PM Bar Daily</h2>

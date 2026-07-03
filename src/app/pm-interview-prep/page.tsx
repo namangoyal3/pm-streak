@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Prep — Practice Product Manager Interview Questions Daily",
@@ -87,6 +90,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewPrepPage() {
+  const dates = pageDates("/pm-interview-prep");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -105,6 +109,16 @@ export default function PmInterviewPrepPage() {
         "teaches": ["Product Sense", "Metrics & Analytics", "Execution", "Strategy", "Behavioral", "Estimation"],
         "url": `${SITE_URL}/pm-interview-prep`,
       }} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Prep That Actually Works",
+        description: "Ace your PM interview with daily practice. PM Streak gives you real product sense, metrics, and execution questions asked at Google, Meta, Amazon, and top startups — with AI feedback.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Prep++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-prep`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         {/* Hero */}
@@ -115,6 +129,16 @@ export default function PmInterviewPrepPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Prep That Actually Works
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Effective PM interview prep means daily practice across six question types —
+            product sense, metrics, execution, strategy, behavioral, and estimation — rather
+            than cramming the night before. If you have two weeks, weight your time toward
+            product sense (50%), metrics (30%), and behavioral (20%), answering at least one
+            question per day in writing with feedback on your structure.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Stop cramming the night before. PM Streak gives you 2-minute daily lessons
             extracted from 300+ real PM interviews — so product thinking becomes instinct,
@@ -192,6 +216,8 @@ export default function PmInterviewPrepPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-prep" />
 
         {/* CTA */}
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">

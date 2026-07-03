@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Duolingo for Product Managers — PM Streak",
@@ -56,6 +59,7 @@ const FAQS = [
 ];
 
 export default function DuolingoForProductManagersPage() {
+  const dates = pageDates("/duolingo-for-product-managers");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -63,6 +67,16 @@ export default function DuolingoForProductManagersPage() {
         { name: "Duolingo for Product Managers", url: `${SITE_URL}/duolingo-for-product-managers` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Duolingo for Product Managers",
+        description: "PM Streak is the Duolingo for PMs. Daily 2-minute lessons from 300+ real PM interviews, streak tracking, XP, leaderboards, and AI-powered practice — all in one app.",
+        image: `${SITE_URL}/api/og?title=Duolingo+for+Product+Managers++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/duolingo-for-product-managers`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-12 text-center">
@@ -72,6 +86,16 @@ export default function DuolingoForProductManagersPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Duolingo for Product Managers
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM Streak is the Duolingo for product managers: 2-minute daily lessons drawn from
+            300+ real PM interviews, with streak tracking, XP, and leaderboards keeping you
+            consistent. Where Duolingo builds a language habit, PM Streak builds product
+            instinct — adding AI-powered practice questions, an interview readiness score,
+            and India pricing at ₹299/month with a 7-day free trial.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Duolingo made language learning a daily habit through streaks, XP, and bite-sized lessons.
             PM Streak does the same for product management — with real content from 300+ PM interviews.
@@ -143,6 +167,8 @@ export default function DuolingoForProductManagersPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="duolingo-for-product-managers" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Start Your PM Streak Today</h2>

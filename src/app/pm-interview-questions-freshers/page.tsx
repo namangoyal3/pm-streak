@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Questions for Freshers (2026) — First PM Job Guide",
@@ -131,6 +134,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewQuestionsFreshersPage() {
+  const dates = pageDates("/pm-interview-questions-freshers");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -138,6 +142,17 @@ export default function PmInterviewQuestionsFreshersPage() {
         { name: "PM Interview Questions for Freshers", url: `${SITE_URL}/pm-interview-questions-freshers` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Questions for Freshers (2026)",
+        description:
+          "PM interview questions for freshers and new graduates. What interviewers actually ask, how to answer without PM experience, APM programs, and how to build your product portfolio from scratch.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Questions+for+Freshers+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-questions-freshers`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -147,6 +162,16 @@ export default function PmInterviewQuestionsFreshersPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Questions<br />for Freshers (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            For freshers, PM interviews concentrate on four question types: product sense, guesstimates and market
+            sizing, &ldquo;why PM&rdquo; motivation questions, and prompts that surface product work you did without
+            the title. Interviewers know freshers haven&apos;t shipped — they grade how you think. A lightweight
+            portfolio (product teardown, mock PRD, user research) plus APM programs like Flipkart&apos;s and
+            Razorpay&apos;s are the most direct route into a first PM role.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What interviewers actually ask freshers, how to answer without PM experience,
             how to build a portfolio from zero, and which APM programs to target.
@@ -215,6 +240,8 @@ export default function PmInterviewQuestionsFreshersPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-questions-freshers" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Start Building PM Instinct Today</h2>
