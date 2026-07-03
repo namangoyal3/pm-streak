@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Mic, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Mic, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 type DrillResponse = {
   dayIndex: number;
@@ -137,8 +137,21 @@ export default function InterviewSprintPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-white px-4 py-8 pb-24">
-      <main className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-white pb-24">
+      <header className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]">
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
+          <Link href="/dashboard" className="text-[var(--text-secondary)] hover:text-white p-2 -ml-2 rounded-xl">
+            <ArrowLeft size={20} />
+          </Link>
+          <div className="flex items-center gap-2">
+            <Mic size={14} className="text-[var(--green-primary)]" />
+            <span className="text-xs text-[var(--green-primary)] font-black uppercase tracking-widest">
+              Interview Sprint
+            </span>
+          </div>
+        </div>
+      </header>
+      <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-6">
           <div className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[var(--green-primary)] bg-[var(--green-primary)]/10 border border-[var(--green-primary)]/30 px-2.5 py-1 rounded-full">
             <Mic size={12} />

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Remote PM Jobs — Product Manager Job Board | PM Streak",
+  title: "Remote PM Jobs — Product Manager Job Board",
   description:
     "Browse curated remote product manager, APM, Senior PM, and AI PM job openings from Wellfound, LinkedIn, and Himalayas. Updated weekly. Generate a personalized interview prep plan for any listing.",
   alternates: { canonical: "/jobs" },

@@ -146,7 +146,7 @@ function ExplorePageContent() {
 
   return (
     <div className={ds.pageShell}>
-      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
+      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} credits={user.credits} avatarUrl={user.avatarUrl} name={user.name} plan={user.plan} />
 
       <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 py-5 pb-28 space-y-5">
         <div className="text-center">

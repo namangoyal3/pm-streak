@@ -103,7 +103,7 @@ export default async function LearnPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {verticalArticles.map((article) => {
-                const readTime = Math.ceil(article.wordCount / 200);
+                const readTime = Math.max(1, Math.ceil(article.wordCount / 200));
                 return (
                   <Link
                     key={article.id}

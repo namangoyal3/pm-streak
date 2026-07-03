@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import JsonLd, { faqSchema } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  title: "AI PM Lesson Generator — Explore Custom Topics | PM Streak",
+  title: "AI PM Lesson Generator — Explore Custom Topics",
   description:
     "Generate personalized product management lessons on any topic using AI. Powered by 300+ expert PM lessons. Earn XP and maintain your streak with custom deep-dive content.",
   alternates: { canonical: "/explore" },

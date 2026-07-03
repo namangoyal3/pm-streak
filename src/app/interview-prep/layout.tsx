@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import JsonLd, { faqSchema } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  title: "PM Interview Prep — AI-Powered Practice Questions | PM Streak",
+  title: "PM Interview Prep — AI-Powered Practice Questions",
   description:
     "Prepare for product management interviews with AI-generated practice questions. Get 5 PM interview questions per session with frameworks, key answer points, and common mistakes — covering Product Sense, Metrics, Execution, Strategy, Behavioral, and Estimation from APM to Director level.",
   alternates: { canonical: "/interview-prep" },

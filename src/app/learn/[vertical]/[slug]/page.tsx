@@ -87,7 +87,7 @@ export default async function ArticlePage({ params }: Props) {
 
   if (!article) notFound();
 
-  const readTime = Math.ceil(article.wordCount / 200);
+  const readTime = Math.max(1, Math.ceil(article.wordCount / 200));
   const publishedDate = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString("en-US", {
         year: "numeric",

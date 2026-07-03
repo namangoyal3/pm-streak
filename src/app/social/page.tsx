@@ -128,7 +128,7 @@ export default function SocialPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} unreadNotifications={0} />
+      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} credits={user.credits} avatarUrl={user.avatarUrl} name={user.name} plan={user.plan} unreadNotifications={0} />
 
       <main className="max-w-2xl mx-auto px-4 py-6 pb-28 space-y-6">
         <div className="text-center">

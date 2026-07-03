@@ -71,7 +71,7 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} />
+      <Navbar streakCount={user.streakCount} xp={user.xp} gems={user.gems} credits={user.credits} avatarUrl={user.avatarUrl} name={user.name} plan={user.plan} />
 
       <main className="max-w-2xl lg:max-w-3xl mx-auto px-4 lg:px-8 py-6 pb-28 space-y-6">
         <div className="text-center">

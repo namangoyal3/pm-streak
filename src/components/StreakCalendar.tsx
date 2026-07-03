@@ -20,7 +20,7 @@ export default function StreakCalendar({ calendar }: { calendar: CalendarDay[] }
           Activity
         </h3>
         <span className="text-xs font-bold text-[var(--green-primary)]">
-          {completedCount} <span className="text-[var(--text-secondary)] font-normal">days active</span>
+          {completedCount} <span className="text-[var(--text-secondary)] font-normal">{completedCount === 1 ? "day" : "days"} active</span>
         </span>
       </div>
       <div className="grid grid-cols-10 gap-1.5">

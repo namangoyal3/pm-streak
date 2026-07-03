@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "PM Learner Leaderboard — Top Streaks | PM Streak",
+  title: "PM Learner Leaderboard — Top Streaks",
   description:
     "See the most consistent product managers learning daily. Ranked by streak length and total XP earned. Compete with PMs worldwide.",
   alternates: { canonical: "/leaderboard" },

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Daily PM Challenge — 3-Minute Product Practice | PM Streak",
+  title: "Daily PM Challenge — 3-Minute Product Practice",
   description:
     "One product management challenge per day. A fresh PM lesson drops at midnight — complete it for 2× XP. Build the habit of daily PM thinking with streaks, XP, and friendly competition.",
   alternates: { canonical: "/daily-challenge" },

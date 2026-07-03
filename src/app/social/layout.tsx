@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "PM Community & Social Challenges | PM Streak",
+  title: "PM Community & Social Challenges",
   description:
     "Challenge friends to 7-day PM learning duels. Follow other product managers, compare streaks, and build accountability through head-to-head competitions.",
   alternates: { canonical: "/social" },

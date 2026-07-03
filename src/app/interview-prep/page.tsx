@@ -145,7 +145,7 @@ export default function InterviewPrepPage() {
                     className={cn(
                       "px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wide transition-colors",
                       topic === t
-                        ? "bg-[var(--blue-primary)] text-black"
+                        ? "bg-[var(--green-primary)] text-black"
                         : "text-[var(--text-secondary)] hover:text-white"
                     )}
                   >
