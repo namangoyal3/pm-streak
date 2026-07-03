@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Mock Interview Guide (2026) — How to Practice & Get Unbiased Feedback",
@@ -87,6 +90,7 @@ const FAQS = [
 ];
 
 export default function PmMockInterviewPage() {
+  const dates = pageDates("/pm-mock-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -94,6 +98,17 @@ export default function PmMockInterviewPage() {
         { name: "PM Mock Interview", url: `${SITE_URL}/pm-mock-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Mock Interview Guide (2026 Edition)",
+        description:
+          "Run effective PM mock interviews. Where to find partners, how to give feedback, what to track, and how AI mock interviews compare to human practice — for every interview stage.",
+        image: `${SITE_URL}/api/og?title=PM+Mock+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-mock-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -103,6 +118,15 @@ export default function PmMockInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Mock Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            An effective PM mock interview practice plan mixes four formats — peer mocks for early reps, paid
+            senior-PM sessions two to three weeks before the real thing, AI mocks for daily volume, and solo video
+            reviews for pacing and filler words. Aim for at least five mocks (ideally ten or more), scoring each on
+            a 15-point rubric covering structure, content, empathy, communication, and pressure.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4 types of mock interviews, how to get unbiased feedback, a 15-point evaluation rubric,
             and how to turn every mock into measurable improvement.
@@ -186,6 +210,8 @@ export default function PmMockInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-mock-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Get Unlimited AI Mock Interviews</h2>

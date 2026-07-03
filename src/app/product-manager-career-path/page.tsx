@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Manager Career Path (2026) — APM to CPO Roadmap",
@@ -110,6 +113,7 @@ const FAQS = [
 ];
 
 export default function ProductManagerCareerPathPage() {
+  const dates = pageDates("/product-manager-career-path");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -117,6 +121,17 @@ export default function ProductManagerCareerPathPage() {
         { name: "Product Manager Career Path", url: `${SITE_URL}/product-manager-career-path` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Manager Career Path (2026 Edition)",
+        description:
+          "The complete PM career path from APM to CPO. What each level requires, how to get promoted, salaries at every stage, and how to accelerate your PM career in India.",
+        image: `${SITE_URL}/api/og?title=Product+Manager+Career+Path+2026++APM+to+CPO++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-manager-career-path`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -126,6 +141,15 @@ export default function ProductManagerCareerPathPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Manager Career Path<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            The PM career path runs through six levels: Associate Product Manager (0–2 years, ₹18–32L in India),
+            Product Manager, Senior PM, Group/Principal PM, Director or VP of Product, and Chief Product Officer
+            (15+ years, ₹2–6Cr+). Reaching Senior PM typically takes 4–6 years, and promotions hinge on metric
+            impact, visible leadership, and growing other PMs — not tenure alone.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What each PM level requires, how to get promoted, salaries at every stage,
             and the moves that accelerate your career faster than tenure alone.
@@ -206,6 +230,8 @@ export default function ProductManagerCareerPathPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-manager-career-path" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Level Up Your PM Career Daily</h2>

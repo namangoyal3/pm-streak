@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Swiggy PM Interview Guide (2026) — Questions, Rounds & Prep Plan",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function SwiggyPmInterviewPage() {
+  const dates = pageDates("/swiggy-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,17 @@ export default function SwiggyPmInterviewPage() {
         { name: "Swiggy PM Interview", url: `${SITE_URL}/swiggy-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Swiggy PM Interview Guide (2026 Edition)",
+        description:
+          "Crack the Swiggy PM interview. All rounds, ops-heavy product questions, what Swiggy PMs say the bar is, and a prep plan for PM and APM roles at India's leading food delivery platform.",
+        image: `${SITE_URL}/api/og?title=Swiggy+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/swiggy-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +126,16 @@ export default function SwiggyPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Swiggy PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Expect four stages in the Swiggy PM interview: a product thinking assessment (often
+            take-home), a product case built around operational trade-offs, a stakeholder round
+            covering city ops and engineering tensions, and a metrics deep dive. Throughout,
+            interviewers test whether you can balance Swiggy&apos;s three-sided marketplace — customers,
+            restaurants, delivery partners — and decompose composite ops metrics like delivery time.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             All interview rounds, the marketplace thinking Swiggy tests for,
             real questions, and what separates candidates who get offers.
@@ -182,6 +207,8 @@ export default function SwiggyPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="swiggy-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train the Marketplace Thinking Swiggy Tests For</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "How to Become a Product Manager in India (2026 Roadmap) — PM Streak",
@@ -104,6 +107,7 @@ const FAQS = [
 ];
 
 export default function HowToBecomeAProductManagerPage() {
+  const dates = pageDates("/how-to-become-a-product-manager");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -123,6 +127,16 @@ export default function HowToBecomeAProductManagerPage() {
           "itemListElement": r.steps.map((s, i) => ({ "@type": "HowToStep", "position": i + 1, "text": s })),
         })),
       }} />
+      <JsonLd data={articleSchema({
+        headline: "How to Become a Product Manager in India (2026 Roadmap)",
+        description: "The complete 2026 roadmap for becoming a product manager in India. From zero to APM to Senior PM — skills, certifications, APM programs, portfolio, and how to crack your first PM interview.",
+        image: `${SITE_URL}/api/og?title=How+to+Become+a+Product+Manager+in+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/how-to-become-a-product-manager`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -132,6 +146,16 @@ export default function HowToBecomeAProductManagerPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             How to Become a Product Manager<br />in India (2026 Roadmap)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Becoming a product manager in India takes roughly 6–12 months of focused effort —
+            no MBA or tech background required. The path splits into four phases over 24 weeks:
+            build foundations, develop product thinking through teardowns and courses, assemble
+            a portfolio of case studies, then crack interviews via APM programs at companies
+            like Flipkart, Razorpay, Google, and Swiggy.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             A concrete, week-by-week plan from zero to your first PM role — or from PM to Senior PM.
             No fluff. No expensive bootcamps required.
@@ -201,6 +225,8 @@ export default function HowToBecomeAProductManagerPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="how-to-become-a-product-manager" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">The Daily Habit That Gets You There</h2>

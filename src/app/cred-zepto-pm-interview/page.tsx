@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "CRED & Zepto PM Interview Guide (2026) — Questions, Culture & Prep",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function CredZeptoPmInterviewPage() {
+  const dates = pageDates("/cred-zepto-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,17 @@ export default function CredZeptoPmInterviewPage() {
         { name: "CRED & Zepto PM Interview", url: `${SITE_URL}/cred-zepto-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "CRED & Zepto PM Interview Guide (2026 Edition)",
+        description:
+          "Crack PM interviews at CRED and Zepto. What each company values, their interview formats, real questions, and what separates candidates who get offers at India's hottest unicorns.",
+        image: `${SITE_URL}/api/og?title=CRED+&+Zepto+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/cred-zepto-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +104,16 @@ export default function CredZeptoPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             CRED & Zepto PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            CRED and Zepto each run three PM rounds but assess opposite bars. CRED pairs a product
+            design round with analytical and culture rounds, judging aesthetic reasoning,
+            premium-user empathy, and fintech depth. Zepto combines a product-plus-ops case, a
+            metrics and growth round, and an execution round, probing ops thinking, decision speed,
+            and data obsession.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What each company actually values in a PM, their interview formats, real questions asked,
             and how to position yourself for India&apos;s most competitive unicorn PM roles.
@@ -163,6 +188,8 @@ export default function CredZeptoPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="cred-zepto-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice for India&apos;s Most Competitive PM Roles</h2>

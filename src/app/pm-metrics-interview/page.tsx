@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Metrics Interview Questions — How to Diagnose Drops & Define Success",
@@ -83,6 +86,7 @@ const FAQS = [
 ];
 
 export default function PmMetricsInterviewPage() {
+  const dates = pageDates("/pm-metrics-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -90,6 +94,17 @@ export default function PmMetricsInterviewPage() {
         { name: "PM Metrics Interview", url: `${SITE_URL}/pm-metrics-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Metrics Interview: Debug Drops. Define Success.",
+        description:
+          "Master the metrics round in PM interviews. Learn how to define success metrics, debug DAU drops, set up A/B tests, and think like a data-driven PM. With 30+ real questions.",
+        image: `${SITE_URL}/api/og?title=PM+Metrics+Interview++Debug+Drops+&+Define+Success++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-metrics-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -99,6 +114,15 @@ export default function PmMetricsInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Metrics Interview:<br />Debug Drops. Define Success.
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM metrics interviews test two things: diagnosing a metric drop and defining success for a feature.
+            The standard drop framework has six steps — confirm the signal is real, segment, check external factors,
+            review recent changes, hypothesise, then act. SQL usually isn&apos;t required; this guide covers 30+ real
+            questions across defining success, debugging drops, A/B testing, and trade-offs.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The metrics round separates PMs who think in data from those who fake it.
             Here are the frameworks and questions you need — with 30+ real interview examples.
@@ -168,6 +192,8 @@ export default function PmMetricsInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-metrics-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Metrics Intuition Every Day</h2>

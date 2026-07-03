@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Manager Resume Guide (2026) — Templates, Examples & Tips",
@@ -78,6 +81,7 @@ const FAQS = [
 ];
 
 export default function ProductManagerResumePage() {
+  const dates = pageDates("/product-manager-resume");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -85,6 +89,17 @@ export default function ProductManagerResumePage() {
         { name: "Product Manager Resume", url: `${SITE_URL}/product-manager-resume` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Manager Resume Guide (2026 Edition)",
+        description:
+          "Write a PM resume that gets interviews. Templates, real examples, bullet formulas, and what hiring managers actually look for at Google, Flipkart, Razorpay, and top startups.",
+        image: `${SITE_URL}/api/og?title=Product+Manager+Resume+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-manager-resume`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -94,6 +109,16 @@ export default function ProductManagerResumePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Manager Resume Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            A strong product manager resume earns its interview in the 15–30 seconds a hiring manager spends on
+            the first pass. Keep it to one page under 5 years of experience, write every bullet as
+            Action → Scope → Outcome with a number, and cut vague verbs like &ldquo;helped&rdquo; and
+            &ldquo;supported&rdquo;. This guide covers the before/after bullets, section checklist, and metrics
+            that get PM resumes shortlisted.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What hiring managers at Google, Flipkart, and Razorpay actually look for — with real before/after bullets,
             section templates, and the mistakes that get PMs rejected before the phone screen.
@@ -171,6 +196,8 @@ export default function ProductManagerResumePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-manager-resume" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Great Resume. Now Ace the Interview.</h2>

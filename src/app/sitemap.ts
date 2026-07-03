@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import pageDates from "../../scripts/seo-page-dates.json";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://learnanything.pro";
 
@@ -466,6 +467,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
 
+  // Real git-derived dates from scripts/seo-page-dates.json (regenerate via
+  // scripts/generate-seo-page-dates.mjs): published = oldest commit, modified
+  // = newest non-bulk commit. The sitemap uses `modified`; routes missing
+  // from the manifest keep `now` as their lastModified.
+  const gitDates: Record<string, { published: string; modified: string }> = pageDates;
+  const staticRoutesWithGitDates: MetadataRoute.Sitemap = staticRoutes.map((route) => {
+    const path = route.url.slice(siteUrl.length) || "/";
+    return gitDates[path]
+      ? { ...route, lastModified: new Date(gitDates[path].modified) }
+      : route;
+  });
+
   const articles = await prisma.article.findMany({
     where: { published: true },
     select: { slug: true, vertical: true, updatedAt: true },
@@ -478,5 +491,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...articleRoutes];
+  return [...staticRoutesWithGitDates, ...articleRoutes];
 }

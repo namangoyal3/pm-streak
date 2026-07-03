@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Roadmap Interview Questions (2026) — Build, Defend & Communicate",
@@ -111,6 +114,7 @@ const FAQS = [
 ];
 
 export default function ProductRoadmapInterviewPage() {
+  const dates = pageDates("/product-roadmap-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -118,6 +122,17 @@ export default function ProductRoadmapInterviewPage() {
         { name: "Product Roadmap Interview", url: `${SITE_URL}/product-roadmap-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Roadmap Interview Questions (2026)",
+        description:
+          "Master product roadmap interview questions. How to build, prioritise, defend, and communicate roadmaps — with real questions, frameworks, and what interviewers want to hear.",
+        image: `${SITE_URL}/api/og?title=Product+Roadmap+Interview+Questions+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-roadmap-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -127,6 +142,16 @@ export default function ProductRoadmapInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Roadmap Interview<br />Questions (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Roadmap questions appear in virtually every PM interview — almost always standalone at senior level,
+            folded into case studies for mid-level roles. Interviewers probe four areas: how you build a roadmap from
+            scratch, how you prioritise (frameworks like RICE), how you defend and communicate changes to stakeholders,
+            and how you handle trade-offs like commitment versus flexibility. This guide covers 20+ questions with
+            model answers.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Everything interviewers want to know about how you build, prioritise, and defend a roadmap —
             with 20+ questions and model answers for each.
@@ -171,6 +196,8 @@ export default function ProductRoadmapInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-roadmap-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Never Be Caught Off-Guard on Roadmap Questions</h2>

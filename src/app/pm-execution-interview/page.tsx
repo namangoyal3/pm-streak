@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Execution Interview Questions (2026) — Delivery, Ops & Sprint Management",
@@ -111,6 +114,7 @@ const FAQS = [
 ];
 
 export default function PmExecutionInterviewPage() {
+  const dates = pageDates("/pm-execution-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -118,6 +122,17 @@ export default function PmExecutionInterviewPage() {
         { name: "PM Execution Interview", url: `${SITE_URL}/pm-execution-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Execution Interview Questions (2026)",
+        description:
+          "Master PM execution interview questions. Sprint planning, launch management, trade-off decisions, handling blockers, and cross-functional coordination — with real questions and model answers.",
+        image: `${SITE_URL}/api/og?title=PM+Execution+Interview+Questions+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-execution-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -127,6 +142,16 @@ export default function PmExecutionInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Execution Interview<br />Questions (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Execution questions in a PM interview ask how you actually run things — sprint and backlog management,
+            end-to-end launches, cross-functional coordination, and decisions under pressure. Unlike behavioral rounds
+            that probe past events, these are process questions, and strong answers cite specific processes like staged
+            rollouts or severity-times-exposure bug triage rather than generic platitudes. Each question below includes
+            a model answer direction.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Sprint management, launch planning, cross-functional coordination, and handling pressure —
             the execution questions most candidates fail to prepare for.
@@ -171,6 +196,8 @@ export default function PmExecutionInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-execution-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice the Questions Most Candidates Skip</h2>

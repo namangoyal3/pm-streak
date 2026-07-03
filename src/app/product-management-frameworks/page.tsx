@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "10 Essential Product Management Frameworks (2026) — PM Streak",
@@ -123,6 +126,7 @@ const FAQS = [
 ];
 
 export default function ProductManagementFrameworksPage() {
+  const dates = pageDates("/product-management-frameworks");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -130,6 +134,17 @@ export default function ProductManagementFrameworksPage() {
         { name: "Product Management Frameworks", url: `${SITE_URL}/product-management-frameworks` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "10 Essential Product Management Frameworks (2026)",
+        description:
+          "The 10 PM frameworks every product manager must know. RICE, JTBD, north star metric, CIRCLES, prioritisation matrices, and more — explained clearly with examples.",
+        image: `${SITE_URL}/api/og?title=10+Essential+PM+Frameworks+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-management-frameworks`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -139,6 +154,15 @@ export default function ProductManagementFrameworksPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             10 Essential Product Management<br />Frameworks (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Ten frameworks cover most day-to-day PM work: RICE and the impact/effort matrix for prioritisation,
+            Jobs To Be Done for user research, north star metrics and OKRs for strategy and goals, CIRCLES for
+            product sense interviews, plus the Kano model, 5 Whys, opportunity solution trees, and PRDs. Each is
+            explained below with its formula, when to use it, a worked example, and the mistake to avoid.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The PM frameworks that actually matter — explained clearly, with when to use them,
             real examples, and the common mistakes to avoid.
@@ -199,6 +223,8 @@ export default function ProductManagementFrameworksPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-management-frameworks" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Put the Frameworks to Work</h2>

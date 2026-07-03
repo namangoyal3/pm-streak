@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Sense Interview Questions — Frameworks & Examples",
@@ -98,6 +101,7 @@ const FAQS = [
 ];
 
 export default function ProductSenseInterviewPage() {
+  const dates = pageDates("/product-sense-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -116,6 +120,16 @@ export default function ProductSenseInterviewPage() {
           "text": s.description,
         })),
       }} />
+      <JsonLd data={articleSchema({
+        headline: "Product Sense Interview: The Framework That Works",
+        description: "Master product sense interviews with proven frameworks. Learn how to design products, identify user needs, and prioritise features — the way top PMs do at Google, Meta, and Stripe.",
+        image: `${SITE_URL}/api/og?title=Product+Sense+Interview++Frameworks+&+Examples++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-sense-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         {/* Hero */}
@@ -126,6 +140,16 @@ export default function ProductSenseInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Sense Interview:<br />The Framework That Works
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A product sense interview tests whether you can understand users deeply, identify
+            real problems, and design solutions that create genuine value — the core skill in
+            every PM loop. Strong answers follow six steps: clarify the goal, define user
+            segments, map pain points, brainstorm several solutions, prioritise one with a
+            clear framework, and define success metrics with a guardrail.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Product sense questions trip up even experienced PMs. Here&apos;s the exact
             6-step framework top PMs use — with real examples and how to practise it daily.
@@ -199,6 +223,8 @@ export default function ProductSenseInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-sense-interview" />
 
         {/* CTA */}
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">

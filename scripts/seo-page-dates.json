@@ -1,0 +1,1794 @@
+{
+  "/": {
+    "published": "2026-03-20",
+    "modified": "2026-05-13"
+  },
+  "/ai-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/airbnb-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/amazon-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/apm-program-preparation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/best-project-management-tools-small-teams-2026": {
+    "published": "2026-04-14",
+    "modified": "2026-04-15"
+  },
+  "/cars24-cartrade-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/community": {
+    "published": "2026-04-10",
+    "modified": "2026-07-03"
+  },
+  "/consumer-vs-b2b-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/cred-zepto-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/duolingo-for-product-managers": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/ecommerce-pm-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/edtech-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/engineer-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/fintech-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/flipkart-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/google-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/growth-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/healthtech-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/how-to-become-a-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/intuit-adobe-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/ixigo-makemytrip-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/mba-to-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/meesho-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/meta-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/microsoft-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/myntra-nykaa-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/notes": {
+    "published": "2026-04-11",
+    "modified": "2026-07-03"
+  },
+  "/paytm-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/phonepe-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/platform-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-1-on-1-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-30-60-90-day-plan": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ab-test-analysis": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ab-testing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-accessibility": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-account-aggregator": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-activation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-agile-rituals": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-agritech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-agents": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-assistants": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-bring-your-own-key": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-coding-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-data-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-distribution": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-education": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-evals": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-feature-launch": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-feedback-loops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-finance": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-hardware": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-healthcare": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-image": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-legal": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-marketing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-meeting": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-monetization": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-onboarding": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-personalization": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-pricing-tiers": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-productivity": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-prompt-injection": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-rate-limits": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-recruiting": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-research-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-robotics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-roi-measurement": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-safety": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-sales": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-search": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-security": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-support": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-trust-signals": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-versioning": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-video": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-voice": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ai-writing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ambiguity-navigation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-analyst-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-analytics-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-anti-patterns": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-api-platforms": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-api-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-apm-to-senior": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-apm-vs-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-async-work": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-attribution-models": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-b2b-marketplaces": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-b2b-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-b2b-sales-collaboration": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-b2b-sales-led": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-bay-area-vs-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-beauty-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-behavioral-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-beta-program": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-bharat-internet-users": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-bharat-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-bold-bets": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-building-in-public": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-burnout": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-calendar-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-car-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-career-levels-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-career-mistakes": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-career-transitions": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-case-bank": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-case-study-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-chat-apps": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-cheat-sheet": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-checkout-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-churn-analysis": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-churn-reduction": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-climatetech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-cohort-analysis": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-cold-start": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-collaboration-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-communication-skills": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-community-building": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-competitive-analysis": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-competitor-teardown": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-consulting-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-consulting-to-product": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-consumer-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-content-moderation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-content-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-context-windows": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-conversion-optimization": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-conviction-pushback": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-cover-letter": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-cpo-role": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-creator-economy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-crisis-management": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-critical-thinking": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-crm-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-cross-functional": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-customer-interviews": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-customer-research": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-customer-segmentation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-customer-success": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-customer-support-insights": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-customer-support-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-d2c-brands": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-daily-practice": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-dashboard-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-data-analyst-partnership": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-data-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-decision-frameworks": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-decision-making": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-deep-work": {
+    "published": "2026-04-14",
+    "modified": "2026-04-17"
+  },
+  "/pm-demo-skills": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-deprecations": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-design-thinking": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-design-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-designer-partnership": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-designer-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-dev-productivity": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-developer-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-digital-sbu": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-discovery-process": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-documentation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-dogfooding": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-domain-knowledge": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-early-stage-startup": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ecommerce-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-edtech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-electronics-ecommerce": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-email-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-empathy-interviews": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-eng-partnership": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-engineer-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-engineering-estimate": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-estimation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-estimation-questions": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-event-tracking": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-execution-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-executive-updates": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-experiment-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-experiment-examples": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-experiment-velocity": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-experimentation-culture": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-experimentation-platform": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-failures-recovery": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-fashion-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-feature-adoption": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-feature-flags": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-feedback-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-feedback-loops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-fine-tuning": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-fintech-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-fintech-payments": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-first-90-days": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-first-job-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-fitness-apps": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-food-delivery": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-founder-collaboration": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-founder-vs-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-freelance-consulting": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-freemium": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-funnel-analysis": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-gaming": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-global-saas-from-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-global-vs-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-glossary": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-govt-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-grocery-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-growth-experiments": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-growth-hacking": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-growth-loops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-habit-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-habits": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-hackathon-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-hardware-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-healthtech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-hiring-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-hr-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-imposter-syndrome": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-incident-management": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-india-startups-2026": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-influence": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-infra-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-insurtech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-intellectual-honesty": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-internal-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-internationalisation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-bar-raiser": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-cheat-sheet": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-day-checklist": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-follow-up": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-prep": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-preparation-plan": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-questions-freshers": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-red-flags": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-interview-stories": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-job-search-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-jobs-platforms": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-jtbd": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-kickoff-doc": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-kids-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-kpi-dashboards": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-kpi-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-language-learning": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-launch-metrics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-launch-strategy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-leadership-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-learning-habits": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-legal-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-lending-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-linkedin-branding": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-llm-cost-management": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-llm-routing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-localization-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-localization-strategy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-logistics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-loyalty-programs": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-manager-path": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-maps-navigation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-market-research": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-marketing-partnership": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-marketplace-dynamics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-marketplace-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-martech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-matrimony-dating": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mba-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mcp-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-measuring-pm-success": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-media-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-meditation-apps": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-meetings-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mental-models": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mentorship": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-metrics-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-microservices-strategy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mobile-app-metrics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mobile-first": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mobile-vs-web": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mock-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-monetization-models": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-multimodal-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-music-creation-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-music-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-mvp-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-negotiation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-negotiation-skills": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-neo-banking": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-networking-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-newsletters": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-no-code": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-non-tech-to-pm": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-north-star-metric": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-notes-apps": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-notifications-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-notifications-strategy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-observability": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-offers-multiple": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-offline-first": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-okr-examples": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-okr-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-okrs-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-onboarding-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-onboarding-examples": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-onboarding-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ondc": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-open-source": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ott-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-paywall-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-personal-okrs": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-personalization": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-pet-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-platform-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-platform-strategy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-podcast-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-podcasts-to-listen": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-portfolio-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-prd-examples": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-prd-writing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-presentations": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-pricing-experiments": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-pricing-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-pricing-page-design": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-pricing-strategy": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-prioritization-examples": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-prioritization-frameworks": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-privacy-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-analytics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-led-growth": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-market-fit": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-operations": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-ops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-reviews": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-sense-examples": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-product-vision": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-productivity-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-project-management-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-prompt-engineering": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-qa-partnership": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-quarterly-planning": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-quick-commerce": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-rag-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-reading-apps": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-reading-list": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-reading-metrics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-real-estate-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-recommendation-systems": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-referral-loops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-referral-programs": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-regulated-industries": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-remote-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-remote-work": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-resume-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-retention-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-retention-strategies": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-retrospectives": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-ride-hailing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-rituals": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-roadmap-communication": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-roadmap-prioritization": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-roadmap-template": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-roadmapping": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-saas-metrics": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-salary-negotiation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-salary-negotiation-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-sales-ops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-scaling-from-pmf": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-search-discovery": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-security-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-senior-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-senior-to-principal": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-side-projects": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-social-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-spatial-computing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-sprint-planning": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-sprint-retrospectives": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-sre-culture": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-stakeholder-management": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-stakeholder-map": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-startup-vs-big-tech": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-storytelling": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-strategy-doc": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-strategy-docs": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-strategy-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-subscription-business": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-take-home-assignment": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-tech-debt": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-tech-stack": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-technical-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-technical-skills": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-thinking-in-systems": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-to-founder": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-tool-use": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-tools-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-trade-off-analysis": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-trello-notion-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-trust-safety": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-upi-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-user-flows": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-user-interviews": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-user-personas": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-user-retention": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-vertical-saas": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-video-editing-tools": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-video-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-viral-features": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-vision-statement": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-voice-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-wealth-management": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-web3": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-weekly-planning": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-weekly-review": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-whatsapp-business": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-wireframing": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-women-focused-products": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-work-life-balance": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-workflow-automation": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-writing-skills": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-zepto-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pm-zero-to-one": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/prd-template-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/pricing": {
+    "published": "2026-03-22",
+    "modified": "2026-05-13"
+  },
+  "/privacy": {
+    "published": "2026-03-21",
+    "modified": "2026-03-21"
+  },
+  "/product-analytics-for-pms": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-discovery-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-growth-loops": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-launch-guide": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-management-frameworks": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-manager-career-path": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-manager-interview-questions": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-manager-resume": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-manager-salary-india": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-manager-skills": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-manager-vs-project-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-roadmap-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/product-sense-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/razorpay-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/research": {
+    "published": "2026-04-21",
+    "modified": "2026-04-21"
+  },
+  "/role-roadmaps": {
+    "published": "2026-03-22",
+    "modified": "2026-04-07"
+  },
+  "/saas-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/senior-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/stripe-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/swiggy-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/terms": {
+    "published": "2026-03-21",
+    "modified": "2026-03-21"
+  },
+  "/transition-to-product-manager": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/uber-ola-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/urban-company-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/user-research-for-pms": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  },
+  "/zomato-pm-interview": {
+    "published": "2026-04-14",
+    "modified": "2026-07-03"
+  }
+}

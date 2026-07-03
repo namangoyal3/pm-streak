@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Meta PM Interview Guide (2026) — Facebook, Instagram & WhatsApp Questions",
@@ -96,6 +99,7 @@ const FAQS = [
 ];
 
 export default function MetaPmInterviewPage() {
+  const dates = pageDates("/meta-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -103,6 +107,17 @@ export default function MetaPmInterviewPage() {
         { name: "Meta PM Interview", url: `${SITE_URL}/meta-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Meta PM Interview Guide (2026 Edition)",
+        description:
+          "Crack the Meta PM interview. Product design, strategy, metrics, and execution rounds — with real questions for Facebook, Instagram, WhatsApp, and Threads, plus a prep plan.",
+        image: `${SITE_URL}/api/og?title=Meta+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/meta-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -112,6 +127,16 @@ export default function MetaPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Meta PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            The Meta PM interview typically runs 4–6 rounds — one to two product design, one product
+            strategy, one metrics and execution, and one to two behavioural — plus a recruiter screen
+            and sometimes a written case. Expect 6–10 weeks from application to offer, and a bar that
+            rewards second-order thinking about engagement, misinformation, and social impact at
+            billion-user scale.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Product design, strategy, and metrics rounds for Facebook, Instagram, WhatsApp, and Threads —
             with real questions and what Meta PMs say the bar actually looks like.
@@ -181,6 +206,8 @@ export default function MetaPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="meta-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Meta-Style Product Questions Daily</h2>

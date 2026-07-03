@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Case Study Interview Guide (2026) — How to Solve Any PM Case",
@@ -115,6 +118,7 @@ const FAQS = [
 ];
 
 export default function PmCaseStudyInterviewPage() {
+  const dates = pageDates("/pm-case-study-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -122,6 +126,17 @@ export default function PmCaseStudyInterviewPage() {
         { name: "PM Case Study Interview", url: `${SITE_URL}/pm-case-study-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Case Study Interview Guide (2026)",
+        description:
+          "Crack PM case study interviews with a proven framework. Product improvement, new market entry, metric drop investigation, and go-to-market cases — with worked examples and structures.",
+        image: `${SITE_URL}/api/og?title=PM+Case+Study+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-case-study-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -131,6 +146,16 @@ export default function PmCaseStudyInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Case Study Interview<br />Guide (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Most PM case study interviews come in four flavours — product improvement, new product
+            or market entry, metric drop investigation, and go-to-market — each solvable with a
+            repeatable structure in 10–15 minutes. Open with two or three clarifying questions,
+            anchor on the user and their pain points before proposing solutions, and always attach
+            a success metric to your recommendation.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             How to crack any PM case study — product improvement, new market entry, metric drops,
             and GTM. With step-by-step frameworks and worked examples for each.
@@ -193,6 +218,8 @@ export default function PmCaseStudyInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-case-study-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Cases Until They Feel Easy</h2>
