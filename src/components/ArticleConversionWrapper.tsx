@@ -264,7 +264,7 @@ export default function ArticleConversionWrapper({
           </Link>
         </div>
         <p className="mt-2 text-xs text-white/25">
-          1,847 PMs started a trial this month
+          Join 200+ PMs learning on PM Streak
         </p>
       </div>
     </>

@@ -271,7 +271,7 @@ async function PricingContent() {
           {userPlan !== "pro" && <PricingPageTrialCTA variant={abVariant} />}
 
           <p className="text-xs text-[var(--text-secondary)] mb-6">
-            Join 200+ PMs learning daily · 30-day money-back guarantee
+            Join 200+ PMs learning · 30-day money-back guarantee
           </p>
           {userPlan === "pro" ? (
             <Link

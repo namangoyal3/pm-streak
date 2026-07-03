@@ -100,7 +100,7 @@ function InviteContent() {
 
         <div className="mt-6 flex items-center justify-center gap-4 text-xs text-[var(--text-secondary)]">
           <div className="flex items-center gap-1">
-            <Users size={12} /> 100+ PMs learning
+            <Users size={12} /> 200+ PMs learning
           </div>
           <div className="flex items-center gap-1">
             <BookOpen size={12} /> 14+ lessons
