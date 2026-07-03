@@ -29,20 +29,29 @@ describe("checkout GET — newline hygiene", () => {
   });
   afterEach(() => vi.clearAllMocks());
 
-  it("strips a trailing newline from a caller-supplied productId", async () => {
-    const { GET } = await import("./route");
-    const res = await GET(makeReq("https://x/api/checkout?plan=quarterly&productId=pdt_abc%0A"));
-    const loc = res.headers.get("location") ?? "";
-    expect(loc).toContain("/buy/pdt_abc");
-    expect(loc).not.toContain("%0A");
-    expect(loc).not.toContain("pdt_abc%0A");
-  });
-
   it("uses the trimmed env product ID when no productId is supplied", async () => {
     const { GET } = await import("./route");
     const res = await GET(makeReq("https://x/api/checkout?plan=quarterly"));
     const loc = res.headers.get("location") ?? "";
     expect(loc).toContain("/buy/pdt_quarterly");
+    expect(loc).not.toContain("%0A");
+  });
+
+  it("uses the plan's configured product over a caller-supplied productId (no arbitrary purchase)", async () => {
+    const { GET } = await import("./route");
+    // Caller tries to check out a product that isn't the quarterly plan's product.
+    const res = await GET(makeReq("https://x/api/checkout?plan=quarterly&productId=pdt_someone_elses%0A"));
+    const loc = res.headers.get("location") ?? "";
+    expect(loc).toContain("/buy/pdt_quarterly");
+    expect(loc).not.toContain("pdt_someone_elses");
+    expect(loc).not.toContain("%0A");
+  });
+
+  it("falls back to the URL productId when the plan is unknown", async () => {
+    const { GET } = await import("./route");
+    const res = await GET(makeReq("https://x/api/checkout?productId=pdt_direct%0A"));
+    const loc = res.headers.get("location") ?? "";
+    expect(loc).toContain("/buy/pdt_direct");
     expect(loc).not.toContain("%0A");
   });
 

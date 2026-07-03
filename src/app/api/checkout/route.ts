@@ -58,8 +58,14 @@ export async function GET(req: NextRequest) {
   // newline-contaminated env vars, so ?productId=pdt_xxx%0A reaches us here.
   if (productId) productId = productId.trim();
 
-  // If no productId provided but plan is, use the base product for that plan
-  if (!productId && plan) {
+  // The plan's configured product is authoritative. This makes env the single
+  // source of truth for which product a plan buys, so a price/product change is
+  // an env update (no reliance on the pricing page's baked-in link), AND it
+  // stops a caller from checking out an arbitrary ?productId of their choosing.
+  // Only fall back to the URL productId when the plan is unknown/unconfigured.
+  if (plan && FALLBACK_PRODUCTS[plan]) {
+    productId = FALLBACK_PRODUCTS[plan];
+  } else if (!productId && plan) {
     productId = FALLBACK_PRODUCTS[plan];
   }
 
