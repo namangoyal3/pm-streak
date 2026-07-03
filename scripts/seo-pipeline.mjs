@@ -252,6 +252,10 @@ for (const kw of KEYWORDS) ranks[kw].google = google.ranks[kw] ?? null;
 
 const indexed = await bingIndexedCount();
 
+// Real Google Search Console truth (indexed count + impressions); null if creds absent.
+const { gscMetrics } = await import("./gsc-metrics.mjs");
+const gsc = await gscMetrics();
+
 const run = {
   ts: new Date().toISOString(),
   sitemapUrls: urls.length,
@@ -260,6 +264,7 @@ const run = {
   bingIndexed: indexed,
   googleChecked: google.ok,
   googleIndexedFirstPage: google.indexed,
+  gsc,
   ranks,
 };
 history.runs.push(run);
@@ -272,6 +277,14 @@ console.log(`Bing indexed (site:): ${indexed ?? "unknown"}${prev?.bingIndexed !=
 console.log(
   `Google indexed, page 1 of site: ${google.ok ? google.indexed ?? "unknown" : "not checked"}${prev?.googleIndexedFirstPage != null && google.indexed != null ? ` (was ${prev.googleIndexedFirstPage})` : ""}`
 );
+if (gsc) {
+  const pg = prev?.gsc;
+  console.log(
+    `GSC (real): sitemap indexed ${gsc.sitemapIndexed}/${gsc.sitemapSubmitted}${pg?.sitemapIndexed != null ? ` (was ${pg.sitemapIndexed})` : ""} · 28d impressions ${gsc.impressions}${pg?.impressions != null ? ` (was ${pg.impressions})` : ""} · clicks ${gsc.clicks}${gsc.topQuery ? ` · top "${gsc.topQuery.q}" pos ${gsc.topQuery.pos}` : ""}`
+  );
+} else {
+  console.log(`GSC (real): not checked (no creds in this env)`);
+}
 console.log(`\n${"keyword".padEnd(42)} ${"Google".padEnd(14)} ${"Bing".padEnd(14)} Mojeek`);
 for (const kw of KEYWORDS) {
   const p = prev?.ranks?.[kw];
