@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Fintech Product Manager Guide (2026) — How to Become One in India",
@@ -75,6 +78,7 @@ const FAQS = [
 ];
 
 export default function FintechProductManagerPage() {
+  const dates = pageDates("/fintech-product-manager");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -82,6 +86,17 @@ export default function FintechProductManagerPage() {
         { name: "Fintech Product Manager", url: `${SITE_URL}/fintech-product-manager` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Fintech Product Manager Guide (2026 Edition)",
+        description:
+          "The complete guide to becoming a fintech PM in India. Domain knowledge to master, top companies hiring, interview questions, salary ranges, and how to break in from adjacent roles.",
+        image: `${SITE_URL}/api/og?title=Fintech+Product+Manager+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/fintech-product-manager`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -91,6 +106,16 @@ export default function FintechProductManagerPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Fintech Product Manager Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Fintech product management in India spans six sub-sectors — payments, lending, wealth
+            and investing, neo-banking, insurance, and credit/cards — each with its own focus,
+            from UPI innovation and fraud prevention in payments to underwriting models and NPA
+            reduction in lending, and pays a premium: APM/PM roles run ₹25–55L, senior PM
+            ₹55–100L, and principal/director ₹1–2Cr+ at growth-stage companies.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The complete fintech PM playbook for India — sub-sectors, companies hiring,
             domain terms you must know, interview questions, and salary ranges.
@@ -155,6 +180,8 @@ export default function FintechProductManagerPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="fintech-product-manager" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Fintech PM Intuition Daily</h2>

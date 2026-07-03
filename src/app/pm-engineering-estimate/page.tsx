@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Engineering Estimates (2026) — How to Work With Eng Timelines Without Becoming a Nuisance",
@@ -72,6 +75,7 @@ const FAQS = [
 ];
 
 export default function PmEngineeringEstimatePage() {
+  const dates = pageDates("/pm-engineering-estimate");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -79,6 +83,17 @@ export default function PmEngineeringEstimatePage() {
         { name: "PM Engineering Estimates", url: `${SITE_URL}/pm-engineering-estimate` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Engineering Estimates (2026 Edition)",
+        description:
+          "How PMs work with engineering estimates — respecting their expertise while keeping projects predictable. When to probe, when to trust, and how to handle slipping timelines.",
+        image: `${SITE_URL}/api/og?title=PM+Engineering+Estimates+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-engineering-estimate`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -88,6 +103,16 @@ export default function PmEngineeringEstimatePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Engineering Estimates<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Working well with engineering estimates means probing through questions — like where the
+            biggest unknowns are or what could ship in half the time — rather than pressuring for a
+            shorter number or reopening estimates mid-sprint. When a timeline slips, PMs surface it
+            early, work with engineering on what to cut instead of extending, and add buffer into
+            their own plans rather than asking engineers to pad theirs.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 questions to ask about estimates, 5 things not to do, 5 moves when things slip,
             and 5 ways to build estimation trust.
@@ -164,6 +189,8 @@ export default function PmEngineeringEstimatePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-engineering-estimate" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Execution Muscle Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Prompt Engineering (2026) — How PMs Should Think About Prompts",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmPromptEngineeringPage() {
+  const dates = pageDates("/pm-prompt-engineering");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,16 @@ export default function PmPromptEngineeringPage() {
         { name: "PM Prompt Engineering", url: `${SITE_URL}/pm-prompt-engineering` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Prompt Engineering (2026 Edition)",
+        description: "How PMs handle prompt engineering. Versioning, evals, system prompts, and why prompt engineering is product engineering, not a hack.",
+        image: `${SITE_URL}/api/og?title=PM+Prompt+Engineering+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-prompt-engineering`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +79,12 @@ export default function PmPromptEngineeringPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Prompt Engineering<br />(2026 Edition)
           </h1>
+          <p className="text-base text-white/70 max-w-2xl mx-auto mb-4">
+            For PMs, prompt engineering means treating prompts as production code — versioned, reviewed, and evaluated rather than edited as casual text. It covers writing system prompts that set model behavior, adding few-shot examples where the model struggles, constraining output formats, and re-testing prompts whenever a vendor updates its model.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 practices and 4 traps for PM prompt engineering.
           </p>
@@ -110,6 +130,8 @@ export default function PmPromptEngineeringPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-prompt-engineering" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Prompt Engineering Scenarios</h2>

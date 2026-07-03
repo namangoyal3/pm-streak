@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "How to Handle Multiple PM Offers (2026) — Deciding Between Companies",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function PmOffersMultiplePage() {
+  const dates = pageDates("/pm-offers-multiple");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,16 @@ export default function PmOffersMultiplePage() {
         { name: "Handling Multiple PM Offers", url: `${SITE_URL}/pm-offers-multiple` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Multiple PM Offers Guide (2026 Edition)",
+        description: "How to evaluate multiple PM offers. Beyond comp: manager quality, scope, growth trajectory, and the decision framework that stops you from choosing on instinct alone.",
+        image: `${SITE_URL}/api/og?title=Handling+Multiple+PM+Offers+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-offers-multiple`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +125,16 @@ export default function PmOffersMultiplePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Multiple PM Offers Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Choosing between multiple PM offers comes down to six factors beyond pay — manager quality,
+            role scope, company trajectory, total compensation, how much you care about the product, and
+            learning velocity — worked through a six-step framework: rank each offer, weight what matters
+            most right now, isolate where the offers differ most, sleep on it, call a mentor, and treat
+            your gut as a tiebreaker only.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 factors to evaluate beyond compensation, 6 red flags to watch for,
             and a 6-step decision framework that stops you from choosing on instinct alone.
@@ -175,6 +199,8 @@ export default function PmOffersMultiplePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-offers-multiple" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Land Multiple Offers with Daily Practice</h2>

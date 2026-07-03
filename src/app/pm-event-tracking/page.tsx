@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Event Tracking (2026) — How to Design Instrumentation That Answers Real Questions",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmEventTrackingPage() {
+  const dates = pageDates("/pm-event-tracking");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmEventTrackingPage() {
         { name: "PM Event Tracking", url: `${SITE_URL}/pm-event-tracking` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Event Tracking Guide (2026 Edition)",
+        description:
+          "How PMs design event tracking that answers the questions they&apos;ll want to ask. Naming conventions, property design, and building a tracking plan before shipping.",
+        image: `${SITE_URL}/api/og?title=PM+Event+Tracking+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-event-tracking`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,12 @@ export default function PmEventTrackingPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Event Tracking Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Good event tracking starts from the questions a PM will need answered, then names each event consistently (verb_noun, like lesson_completed) and attaches a user ID, timestamp, and three-to-five properties worth segmenting by — never more, since over-tracking every click buries the signal. Skipping this before launch is costly: retrofitting instrumentation after shipping takes three to five times the effort and loses the pre-launch data entirely.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 design principles, 5 parts of a well-designed event, 6 common mistakes,
             and 5 moments to instrument or audit.
@@ -167,6 +188,8 @@ export default function PmEventTrackingPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-event-tracking" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Data Skills Daily</h2>

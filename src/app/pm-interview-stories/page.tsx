@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Stories Guide (2026) — How to Build 10 Stories That Cover Every Behavioural Question",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewStoriesPage() {
+  const dates = pageDates("/pm-interview-stories");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,17 @@ export default function PmInterviewStoriesPage() {
         { name: "PM Interview Stories", url: `${SITE_URL}/pm-interview-stories` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Stories (2026 Edition)",
+        description:
+          "The 10 PM interview stories every candidate should prepare. Cover 80% of behavioural questions with 10 flexible stories — with templates and coverage map.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Stories+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-stories`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +104,15 @@ export default function PmInterviewStoriesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Stories<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            PM interview behavioural rounds pull from a narrow set of themes — impact, failure, conflict,
+            ambiguity, data, leadership, prioritisation, feedback, user insight, and pressure — so building
+            8–10 flexible stories mapped to these themes, each told in a tight 10/10/60/20 STAR split, covers
+            roughly 80% of what interviewers ask.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline font-semibold">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 10 story types every PM candidate should prepare, the question types they cover,
             and the tight STAR structure that keeps answers sharp.
@@ -151,6 +175,8 @@ export default function PmInterviewStoriesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-stories" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Your Stories Out Loud Daily</h2>

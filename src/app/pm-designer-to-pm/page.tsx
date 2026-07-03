@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Designer to PM (2026) — Designers Who Cross Into Product",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmDesignerToPmPage() {
+  const dates = pageDates("/pm-designer-to-pm");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,17 @@ export default function PmDesignerToPmPage() {
         { name: "PM Designer to PM", url: `${SITE_URL}/pm-designer-to-pm` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Designer to PM (2026 Edition)",
+        description:
+          "How designers become PMs. Strengths they bring, the data and engineering gaps to close, and why designer-PMs often ship the best-experience products.",
+        image: `${SITE_URL}/api/og?title=PM+Designer+to+PM+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-designer-to-pm`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +79,12 @@ export default function PmDesignerToPmPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Designer to PM<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Designers crossing into product management lean on user empathy, visual and verbal storytelling, whole-flow thinking that goes beyond individual features, and strong partnership skills with engineering; the transition mostly hinges on closing gaps in quantitative analysis, business framing around revenue and unit economics, executive-level stakeholder management, and resisting the urge to design the solution too early.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 strengths designers bring and 4 gaps to close.
           </p>
@@ -109,6 +130,8 @@ export default function PmDesignerToPmPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-designer-to-pm" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Designer-to-PM Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Demo Skills Guide (2026) — How to Present Products That Land",
@@ -67,6 +70,7 @@ const FAQS = [
 ];
 
 export default function PmDemoSkillsPage() {
+  const dates = pageDates("/pm-demo-skills");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -74,6 +78,17 @@ export default function PmDemoSkillsPage() {
         { name: "PM Demo Skills", url: `${SITE_URL}/pm-demo-skills` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Demo Skills Guide (2026 Edition)",
+        description:
+          "How PMs give demos that convert. Structure, storytelling, live demo traps, and what executives actually pay attention to.",
+        image: `${SITE_URL}/api/og?title=PM+Demo+Skills+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-demo-skills`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -83,6 +98,16 @@ export default function PmDemoSkillsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Demo Skills Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A PM demo that lands runs about six minutes across six parts: a hook on the problem,
+            brief context, a focused live walkthrough of the happy path, impact framing with one
+            clear metric, an honest look at what&apos;s next, and a handoff to Q&amp;A. Demos
+            that fail usually skip the user story for a feature dump, or get derailed by an
+            unrehearsed live-demo trap like slow internet.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 6-part demo structure, 6 storytelling moves, 6 live demo traps,
             and how to land with specificity instead of feature dumps.
@@ -144,6 +169,8 @@ export default function PmDemoSkillsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-demo-skills" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Communication Muscle Daily</h2>

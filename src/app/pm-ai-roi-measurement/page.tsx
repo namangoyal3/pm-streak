@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM AI ROI Measurement (2026) — Proving AI Pays Off",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmAiRoiMeasurementPage() {
+  const dates = pageDates("/pm-ai-roi-measurement");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,17 @@ export default function PmAiRoiMeasurementPage() {
         { name: "PM AI ROI", url: `${SITE_URL}/pm-ai-roi-measurement` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI ROI Measurement (2026 Edition)",
+        description:
+          "How PMs measure AI ROI. Time saved, deflection rates, revenue lift, and why most AI ROI claims don&apos;t survive scrutiny.",
+        image: `${SITE_URL}/api/og?title=PM+AI+ROI+Measurement+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-roi-measurement`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +80,12 @@ export default function PmAiRoiMeasurementPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI ROI Measurement<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            AI ROI is proven by tracking five signals — hours saved per user, ticket/call deflection rate, revenue lift, labour or vendor cost saved, and quality lift in NPS or error rate — while avoiding the traps that inflate claims: self-reported time savings, counting feature usage instead of outcomes, ignoring AI cost, and skipping a baseline to compare against.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 ROI metrics and 4 traps for AI product PMs.
           </p>
@@ -110,6 +131,8 @@ export default function PmAiRoiMeasurementPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-roi-measurement" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI ROI Scenarios</h2>

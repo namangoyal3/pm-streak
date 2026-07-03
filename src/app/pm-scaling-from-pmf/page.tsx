@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Scaling From PMF (2026) — How to Scale a Product After Finding Fit",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmScalingFromPmfPage() {
+  const dates = pageDates("/pm-scaling-from-pmf");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,17 @@ export default function PmScalingFromPmfPage() {
         { name: "PM Scaling From PMF", url: `${SITE_URL}/pm-scaling-from-pmf` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Scaling From PMF (2026 Edition)",
+        description:
+          "How PMs scale products after finding PMF. Widening the user base, expanding geography, protecting core, and the scaling traps that break PMF.",
+        image: `${SITE_URL}/api/og?title=PM+Scaling+From+PMF+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-scaling-from-pmf`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +104,16 @@ export default function PmScalingFromPmfPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Scaling From PMF<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Scaling safely after PMF hinges on deepening the core use case before widening —
+            expanding user base, geography, or platform reach only once core-cohort retention holds
+            steady, new cohorts retain nearly as well as founding users, and the team can ship
+            without breaking what already works. Premature horizontal expansion before that core is
+            solid is the most common way promising products lose the fit they just found.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 scaling moves, 5 core-protection principles, 6 traps, and 5 signs of healthy scaling.
           </p>
@@ -164,6 +189,8 @@ export default function PmScalingFromPmfPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-scaling-from-pmf" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Scaling Skills Daily</h2>

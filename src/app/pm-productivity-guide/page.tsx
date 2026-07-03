@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Productivity Guide (2026) — How Top Product Managers Get More Done",
@@ -96,6 +99,7 @@ const FAQS = [
 ];
 
 export default function PmProductivityGuidePage() {
+  const dates = pageDates("/pm-productivity-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -103,6 +107,17 @@ export default function PmProductivityGuidePage() {
         { name: "PM Productivity Guide", url: `${SITE_URL}/pm-productivity-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Productivity Guide (2026 Edition)",
+        description:
+          "How top PMs stay productive under constant demands. Time-blocking, async systems, saying no, and the productivity habits that separate high-output PMs from burned-out ones.",
+        image: `${SITE_URL}/api/og?title=PM+Productivity+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-productivity-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -112,6 +127,12 @@ export default function PmProductivityGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Productivity Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Systems, not willpower, are what separate PMs who sustain high output from those who burn out — defaulting to async instead of meetings, time-blocking focus work, saying no with options, batching Slack instead of watching it continuously, and protecting 2–3 weekly hours for strategic work, all backed by tools like a focus-blocked calendar and a single source of truth for decisions.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             8 productivity habits that separate sustainable high-output PMs from burned-out ones,
             5 essential tools, and 6 anti-patterns to avoid.
@@ -173,6 +194,8 @@ export default function PmProductivityGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-productivity-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Thinking in 2 Minutes a Day</h2>

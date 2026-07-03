@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Domain Knowledge Guide (2026) — How to Build Expertise in Your Product Area",
@@ -87,6 +90,7 @@ const FAQS = [
 ];
 
 export default function PmDomainKnowledgePage() {
+  const dates = pageDates("/pm-domain-knowledge");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -94,6 +98,17 @@ export default function PmDomainKnowledgePage() {
         { name: "PM Domain Knowledge", url: `${SITE_URL}/pm-domain-knowledge` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Domain Knowledge Guide (2026 Edition)",
+        description:
+          "How PMs build deep domain expertise. The habits that compound, what to read, who to follow, and how to become the person people call when they need domain insight.",
+        image: `${SITE_URL}/api/og?title=PM+Domain+Knowledge+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-domain-knowledge`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -103,6 +118,15 @@ export default function PmDomainKnowledgePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Domain Knowledge Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Building real PM domain knowledge means climbing four levels of depth — vocabulary, frameworks, operator
+            intuition, and strategic view — through six compounding habits such as reading the industry canon, following
+            real operators instead of influencers, and spending time in the support queue each week. Operator-level
+            intuition, per the guide&apos;s own timeline, usually takes a full one-to-two-year product cycle in a single space to develop.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4 levels of domain depth, 6 learning habits that compound,
             and what you need to know for every major PM domain.
@@ -167,6 +191,8 @@ export default function PmDomainKnowledgePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-domain-knowledge" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Domain Intuition in 2 Minutes a Day</h2>

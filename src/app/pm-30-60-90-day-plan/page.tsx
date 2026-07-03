@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM 30-60-90 Day Plan Template (2026) — What to Ship in Your First Quarter",
@@ -93,6 +96,7 @@ const FAQS = [
 ];
 
 export default function Pm30_60_90DayPlanPage() {
+  const dates = pageDates("/pm-30-60-90-day-plan");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -100,6 +104,16 @@ export default function Pm30_60_90DayPlanPage() {
         { name: "PM 30-60-90 Day Plan", url: `${SITE_URL}/pm-30-60-90-day-plan` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM 30-60-90 Day Plan Template (2026)",
+        description: "The 30-60-90 day PM plan template. Specific deliverables for each phase, how to share it with your manager, and what counts as a successful first quarter.",
+        image: `${SITE_URL}/api/og?title=PM+30-60-90+Day+Plan+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-30-60-90-day-plan`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -109,9 +123,14 @@ export default function Pm30_60_90DayPlanPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM 30-60-90 Day Plan<br />Template (2026)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            Specific deliverables for each 30-day phase, how to share the plan with your manager,
-            and the 6 mistakes that derail new PMs in their first quarter.
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            A PM 30-60-90 day plan breaks the first quarter into three phases: Days 1–30 for
+            learning the team and current state, Days 31–60 for aligning on a scoped first ship,
+            and Days 61–90 for shipping and reviewing real impact. Share it with your manager in
+            Week 1, not at Day 30.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Stay Sharp Daily — Free →
@@ -183,6 +202,8 @@ export default function Pm30_60_90DayPlanPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-30-60-90-day-plan" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Stay Sharp Before and During Your New Role</h2>

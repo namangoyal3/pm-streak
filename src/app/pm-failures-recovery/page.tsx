@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Failure Recovery Guide (2026) — When Your Product or Launch Fails",
@@ -90,6 +93,7 @@ const FAQS = [
 ];
 
 export default function PmFailuresRecoveryPage() {
+  const dates = pageDates("/pm-failures-recovery");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -97,6 +101,17 @@ export default function PmFailuresRecoveryPage() {
         { name: "PM Failure Recovery", url: `${SITE_URL}/pm-failures-recovery` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Failure Recovery Guide (2026 Edition)",
+        description:
+          "How to handle PM failures — failed launches, missed metrics, shipped features nobody used. Recovery steps, post-mortems, career protection, and lessons that compound.",
+        image: `${SITE_URL}/api/og?title=PM+Failure+Recovery+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-failures-recovery`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -106,6 +121,12 @@ export default function PmFailuresRecoveryPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Failure Recovery Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Five failure types show up again and again for PMs — launch-day disasters, zero-adoption features, missed quarterly metrics, strategic bets that don&apos;t pan out, and cross-functional breakdowns — and each needs a different recovery move, from rolling back a bad launch within 48 hours to killing a failing bet cleanly instead of chasing sunk cost. What protects a PM&apos;s career most is honest ownership, not avoiding failure.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 common PM failure types and how to recover from each, a 6-section post-mortem template,
             and 6 career-protection moves when things go sideways.
@@ -171,6 +192,8 @@ export default function PmFailuresRecoveryPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-failures-recovery" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Judgment Daily</h2>

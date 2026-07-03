@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Career Transitions (2026) — Changing Domain, Scale, or Level",
@@ -90,6 +93,7 @@ const FAQS = [
 ];
 
 export default function PmCareerTransitionsPage() {
+  const dates = pageDates("/pm-career-transitions");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -97,6 +101,16 @@ export default function PmCareerTransitionsPage() {
         { name: "PM Career Transitions", url: `${SITE_URL}/pm-career-transitions` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Career Transitions (2026 Edition)",
+        description: "How PMs navigate career transitions — switching domain, moving from startup to enterprise (or vice versa), going from IC to manager. What's hard about each, what works.",
+        image: `${SITE_URL}/api/og?title=PM+Career+Transitions+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-career-transitions`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -106,9 +120,15 @@ export default function PmCareerTransitionsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Career Transitions<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            6 major PM transitions with what&apos;s hard + what helps, 5 common patterns,
-            and a 6-question decision framework before any big move.
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            PM career transitions fall into six recurring patterns — consumer to B2B, startup to
+            enterprise (and back), IC to manager, and domain switches like fintech to edtech —
+            each with its own hard part and what actually helps. Startup-to-enterprise moves tend
+            to succeed more often than the reverse, and IC-to-manager is widely considered the
+            hardest transition of all.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Build PM Skills Daily — Free →
@@ -176,6 +196,8 @@ export default function PmCareerTransitionsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-career-transitions" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Skills That Transfer Across Transitions</h2>

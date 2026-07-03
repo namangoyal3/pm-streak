@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Paywall Design (2026) — Hard, Soft, and Hybrid Paywalls",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmPaywallDesignPage() {
+  const dates = pageDates("/pm-paywall-design");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,16 @@ export default function PmPaywallDesignPage() {
         { name: "PM Paywall Design", url: `${SITE_URL}/pm-paywall-design` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Paywall Design (2026 Edition)",
+        description: "How PMs design paywalls. Hard vs soft, metered, freemium, and which patterns convert best for content, SaaS, and consumer apps.",
+        image: `${SITE_URL}/api/og?title=PM+Paywall+Design+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-paywall-design`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +78,12 @@ export default function PmPaywallDesignPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Paywall Design<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            Which paywall to use depends on the goal: hard paywalls gate everything for high-intent-only audiences, metered paywalls (the NYT model) allow a fixed number of free items, soft paywalls keep some content open while gating premium value, and freemium tiers pair a forever-free layer with paid features — the general rule is to show value before charging, since soft-paywall A/B tests outperform hard-paywall changes.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 paywall types and 4 tips for high-converting paywalls.
           </p>
@@ -109,6 +129,8 @@ export default function PmPaywallDesignPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-paywall-design" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Paywall PM Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Reading PM Metrics Correctly (2026) — Spotting Signal vs Noise",
@@ -75,6 +78,7 @@ const FAQS = [
 ];
 
 export default function PmReadingMetricsPage() {
+  const dates = pageDates("/pm-reading-metrics");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -82,6 +86,16 @@ export default function PmReadingMetricsPage() {
         { name: "Reading PM Metrics", url: `${SITE_URL}/pm-reading-metrics` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Reading PM Metrics Correctly (2026 Edition)",
+        description: "How PMs read metrics correctly. Spot noise vs signal, avoid confirmation bias, segment correctly, and the 7 questions to ask before acting on any metric move.",
+        image: `${SITE_URL}/api/og?title=Reading+PM+Metrics+Correctly+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-reading-metrics`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -91,9 +105,19 @@ export default function PmReadingMetricsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Reading PM Metrics Correctly<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Before acting on any metric move, this guide walks through seven diagnostic questions, five
+            signal-vs-noise examples, five interpretation biases, and a six-step process for tracing a change
+            back to its cause. Most week-over-week swings under 3–5% are ordinary variance rather than signal,
+            and the most common mistake is crediting your last shipped change for a shift that seasonality or
+            an unrelated event actually caused.
+          </p>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
             7 questions to ask before acting on any metric move, 5 signal-vs-noise examples,
             5 biases to avoid, and a 6-step diagnosis process.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Build Metric Intuition Daily — Free →
@@ -167,6 +191,8 @@ export default function PmReadingMetricsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-reading-metrics" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Metric Intuition Daily</h2>

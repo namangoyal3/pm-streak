@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "SaaS Product Manager Guide (2026) — How to Excel as a B2B SaaS PM",
@@ -75,6 +78,7 @@ const FAQS = [
 ];
 
 export default function SaasProductManagerPage() {
+  const dates = pageDates("/saas-product-manager");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -82,6 +86,17 @@ export default function SaasProductManagerPage() {
         { name: "SaaS Product Manager", url: `${SITE_URL}/saas-product-manager` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "SaaS Product Manager Guide (2026 Edition)",
+        description:
+          "The complete SaaS PM playbook. B2B SaaS metrics, roadmap dynamics, customer-led development, freemium vs enterprise trade-offs, and how to break into SaaS PM in India.",
+        image: `${SITE_URL}/api/og?title=SaaS+Product+Manager+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/saas-product-manager`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -91,6 +106,17 @@ export default function SaasProductManagerPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             SaaS Product Manager Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            SaaS product managers live inside eight recurring metrics — MRR/ARR, net and gross
+            revenue retention, churn, CAC payback, time to value, PQLs, and expansion MRR — while
+            navigating six structural challenges unique to B2B: a buyer-versus-user split,
+            enterprise customers who can override the roadmap, freemium-versus-paid tension, and
+            sales cycles that stretch 3–9 months versus the days-long iteration loops of consumer
+            PMs.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             B2B SaaS metrics, the unique challenges SaaS PMs face, top companies hiring in India,
             and how to break into SaaS PM from a consumer or adjacent background.
@@ -153,6 +179,8 @@ export default function SaasProductManagerPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="saas-product-manager" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build SaaS PM Intuition Daily</h2>

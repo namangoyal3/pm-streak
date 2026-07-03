@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Internationalisation (2026) — Building Products for Multiple Markets",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmInternationalisationPage() {
+  const dates = pageDates("/pm-internationalisation");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmInternationalisationPage() {
         { name: "PM Internationalisation", url: `${SITE_URL}/pm-internationalisation` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Internationalisation (2026 Edition)",
+        description:
+          "How PMs internationalise products. Localisation vs translation, payment methods, legal, and why i18n is a first-class product concern.",
+        image: `${SITE_URL}/api/og?title=PM+Internationalisation+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-internationalisation`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmInternationalisationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Internationalisation<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Internationalising a product touches five layers at once — language, currency and payment methods, legal and regulatory rules, cultural UX, and local operations — which is why PMs are advised to start early, since retrofitting i18n later can cost five to ten times more, and to expand only once domestic unit economics are proven, typically past $5M–$20M in ARR.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 i18n layers and 5 practices for PMs going global.
           </p>
@@ -112,6 +133,8 @@ export default function PmInternationalisationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-internationalisation" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice i18n PM Scenarios</h2>

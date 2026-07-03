@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Building in Public (2026) — Why More PMs Should Share Their Work",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmBuildingInPublicPage() {
+  const dates = pageDates("/pm-building-in-public");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,17 @@ export default function PmBuildingInPublicPage() {
         { name: "PM Building in Public", url: `${SITE_URL}/pm-building-in-public` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Building in Public (2026 Edition)",
+        description:
+          "Why PMs benefit from building in public. Accountability, compounding distribution, and the specific things to share (and not).",
+        image: `${SITE_URL}/api/og?title=PM+Building+in+Public+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-building-in-public`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +80,12 @@ export default function PmBuildingInPublicPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Building in Public<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Building in public pays off for PMs through five compounding benefits — publicly committing drives consistency, distribution compounds as followers bring inbound opportunities, strangers surface blind spots through feedback, a portfolio grows passively, and mentorship happens in the open — best fueled by sharing project learnings, useful frameworks with honest caveats, and failed experiments. The line to hold: share lessons and principles, never confidential metrics, pre-launch features, or company specifics.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 benefits and 4 categories of what to share.
           </p>
@@ -110,6 +131,8 @@ export default function PmBuildingInPublicPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-building-in-public" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Building in Public Scenarios</h2>

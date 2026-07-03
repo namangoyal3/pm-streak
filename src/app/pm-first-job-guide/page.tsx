@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "How to Land Your First PM Job (2026) — Complete India Guide",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmFirstJobGuidePage() {
+  const dates = pageDates("/pm-first-job-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,16 @@ export default function PmFirstJobGuidePage() {
         { name: "First PM Job Guide", url: `${SITE_URL}/pm-first-job-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Land Your First PM Job (India 2026 Edition)",
+        description: "The complete guide to landing your first PM job in India. Paths in, portfolio to build, interview prep, and how to differentiate when you have no PM experience.",
+        image: `${SITE_URL}/api/og?title=First+PM+Job+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-first-job-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,9 +103,15 @@ export default function PmFirstJobGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Land Your First PM Job<br />(India 2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            5 paths in, 5 portfolio artefacts to build, 6 interview focus areas,
-            and a realistic 6-month timeline from start to signed offer.
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            There are five realistic paths into a first PM job — APM programs, internal transfer,
+            startup PM roles, consulting-to-PM, and a side-project-driven referral — and building
+            a portfolio (teardown, mock PRD, user research brief) matters as much as picking the
+            right path. Most candidates need four to nine months from a deliberate start to a
+            signed offer.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Start Daily PM Prep — Free →
@@ -167,6 +187,8 @@ export default function PmFirstJobGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-first-job-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Make Daily PM Practice Your First Habit</h2>

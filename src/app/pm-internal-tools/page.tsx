@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Internal Tools PM (2026) — PM Work Serving Your Own Company",
@@ -72,6 +75,7 @@ const FAQS = [
 ];
 
 export default function PmInternalToolsPage() {
+  const dates = pageDates("/pm-internal-tools");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -79,6 +83,17 @@ export default function PmInternalToolsPage() {
         { name: "Internal Tools PM", url: `${SITE_URL}/pm-internal-tools` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Internal Tools PM Guide (2026 Edition)",
+        description:
+          "Internal tools PM — what it is, what&apos;s hard about it, career trade-offs, and why great internal tools PMs are increasingly valuable at scaled companies.",
+        image: `${SITE_URL}/api/og?title=Internal+Tools+PM+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-internal-tools`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -88,6 +103,16 @@ export default function PmInternalToolsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Internal Tools PM Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Internal tools PM means building for ops, seller/merchant, analyst, developer, or finance
+            audiences who don&apos;t choose the product — they&apos;re assigned to it, so feedback is blunt
+            and metrics shift to productivity gained or errors reduced rather than DAU. It&apos;s less
+            glamorous and success is often invisible, but at scaled companies it sits on the same career
+            ladder as consumer PM and drives real P&amp;L impact.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 types of internal tools PM work, what&apos;s hard about it,
             why it&apos;s increasingly valuable, and career trade-offs to consider.
@@ -164,6 +189,8 @@ export default function PmInternalToolsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-internal-tools" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Skills That Transfer Everywhere</h2>

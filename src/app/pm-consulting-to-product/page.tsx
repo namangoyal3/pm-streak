@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Consulting to Product (2026) — From McKinsey, BCG, Bain to PM",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmConsultingToProductPage() {
+  const dates = pageDates("/pm-consulting-to-product");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,17 @@ export default function PmConsultingToProductPage() {
         { name: "PM Consulting to Product", url: `${SITE_URL}/pm-consulting-to-product` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Consulting to Product (2026 Edition)",
+        description:
+          "How consultants transition to PM. Strengths they bring, gaps they must close, and why ex-consultants often excel at strategy but struggle with craft.",
+        image: `${SITE_URL}/api/og?title=PM+Consulting+to+Product+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-consulting-to-product`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +79,12 @@ export default function PmConsultingToProductPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Consulting to Product<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Consultants moving into product management arrive with structured thinking, executive communication, cross-functional stakeholder management, and data-driven analysis, but they typically have to build hands-on product craft, patience for long execution cycles, and comfort with technical ambiguity on tradeoffs — unlearning the urge to deliver slides instead of shipping products.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 strengths consultants bring and 4 gaps they must close.
           </p>
@@ -109,6 +130,8 @@ export default function PmConsultingToProductPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-consulting-to-product" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Transition Scenarios</h2>

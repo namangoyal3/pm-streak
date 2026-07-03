@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Meetings Guide (2026) — How to Run Meetings Your Team Thanks You For",
@@ -85,6 +88,7 @@ const FAQS = [
 ];
 
 export default function PmMeetingsGuidePage() {
+  const dates = pageDates("/pm-meetings-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -92,6 +96,17 @@ export default function PmMeetingsGuidePage() {
         { name: "PM Meetings Guide", url: `${SITE_URL}/pm-meetings-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Meetings Guide (2026 Edition)",
+        description:
+          "How PMs run meetings that don&apos;t waste time. Types of meetings, agenda templates, when to cancel, and how to keep meetings short, decisive, and valuable.",
+        image: `${SITE_URL}/api/og?title=PM+Meetings+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-meetings-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -101,6 +116,17 @@ export default function PmMeetingsGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Meetings Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Not every PM meeting deserves to exist: decision meetings, alignment meetings,
+            review meetings, stand-ups, and brainstorms each serve a different purpose and
+            should be cancelled when there&apos;s no clear agenda, no decision to make, or more
+            than eight people in the room. Meetings worth keeping run tight — a stated purpose
+            in the first 30 seconds, a drive to decision over consensus, and written follow-up
+            within 24 hours.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 types of PM meetings with rules for each, 5 signs a meeting should be cancelled,
             and 6 rules for running meetings your team thanks you for.
@@ -170,6 +196,8 @@ export default function PmMeetingsGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-meetings-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Execution Muscle Daily</h2>

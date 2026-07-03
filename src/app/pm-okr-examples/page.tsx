@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM OKR Examples (2026) — Real Quarterly OKRs From Great Product Teams",
@@ -97,6 +100,7 @@ const FAQS = [
 ];
 
 export default function PmOkrExamplesPage() {
+  const dates = pageDates("/pm-okr-examples");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -104,6 +108,17 @@ export default function PmOkrExamplesPage() {
         { name: "PM OKR Examples", url: `${SITE_URL}/pm-okr-examples` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM OKR Examples (2026 Edition)",
+        description:
+          "15+ real-style PM OKR examples for consumer, B2B, growth, and platform products. See what well-written Objectives + Key Results actually look like.",
+        image: `${SITE_URL}/api/og?title=PM+OKR+Examples+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-okr-examples`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -113,6 +128,12 @@ export default function PmOkrExamplesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM OKR Examples<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            This guide collects five real-style OKR sets — spanning consumer growth, B2B SaaS, fintech payments, platform, and marketplace products — each pairing one ambitious, qualitative Objective with three measurable Key Results. Beyond the examples, six recurring patterns show what separates a well-written OKR from a vague one, from ambitious framing to guardrail metrics that protect against unintended trade-offs.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 real-style OKRs across consumer, B2B, fintech, platform, and marketplace —
             plus 6 patterns that separate great OKRs from generic ones.
@@ -168,6 +189,8 @@ export default function PmOkrExamplesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-okr-examples" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice OKR Writing Daily</h2>

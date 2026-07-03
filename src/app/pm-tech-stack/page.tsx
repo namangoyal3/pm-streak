@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "The PM Tech Stack You Should Understand (2026) — APIs, Databases, Infra for PMs",
@@ -113,12 +116,24 @@ const FAQS = [
 ];
 
 export default function PmTechStackPage() {
+  const dates = pageDates("/pm-tech-stack");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Tech Stack", url: `${SITE_URL}/pm-tech-stack` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "The PM Tech Stack You Should Understand (2026) — APIs, Databases, Infra for PMs",
+        description:
+          "The technical concepts every PM needs to understand (without coding). APIs, databases, caches, queues, CDNs, observability — explained for PMs who work with engineers.",
+        image: `${SITE_URL}/api/og?title=PM+Tech+Stack+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-tech-stack`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -129,6 +144,16 @@ export default function PmTechStackPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Tech Stack Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Without needing to write code, PMs can build technical fluency around ten
+            concepts covered here — APIs, REST vs GraphQL, SQL vs NoSQL databases,
+            caching, queues, CDNs, load balancers, observability, microservices vs
+            monoliths, and auth — plus what to learn first and five concrete ways to
+            build that fluency.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             10 technical concepts every PM should understand (conceptually, not as an engineer),
             what to learn first, and how to build technical fluency deliberately.
@@ -191,6 +216,8 @@ export default function PmTechStackPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-tech-stack" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Earn Engineering Trust Through Fluency</h2>

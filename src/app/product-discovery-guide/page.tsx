@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Product Discovery Guide (2026) — How PMs Find the Right Problems to Solve",
@@ -97,6 +100,7 @@ const FAQS = [
 ];
 
 export default function ProductDiscoveryGuidePage() {
+  const dates = pageDates("/product-discovery-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -104,6 +108,16 @@ export default function ProductDiscoveryGuidePage() {
         { name: "Product Discovery Guide", url: `${SITE_URL}/product-discovery-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Discovery Guide (2026 Edition)",
+        description: "Master continuous product discovery. User interviews, opportunity mapping, assumption testing, and the Teresa Torres OST framework — so you build what users actually need.",
+        image: `${SITE_URL}/api/og?title=Product+Discovery+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-discovery-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -113,6 +127,12 @@ export default function ProductDiscoveryGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Discovery Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            Product discovery works as six sequential phases: define the outcome you&apos;re trying to improve, map the opportunity space using Teresa Torres&apos;s Opportunity Solution Tree, run user interviews about specific past experiences, surface the three riskiest assumptions behind each solution, test them with rapid low-investment experiments, and synthesise the evidence into a prioritised backlog — the goal throughout is de-risking decisions, not just generating insights.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 6-phase discovery process for finding the right problems before investing in solutions —
             with user interview templates, assumption testing, and the OST framework.
@@ -178,6 +198,8 @@ export default function ProductDiscoveryGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-discovery-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Discovery Habits in 2 Minutes a Day</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Manager vs Project Manager (2026) — The Real Differences",
@@ -118,6 +121,7 @@ const FAQS = [
 ];
 
 export default function ProductManagerVsProjectManagerPage() {
+  const dates = pageDates("/product-manager-vs-project-manager");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -125,6 +129,17 @@ export default function ProductManagerVsProjectManagerPage() {
         { name: "Product Manager vs Project Manager", url: `${SITE_URL}/product-manager-vs-project-manager` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Manager vs Project Manager (2026)",
+        description:
+          "Product manager vs project manager — what's actually different, where they overlap, which earns more, and which career to choose. With a side-by-side comparison.",
+        image: `${SITE_URL}/api/og?title=Product+Manager+vs+Project+Manager+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-manager-vs-project-manager`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -134,6 +149,17 @@ export default function ProductManagerVsProjectManagerPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Manager vs<br />Project Manager (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Product managers decide what to build and are judged on business outcomes like
+            retention and revenue; project managers decide how to ship what&apos;s already been
+            decided and are judged on delivery outcomes like on-time, on-budget completion — a
+            split that shows up across ownership (roadmaps and PRDs versus Gantt charts and risk
+            logs), typical mid-level salary in India (₹25L–₹55L versus ₹15L–₹35L), and career
+            ceiling (CPO versus Delivery Head).
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What actually differs between these two PM roles — responsibilities, salary, career path,
             and a clear framework for choosing between them.
@@ -213,6 +239,8 @@ export default function ProductManagerVsProjectManagerPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-manager-vs-project-manager" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">If You&apos;re Choosing Product — Start Here</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM KPI Guide (2026) — Choosing KPIs That Drive Decisions",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function PmKpiGuidePage() {
+  const dates = pageDates("/pm-kpi-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,16 @@ export default function PmKpiGuidePage() {
         { name: "PM KPI Guide", url: `${SITE_URL}/pm-kpi-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM KPI Guide (2026 Edition)",
+        description: "How PMs pick KPIs that actually drive decisions. Leading vs lagging indicators, outcome vs output, and how to avoid the Goodhart&apos;s Law trap.",
+        image: `${SITE_URL}/api/og?title=PM+KPI+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-kpi-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +125,16 @@ export default function PmKpiGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM KPI Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Choosing a PM KPI means telling outcome metrics apart from output, leading, lagging,
+            guardrail, and vanity metrics, then running each candidate through a six-point
+            checklist — does it move with real value, can it be gamed, is it actually instrumented,
+            and does the team agree on its definition — before settling on the 5 to 10 KPIs a
+            focused product area actually needs.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 KPI types every PM should know, a 6-point checklist for choosing KPIs,
             and the 6 common KPI mistakes that lead to well-measured failure.
@@ -173,6 +197,8 @@ export default function PmKpiGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-kpi-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Metric Intuition in 2 Minutes a Day</h2>

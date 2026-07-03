@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Executive Updates Guide (2026) — How to Write Updates Leadership Actually Reads",
@@ -79,6 +82,7 @@ const FAQS = [
 ];
 
 export default function PmExecutiveUpdatesPage() {
+  const dates = pageDates("/pm-executive-updates");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -86,6 +90,17 @@ export default function PmExecutiveUpdatesPage() {
         { name: "PM Executive Updates", url: `${SITE_URL}/pm-executive-updates` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Executive Updates Guide (2026 Edition)",
+        description:
+          "How PMs write exec updates that get read. Structure, length, what to include, what to cut, and how to build trust through consistent communication.",
+        image: `${SITE_URL}/api/og?title=PM+Executive+Updates+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-executive-updates`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -95,6 +110,12 @@ export default function PmExecutiveUpdatesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Executive Updates Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A strong PM executive update follows a six-part structure — status tag, one-sentence headline, three wins, one risk, one ask, and next week&apos;s outcome — kept under 300 words and sent on a predictable weekly cadence, usually Friday. Leading with numbers over adjectives and surfacing risks early builds the trust these updates are meant to create.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6-section structure, 6 principles for great updates, before/after examples,
             and 5 rules for timing and cadence.
@@ -180,6 +201,8 @@ export default function PmExecutiveUpdatesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-executive-updates" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Concise PM Writing Daily</h2>

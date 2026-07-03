@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Agile Rituals (2026) — Standups, Retros, Demos Done Right",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmAgileRitualsPage() {
+  const dates = pageDates("/pm-agile-rituals");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,17 @@ export default function PmAgileRitualsPage() {
         { name: "PM Agile Rituals", url: `${SITE_URL}/pm-agile-rituals` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Agile Rituals (2026 Edition)",
+        description:
+          "How PMs run agile rituals without waste. Standups, retros, demos, refinement — what to keep, what to cut, what works in 2026.",
+        image: `${SITE_URL}/api/og?title=PM+Agile+Rituals+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-agile-rituals`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +81,12 @@ export default function PmAgileRitualsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Agile Rituals<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            The rule that governs every PM-run agile ritual is simple: rituals serve the team, not the framework, so short and frequent beats long and rare and async-by-default suits remote teams best. In practice that means five checkpoints — a 15-minute standup for blockers only, backlog refinement before planning, sprint planning against real capacity, a demo of working product for real stakeholders, and a retro that commits to exactly one change.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 rituals explained and 4 rules for running them well.
           </p>
@@ -111,6 +132,8 @@ export default function PmAgileRitualsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-agile-rituals" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Agile PM Scenarios</h2>

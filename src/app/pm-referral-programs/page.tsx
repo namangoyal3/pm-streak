@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Referral Programs (2026) — When They Work and When They Don&apos;t",
@@ -79,6 +82,7 @@ const FAQS = [
 ];
 
 export default function PmReferralProgramsPage() {
+  const dates = pageDates("/pm-referral-programs");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -86,6 +90,17 @@ export default function PmReferralProgramsPage() {
         { name: "PM Referral Programs", url: `${SITE_URL}/pm-referral-programs` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Referral Programs (2026 Edition)",
+        description:
+          "How PMs design referral programs that drive real growth. The math, the psychology, great examples, and why most referral programs fail.",
+        image: `${SITE_URL}/api/og?title=PM+Referral+Programs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-referral-programs`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -95,6 +110,12 @@ export default function PmReferralProgramsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Referral Programs<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Referral programs work only when a product already delivers real value and users have a natural moment to share it, rewarding both sides proportionally with reliable tracking; they fail when the product isn&apos;t yet delightful, rewards are one-sided, or redemption is complicated — which is why K-factor above 0.5 is considered meaningful, above 1 viral, even though most programs land closer to 0.1–0.3.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 signals referrals work, 5 failure modes, 5 design principles, 5 metrics to track, and 4 famous examples.
           </p>
@@ -183,6 +204,8 @@ export default function PmReferralProgramsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-referral-programs" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Growth PM Skills Daily</h2>

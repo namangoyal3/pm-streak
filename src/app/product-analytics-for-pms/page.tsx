@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Analytics for Product Managers (2026) — Metrics, Funnels & A/B Testing",
@@ -105,6 +108,7 @@ const FAQS = [
 ];
 
 export default function ProductAnalyticsForPmsPage() {
+  const dates = pageDates("/product-analytics-for-pms");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -112,6 +116,16 @@ export default function ProductAnalyticsForPmsPage() {
         { name: "Product Analytics for PMs", url: `${SITE_URL}/product-analytics-for-pms` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Analytics for Product Managers (2026)",
+        description: "Master product analytics as a PM. Retention curves, funnel analysis, A/B testing, north star metrics, and how to use Amplitude and Mixpanel — explained without the data science jargon.",
+        image: `${SITE_URL}/api/og?title=Product+Analytics+for+Product+Managers+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-analytics-for-pms`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -121,6 +135,15 @@ export default function ProductAnalyticsForPmsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Analytics<br />for Product Managers (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Product analytics for PMs breaks down into six recurring skills: reading retention curves,
+            diagnosing funnel drop-off, running valid A/B tests, defining a north star metric, doing
+            cohort analysis, and owning the event tracking schema — then using tools like Amplitude,
+            Mixpanel, GA4, or direct SQL to answer routine questions without waiting on a data analyst.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Retention curves, funnels, A/B tests, cohort analysis, and event tracking —
             the analytics concepts every PM needs, explained without the data science jargon.
@@ -192,6 +215,8 @@ export default function ProductAnalyticsForPmsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-analytics-for-pms" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Analytics Intuition in 2 Minutes a Day</h2>

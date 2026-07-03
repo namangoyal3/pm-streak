@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM x Sales Ops (2026) — Working With Sales Operations as a PM",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmSalesOpsPage() {
+  const dates = pageDates("/pm-sales-ops");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmSalesOpsPage() {
         { name: "PM Sales Ops", url: `${SITE_URL}/pm-sales-ops` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM x Sales Ops (2026 Edition)",
+        description:
+          "How PMs partner with sales operations. Pipeline data, forecast accuracy, deal desk, and why sales ops is a rich PM research channel.",
+        image: `${SITE_URL}/api/og?title=PM+x+Sales+Ops+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-sales-ops`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmSalesOpsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM x Sales Ops<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM-sales ops partnership means engaging directly with the data sales teams already have: attending forecast meetings, reviewing deal desk exceptions, keeping CRM data clean, reading win/loss decks, and sitting in on sales calls — then watching signals like feature-gated deals, win rate, and churn reasons to see which product decisions actually move revenue.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 practices and 5 signals for PM-sales ops partnership.
           </p>
@@ -112,6 +133,8 @@ export default function PmSalesOpsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-sales-ops" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM-Sales Ops Scenarios</h2>

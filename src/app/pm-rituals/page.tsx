@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Team Rituals (2026) — The Recurring Meetings Great PM Teams Use",
@@ -68,6 +71,7 @@ const FAQS = [
 ];
 
 export default function PmRitualsPage() {
+  const dates = pageDates("/pm-rituals");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -75,6 +79,17 @@ export default function PmRitualsPage() {
         { name: "PM Team Rituals", url: `${SITE_URL}/pm-rituals` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Team Rituals (2026 Edition)",
+        description:
+          "The recurring rituals great PM teams use. Product reviews, metric reviews, roadmap reviews — when each matters, how long they should take, and which to skip.",
+        image: `${SITE_URL}/api/og?title=PM+Team+Rituals+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-rituals`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -84,6 +99,16 @@ export default function PmRitualsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Team Rituals<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Great PM teams run eight recurring rituals — weekly metric reviews, sprint planning and retros,
+            product and roadmap reviews, quarterly planning, all-hands, and manager 1:1s — typically totaling
+            8 to 15 hours a week, with the weekly 1:1 and metric review mattering most because missing them
+            erodes alignment fastest. Just as important is knowing which to skip: status meetings,
+            agenda-less updates, and any meeting you attend but never speak in.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             8 recurring rituals great PM teams use, 5 you can skip, and 6 moves to make the ones you keep better.
           </p>
@@ -148,6 +173,8 @@ export default function PmRitualsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-rituals" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Habits Daily</h2>

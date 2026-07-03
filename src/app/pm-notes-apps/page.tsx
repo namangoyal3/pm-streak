@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Notes Apps (2026) — Notion, Obsidian, Apple Notes PM Lessons",
@@ -43,6 +46,7 @@ const FAQS = [
 ];
 
 export default function PmNotesAppsPage() {
+  const dates = pageDates("/pm-notes-apps");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -50,6 +54,16 @@ export default function PmNotesAppsPage() {
         { name: "PM Notes Apps", url: `${SITE_URL}/pm-notes-apps` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Notes Apps (2026 Edition)",
+        description: "How PMs build notes and knowledge apps. Blocks vs pages, sync, AI-assisted writing, and why notes apps compound through personal daily use.",
+        image: `${SITE_URL}/api/og?title=PM+Notes+Apps+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-notes-apps`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -59,6 +73,12 @@ export default function PmNotesAppsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Notes Apps<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Building a notes app in 2026 means competing against Notion, Apple Notes, and Obsidian on a market that&apos;s barely winnable head-on — the wedge is picking a specific niche like voice-first, AI-native, or privacy-first capture, then optimizing for speed of capture, sync reliability, and daily active use rather than trying to out-structure the incumbents.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for notes app PMs.
           </p>
@@ -104,6 +124,8 @@ export default function PmNotesAppsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-notes-apps" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Notes App Scenarios</h2>

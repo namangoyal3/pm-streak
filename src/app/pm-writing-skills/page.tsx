@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Writing Skills Guide (2026) — How Great PMs Write PRDs, Updates & Strategy",
@@ -110,6 +113,7 @@ const FAQS = [
 ];
 
 export default function PmWritingSkillsPage() {
+  const dates = pageDates("/pm-writing-skills");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -117,6 +121,17 @@ export default function PmWritingSkillsPage() {
         { name: "PM Writing Skills", url: `${SITE_URL}/pm-writing-skills` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Writing Skills Guide (2026 Edition)",
+        description:
+          "How to write like a great PM. PRD structure, exec updates, strategy memos, and the writing habits that compound. With before/after examples.",
+        image: `${SITE_URL}/api/og?title=PM+Writing+Skills+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-writing-skills`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -126,6 +141,15 @@ export default function PmWritingSkillsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Writing Skills Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            What separates great PM writing from average PM writing isn&apos;t talent — it&apos;s five rules: leading with the
+            answer, cutting hedging words, using numbers instead of adjectives, naming owners, and structuring for
+            scanning. Those same rules show up across the five documents every PM writes, from two-to-three-page PRDs
+            to five-bullet weekly exec updates and one-page decision docs.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 rules for great PM writing with before/after examples,
             5 document types every PM writes, and how to improve your writing deliberately.
@@ -190,6 +214,8 @@ export default function PmWritingSkillsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-writing-skills" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Writing Muscle Daily</h2>

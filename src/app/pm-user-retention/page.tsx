@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM User Retention (2026) — The Ultimate Product Metric",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmUserRetentionPage() {
+  const dates = pageDates("/pm-user-retention");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,17 @@ export default function PmUserRetentionPage() {
         { name: "PM User Retention", url: `${SITE_URL}/pm-user-retention` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM User Retention Guide (2026 Edition)",
+        description:
+          "How PMs build retention — the truest sign of product-market fit. Retention curves, benchmarks, levers, and why every PM should obsess over D30.",
+        image: `${SITE_URL}/api/og?title=PM+User+Retention+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-user-retention`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +104,12 @@ export default function PmUserRetentionPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM User Retention Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            User retention is the clearest evidence of product-market fit because people only return when they get value, and it varies sharply by category — from roughly 20–35% D30 for learning apps like Duolingo to 80–90% for messaging apps like WhatsApp — while PMs raise it through faster time-to-value, habit loops, compounding content, network effects, reactivation flows, and less friction, then track whether the curve flattens or decays to zero.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 reasons retention is the PM north star, 6 category benchmarks, 6 levers to improve,
             and 4 retention curve patterns to recognise.
@@ -165,6 +186,8 @@ export default function PmUserRetentionPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-user-retention" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Retention Skills Daily</h2>

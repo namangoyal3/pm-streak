@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Communication Skills (2026) — How Great PMs Communicate",
@@ -86,6 +89,7 @@ const FAQS = [
 ];
 
 export default function PmCommunicationSkillsPage() {
+  const dates = pageDates("/pm-communication-skills");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -93,6 +97,17 @@ export default function PmCommunicationSkillsPage() {
         { name: "PM Communication Skills", url: `${SITE_URL}/pm-communication-skills` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Communication Skills (2026 Edition)",
+        description:
+          "The communication skills that separate great PMs from average ones. Presenting to executives, leading meetings, async writing, giving hard feedback, and public speaking.",
+        image: `${SITE_URL}/api/og?title=PM+Communication+Skills+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-communication-skills`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -102,6 +117,15 @@ export default function PmCommunicationSkillsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Communication Skills<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            This guide treats PM communication as six distinct channels — executive presentations, team meetings, async
+            written updates, manager 1:1s, hard feedback, and public speaking — since each demands its own rules, from
+            leading a deck with the recommendation to using SBI (situation, behaviour, impact) for feedback. Skipping the
+            six mistakes below it, like leading with context instead of the takeaway, is what keeps a PM from sounding junior.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 6 communication channels PMs must master, rules for each,
             and the 6 mistakes that make average PMs feel junior.
@@ -163,6 +187,8 @@ export default function PmCommunicationSkillsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-communication-skills" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Communication Muscle Daily</h2>

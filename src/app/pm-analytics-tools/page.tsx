@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Analytics Tools (2026) — Mixpanel, Amplitude, PostHog Compared",
@@ -56,6 +59,7 @@ const FAQS = [
 ];
 
 export default function PmAnalyticsToolsPage() {
+  const dates = pageDates("/pm-analytics-tools");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -63,6 +67,17 @@ export default function PmAnalyticsToolsPage() {
         { name: "PM Analytics Tools", url: `${SITE_URL}/pm-analytics-tools` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Analytics Tools (2026 Edition)",
+        description:
+          "The analytics tools PMs actually use in 2026 — Mixpanel, Amplitude, PostHog, Heap, GA4. When to use which, pricing, and PM-specific workflows.",
+        image: `${SITE_URL}/api/og?title=PM+Analytics+Tools+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-analytics-tools`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -72,6 +87,12 @@ export default function PmAnalyticsToolsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Analytics Tools<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Mixpanel, Amplitude, PostHog, Heap, and GA4 make up the PM analytics stack in 2026 — Mixpanel and Amplitude suit funnel-driven and enterprise teams, PostHog bundles session replay and feature flags for startups, Heap covers teams without engineering bandwidth via autocapture, and GA4 handles marketing-led attribution for free. The five workflows every PM should run across them: funnel analysis, retention curves, cohort comparison, feature adoption, and session replay.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 tools compared, 5 core workflows every PM should know.
           </p>
@@ -119,6 +140,8 @@ export default function PmAnalyticsToolsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-analytics-tools" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Analytics Fluency Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Feedback Loops (2026) — How PMs Turn User Signal Into Decisions",
@@ -52,6 +55,7 @@ const FAQS = [
 ];
 
 export default function PmFeedbackLoopsPage() {
+  const dates = pageDates("/pm-feedback-loops");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -59,6 +63,16 @@ export default function PmFeedbackLoopsPage() {
         { name: "PM Feedback Loops", url: `${SITE_URL}/pm-feedback-loops` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Feedback Loops (2026 Edition)",
+        description: "How PMs build feedback loops that actually inform decisions. Channels, triage, synthesis, and why most feedback systems are graveyards.",
+        image: `${SITE_URL}/api/og?title=PM+Feedback+Loops+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-feedback-loops`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -68,6 +82,12 @@ export default function PmFeedbackLoopsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Feedback Loops<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            PM feedback loops turn raw signal into shipped decisions by running six channels — tickets, widgets, NPS, interviews, sales calls, and community chatter — through a five-step process: tag every item at intake, rank it by frequency times severity times segment, synthesize the themes weekly, and close the loop by telling users what shipped. The hardest discipline is not letting one angry enterprise account outweigh what the broader market is telling you.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#58cc02] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 channels and a 5-step workflow for turning feedback into decisions.
           </p>
@@ -113,6 +133,8 @@ export default function PmFeedbackLoopsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-feedback-loops" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Feedback PM Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Manager Path (2026) — When and How to Become a Group PM",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmManagerPathPage() {
+  const dates = pageDates("/pm-manager-path");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,17 @@ export default function PmManagerPathPage() {
         { name: "PM Manager Path", url: `${SITE_URL}/pm-manager-path` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Manager Path (2026 Edition)",
+        description:
+          "How PMs become managers. Why some love it and others hate it, the skill shifts, and when to make the jump to Group PM or Head of Product.",
+        image: `${SITE_URL}/api/og?title=PM+Manager+Path+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-manager-path`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +81,17 @@ export default function PmManagerPathPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Manager Path<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Moving into PM management means shipping PMs instead of products: decisions shift from
+            roadmap calls to hiring and development calls, and success shifts from individual
+            output to team output and org ownership. Whether it&apos;s right for you comes down to
+            a few honest questions — do you get more satisfaction from a great 1:1 than from
+            shipping a feature, and do you naturally coach teammates without missing the hands-on
+            product work?
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 shifts and 4 signals that manager path is right for you.
           </p>
@@ -111,6 +137,8 @@ export default function PmManagerPathPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-manager-path" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Manager Scenarios</h2>

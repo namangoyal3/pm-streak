@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Real Estate Tech (2026) — NoBroker, MagicBricks, Housing PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmRealEstateTechPage() {
+  const dates = pageDates("/pm-real-estate-tech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmRealEstateTechPage() {
         { name: "PM Real Estate Tech", url: `${SITE_URL}/pm-real-estate-tech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Real Estate Tech (India Edition)",
+        description: "How PMs build real estate tech products. Listings quality, broker dynamics, renter vs buyer funnels, and the long-cycle problems of proptech.",
+        image: `${SITE_URL}/api/og?title=PM+Real+Estate+Tech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-real-estate-tech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmRealEstateTechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Real Estate Tech<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Real estate tech in India wins by picking one narrow slice — rentals, co-living, short-stay, or plots — rather than solving buying and selling at once, because fake or stale listings destroy trust faster than any UX fix can rebuild it, and buyers spend six-plus months researching before they close. That&apos;s why proptech PMs watch verified-listings ratio, listing freshness, inquiry-to-visit conversion, and broker satisfaction instead of typical acquisition funnels.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for proptech PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmRealEstateTechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-real-estate-tech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Proptech Scenarios</h2>

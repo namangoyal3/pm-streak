@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Developer Productivity (2026) — Measuring and Improving Eng Velocity",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmDevProductivityPage() {
+  const dates = pageDates("/pm-dev-productivity");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,16 @@ export default function PmDevProductivityPage() {
         { name: "PM Developer Productivity", url: `${SITE_URL}/pm-dev-productivity` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Developer Productivity (2026 Edition)",
+        description: "How PMs work on developer productivity. DORA metrics, SPACE framework, AI coding tools, and why velocity is a team sport.",
+        image: `${SITE_URL}/api/og?title=PM+Developer+Productivity+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-dev-productivity`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +79,12 @@ export default function PmDevProductivityPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Developer Productivity<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Good developer-productivity PMs lean on team-level signals, not individual scoring: DORA&apos;s deployment frequency, lead time, and change failure rate; the SPACE framework&apos;s satisfaction and efficiency dimensions; and flow metrics like cycle time, backed by dashboards such as LinearB or Jellyfish and AI coding tools like Copilot — because individual metrics turn into perverse incentives when devs optimise for the number instead of the outcome.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 frameworks and 4 tool categories for measuring and improving eng velocity.
           </p>
@@ -110,6 +130,8 @@ export default function PmDevProductivityPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-dev-productivity" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Dev Productivity Scenarios</h2>

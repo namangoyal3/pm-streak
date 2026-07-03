@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Personal OKRs (2026) — Setting Career Goals That Compound",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmPersonalOkrsPage() {
+  const dates = pageDates("/pm-personal-okrs");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,16 @@ export default function PmPersonalOkrsPage() {
         { name: "PM Personal OKRs", url: `${SITE_URL}/pm-personal-okrs` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Personal OKRs (2026 Edition)",
+        description: "How PMs set personal OKRs for career growth. Skill, network, brand, and impact — and why writing them down dramatically increases follow-through.",
+        image: `${SITE_URL}/api/og?title=PM+Personal+OKRs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-personal-okrs`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +80,12 @@ export default function PmPersonalOkrsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Personal OKRs<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Personal OKRs for PMs span five categories — skills, network, brand, impact, and health and balance — capped at three per quarter, written somewhere visible weekly, reviewed honestly mid-quarter, and shared with a trusted peer for accountability. Mental goals evaporate within weeks, but written ones that get revisited weekly survive months, which is why PMs who deliberately track them progress 2x faster than those who don&apos;t.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 OKR categories and 5 rules for personal goal-setting.
           </p>
@@ -111,6 +131,8 @@ export default function PmPersonalOkrsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-personal-okrs" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Personal OKR Scenarios</h2>

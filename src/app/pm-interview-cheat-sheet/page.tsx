@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Cheat Sheet (2026) — One-Page Interview Prep Reference",
@@ -84,6 +87,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewCheatSheetPage() {
+  const dates = pageDates("/pm-interview-cheat-sheet");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -91,6 +95,17 @@ export default function PmInterviewCheatSheetPage() {
         { name: "PM Interview Cheat Sheet", url: `${SITE_URL}/pm-interview-cheat-sheet` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Cheat Sheet (2026 Edition)",
+        description:
+          "The one-page PM interview cheat sheet. Frameworks, openings, transitions, closings — everything you need to remember before walking in.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Cheat+Sheet+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-cheat-sheet`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -100,6 +115,15 @@ export default function PmInterviewCheatSheetPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Cheat Sheet<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            This cheat sheet compresses PM interview prep into one page: five openings for common
+            question types, five transitions that signal structure mid-answer, five closings that
+            land, eight frameworks to know cold — RICE, JTBD, AARRR, CIRCLES, STAR, HEART, MoSCoW,
+            and SBI — and six red flags to avoid, from vague metrics to claiming false certainty.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 openings, 5 transitions, 5 closings, 8 frameworks, and 6 red flags — everything on one page.
           </p>
@@ -187,6 +211,8 @@ export default function PmInterviewCheatSheetPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-cheat-sheet" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Make Daily Practice the Habit Before Interviews</h2>

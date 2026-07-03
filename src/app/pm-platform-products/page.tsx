@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Platform Products (2026) — Building Products Other Products Are Built On",
@@ -82,6 +85,7 @@ const FAQS = [
 ];
 
 export default function PmPlatformProductsPage() {
+  const dates = pageDates("/pm-platform-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -89,6 +93,17 @@ export default function PmPlatformProductsPage() {
         { name: "PM Platform Products", url: `${SITE_URL}/pm-platform-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Platform Products (2026 Edition)",
+        description:
+          "How PMs build platform products — APIs, SDKs, developer tools. Why platform PM is harder and what makes it rewarding.",
+        image: `${SITE_URL}/api/og?title=PM+Platform+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-platform-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -98,6 +113,12 @@ export default function PmPlatformProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Platform Products<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Building a platform product means treating developers as the primary user: documentation carries roughly half of adoption, API design functions as the user experience, and backwards compatibility becomes non-negotiable once other teams&apos; code depends on your endpoints. Platform PM trades weekly ship velocity for stability, with results taking 12–24 months to show up — why Stripe, Twilio, and Razorpay are studied as the benchmark.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 unique dynamics, 6 key metrics, 5 skills, 6 companies to study, and 5 common traps.
           </p>
@@ -186,6 +207,8 @@ export default function PmPlatformProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-platform-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Platform PM Skills Daily</h2>

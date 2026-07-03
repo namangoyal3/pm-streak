@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Edtech (2026) — Byju's, Unacademy, PhysicsWallah PM Guide",
@@ -58,6 +61,7 @@ const FAQS = [
 ];
 
 export default function PmEdtechPage() {
+  const dates = pageDates("/pm-edtech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -65,6 +69,17 @@ export default function PmEdtechPage() {
         { name: "PM Edtech", url: `${SITE_URL}/pm-edtech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Edtech (India Edition)",
+        description:
+          "How PMs build edtech products in India. Learning outcomes, engagement, parent-student dynamics, and why retention is the real battle.",
+        image: `${SITE_URL}/api/og?title=PM+Edtech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-edtech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -74,6 +89,12 @@ export default function PmEdtechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Edtech<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Three stakeholders complicate every edtech decision — the learner who uses the product, the parent who pays for it, and the teacher who delivers it — and with seasonality concentrating revenue into Jan–Mar and Jun–Aug while 90-day retention stays rare industry-wide, edtech PMs prioritise assessment improvement, completion rate, and renewal over raw engagement minutes.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics, 5 metrics, and 4 interview-style questions for edtech PMs.
           </p>
@@ -131,6 +152,8 @@ export default function PmEdtechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-edtech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Edtech PM Scenarios</h2>

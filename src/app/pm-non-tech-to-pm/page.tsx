@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Non-Tech to PM (2026) — Crossing Into Product From Outside Tech",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmNonTechToPmPage() {
+  const dates = pageDates("/pm-non-tech-to-pm");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,16 @@ export default function PmNonTechToPmPage() {
         { name: "PM Non-Tech to PM", url: `${SITE_URL}/pm-non-tech-to-pm` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Non-Tech to PM (2026 Edition)",
+        description: "How non-tech professionals (finance, ops, teachers, lawyers) break into PM. Storytelling, stepping stones, and why domain-specific PM roles are the cleanest entry.",
+        image: `${SITE_URL}/api/og?title=PM+Non-Tech+to+PM+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-non-tech-to-pm`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +79,12 @@ export default function PmNonTechToPmPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Non-Tech to PM<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Non-tech professionals cross into product management fastest through domain-specific roles — a doctor into healthtech, a teacher into edtech, a banker into fintech — rather than applying cold to generic tech PM jobs. Internal transfers, APM programs open to outsiders, founder-led shipping, and product-adjacent roles like Product Ops round out the paths in.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:text-[#58cc02]">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 paths in and 4 mistakes to avoid.
           </p>
@@ -110,6 +130,8 @@ export default function PmNonTechToPmPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-non-tech-to-pm" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Non-Tech PM Scenarios</h2>

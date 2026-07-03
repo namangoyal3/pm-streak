@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Observability Products (2026) — Datadog, Honeycomb, Grafana PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmObservabilityPage() {
+  const dates = pageDates("/pm-observability");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmObservabilityPage() {
         { name: "PM Observability", url: `${SITE_URL}/pm-observability` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Observability (2026 Edition)",
+        description:
+          "How PMs build observability products. Metrics, logs, traces, and why pricing is the hardest product decision in the category.",
+        image: `${SITE_URL}/api/og?title=PM+Observability+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-observability`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmObservabilityPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Observability<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Observability pricing is the hardest call in the category: ingest-based models built around cardinality and retention scale unpredictably with traffic, which is why Datadog&apos;s fast growth drew pushback while Honeycomb and Grafana now compete on pricing predictability instead. PMs manage this by watching monthly ingest volume, alert-to-investigation conversion, and custom dashboard adoption, while fighting alert noise and adapting to OpenTelemetry&apos;s growing pull away from proprietary agents.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2 transition-colors">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for observability PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmObservabilityPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-observability" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Observability Scenarios</h2>

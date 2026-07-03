@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Community Building (2026) — How PMs Grow Engaged User Communities",
@@ -47,6 +50,7 @@ const FAQS = [
 ];
 
 export default function PmCommunityBuildingPage() {
+  const dates = pageDates("/pm-community-building");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -54,6 +58,17 @@ export default function PmCommunityBuildingPage() {
         { name: "PM Community Building", url: `${SITE_URL}/pm-community-building` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Community Building (2026 Edition)",
+        description:
+          "How PMs build communities that drive retention, advocacy, and product insight. Channels, rituals, and the metrics that matter.",
+        image: `${SITE_URL}/api/og?title=PM+Community+Building+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-community-building`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -63,6 +78,12 @@ export default function PmCommunityBuildingPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Community Building<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM community building treats a user community as a product in its own right — built on rituals like weekly AMAs, investment in the top power users, and moderation as core infrastructure hosted wherever users already gather — and judged by community DAU/MAU, weekly post/reply rates, sub-hour response times, and whether top contributors and their NPS actually stick around.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 principles and 5 metrics that separate real communities from dead Discord servers.
           </p>
@@ -108,6 +129,8 @@ export default function PmCommunityBuildingPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-community-building" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Community PM Scenarios</h2>

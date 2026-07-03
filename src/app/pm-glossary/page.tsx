@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Glossary (2026) — 50+ Product Management Terms Explained",
@@ -130,12 +133,24 @@ const FAQS = [
 ];
 
 export default function PmGlossaryPage() {
+  const dates = pageDates("/pm-glossary");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Glossary", url: `${SITE_URL}/pm-glossary` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "PM Glossary (2026) — 50+ Product Management Terms Explained",
+        description:
+          "The complete PM glossary. 50+ product management terms every PM should know — organised by category, defined clearly, with examples.",
+        image: `${SITE_URL}/api/og?title=PM+Glossary+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-glossary`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -146,6 +161,15 @@ export default function PmGlossaryPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Glossary<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Here, 50-plus product management terms are grouped into seven categories —
+            metrics and analytics, frameworks and methodologies, experimentation, product
+            strategy, execution, user research, and SaaS/B2B — each defined with a short
+            example, meant to be skimmed for gaps rather than memorised outright.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             50+ product management terms across metrics, frameworks, experimentation,
             strategy, execution, research, and SaaS — clearly defined with context.
@@ -188,6 +212,8 @@ export default function PmGlossaryPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-glossary" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Use These Terms in Real Scenarios</h2>

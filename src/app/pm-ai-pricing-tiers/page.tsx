@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM AI Pricing Tiers (2026) — Designing Plans for AI Products",
@@ -41,6 +44,7 @@ const FAQS = [
 ];
 
 export default function PmAiPricingTiersPage() {
+  const dates = pageDates("/pm-ai-pricing-tiers");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -48,6 +52,17 @@ export default function PmAiPricingTiersPage() {
         { name: "PM AI Pricing Tiers", url: `${SITE_URL}/pm-ai-pricing-tiers` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Pricing Tiers (2026 Edition)",
+        description:
+          "How PMs design tiers for AI products. Free, Pro, Team, Enterprise — and what each tier should include for AI-first products.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Pricing+Tiers+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-pricing-tiers`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -57,6 +72,12 @@ export default function PmAiPricingTiersPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Pricing Tiers<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Most AI products settle into four tiers — a limited free plan for acquisition, a roughly $20/month Pro plan carrying the latest model and higher limits, a per-seat Team plan with admin controls, and an Enterprise plan with SSO and custom contracts — because ChatGPT Plus anchored the market at $20/month, a price domain-specific AI can exceed when each query is worth more.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 tiers and what to put in each.
           </p>
@@ -88,6 +109,8 @@ export default function PmAiPricingTiersPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-pricing-tiers" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI Tier Scenarios</h2>

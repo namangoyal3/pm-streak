@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "First 90 Days as a PM (2026) — How to Start Strong in a New PM Role",
@@ -100,6 +103,7 @@ const FAQS = [
 ];
 
 export default function PmFirst90DaysPage() {
+  const dates = pageDates("/pm-first-90-days");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -107,6 +111,16 @@ export default function PmFirst90DaysPage() {
         { name: "First 90 Days as a PM", url: `${SITE_URL}/pm-first-90-days` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "First 90 Days as a PM (2026)",
+        description: "The first 90 days determine your trajectory at a new PM job. The week-by-week playbook for building context, earning trust, and shipping your first real win.",
+        image: `${SITE_URL}/api/og?title=First+90+Days+as+a+PM+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-first-90-days`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -116,6 +130,16 @@ export default function PmFirst90DaysPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             First 90 Days as a PM<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Succeeding in the first 90 days as a PM means moving through four phases in order —
+            listening in weeks 1–2, learning the product and users in weeks 3–4, developing and
+            sharing a point of view in weeks 5–8, then shipping one meaningful, metric-moving win
+            in weeks 9–12. Skipping ahead to propose changes before earning context is the single
+            most common failure mode.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The week-by-week playbook for your first 90 days in a new PM role —
             listen, learn, align, ship. Get your first real win without stumbling.
@@ -177,6 +201,8 @@ export default function PmFirst90DaysPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-first-90-days" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Stay Sharp Before Your First Day</h2>

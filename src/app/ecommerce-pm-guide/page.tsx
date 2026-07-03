@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "E-commerce Product Manager Guide (2026) — How to Excel as an E-commerce PM",
@@ -94,6 +97,7 @@ const FAQS = [
 ];
 
 export default function EcommercePmGuidePage() {
+  const dates = pageDates("/ecommerce-pm-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -101,6 +105,17 @@ export default function EcommercePmGuidePage() {
         { name: "E-commerce PM Guide", url: `${SITE_URL}/ecommerce-pm-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "E-commerce Product Manager Guide (2026 Edition)",
+        description:
+          "The complete e-commerce PM guide. Unit economics, category PM vs platform PM, the buyer-seller-ops triangle, and how to break into e-commerce PM at Flipkart, Amazon, and Meesho.",
+        image: `${SITE_URL}/api/og?title=E-commerce+PM+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/ecommerce-pm-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -110,6 +125,12 @@ export default function EcommercePmGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             E-commerce PM Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            E-commerce PM work spans five role types — category, buyer experience, seller platform, logistics, and growth — measured against GMV, take rate, contribution margin, return rate, repeat purchase rate, and two-sided NPS, with the job&apos;s hardest tensions being return economics, balancing buyer and seller costs, discovery versus conversion, and designing for sale-peak traffic that can spike 10–50x average load.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 6 e-commerce metrics every PM must know, 5 types of e-commerce PM roles,
             the hardest challenges, and the career paths at India&apos;s top e-commerce companies.
@@ -173,6 +194,8 @@ export default function EcommercePmGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="ecommerce-pm-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build E-commerce PM Intuition Daily</h2>

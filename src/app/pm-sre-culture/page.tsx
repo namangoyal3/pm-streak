@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM SRE Culture (2026) — Error Budgets, SLOs, and PM Responsibility for Reliability",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmSreCulturePage() {
+  const dates = pageDates("/pm-sre-culture");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmSreCulturePage() {
         { name: "PM SRE Culture", url: `${SITE_URL}/pm-sre-culture` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM SRE Culture (2026 Edition)",
+        description: "How PMs work with SRE teams. Error budgets, SLOs, postmortems, and why PMs own the tradeoff between velocity and reliability.",
+        image: `${SITE_URL}/api/og?title=PM+SRE+Culture+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-sre-culture`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmSreCulturePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM SRE Culture<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM SRE culture rests on five concepts — SLOs, error budgets, SLIs, blameless postmortems, and chaos engineering — paired with five PM responsibilities: negotiating SLOs, deciding whether error budget funds features or reliability, prioritising reliability work, driving postmortem action items to completion, and communicating tradeoffs to stakeholders. The SLO conversation is, underneath it, a product prioritisation conversation in disguise.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 SRE concepts and 5 PM responsibilities in reliability culture.
           </p>
@@ -112,6 +132,8 @@ export default function PmSreCulturePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-sre-culture" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice SRE PM Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Daily Practice Guide (2026) — The 15-Minute Habit That Builds Product Mastery",
@@ -99,6 +102,7 @@ const FAQS = [
 ];
 
 export default function PmDailyPracticePage() {
+  const dates = pageDates("/pm-daily-practice");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -106,6 +110,17 @@ export default function PmDailyPracticePage() {
         { name: "PM Daily Practice", url: `${SITE_URL}/pm-daily-practice` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Daily Practice Guide (2026 Edition)",
+        description:
+          "The science of PM daily practice. What 15 minutes a day actually builds, what to practice, how to track progress, and why streaks beat cramming for interviews.",
+        image: `${SITE_URL}/api/og?title=PM+Daily+Practice+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-daily-practice`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -115,6 +130,12 @@ export default function PmDailyPracticePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Daily Practice Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Fifteen minutes of daily PM practice — split across product sense, metrics, strategy, behavioural stories, and technical fluency — builds the pattern recognition a single cramming weekend can&apos;t, because active recall beats passive reading and reps (not just understanding) are what make skills stick under interview pressure; tracking attempts, self-scored quality, and streak length keeps the habit honest.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Why daily practice beats cramming for PM interviews and mastery,
             what to practice across product sense, metrics, strategy, and how to track progress.
@@ -179,6 +200,8 @@ export default function PmDailyPracticePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-daily-practice" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build the Daily PM Habit</h2>

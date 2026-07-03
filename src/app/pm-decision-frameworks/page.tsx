@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Decision Frameworks (2026) — How Good PMs Decide Under Uncertainty",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmDecisionFrameworksPage() {
+  const dates = pageDates("/pm-decision-frameworks");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,17 @@ export default function PmDecisionFrameworksPage() {
         { name: "PM Decision Frameworks", url: `${SITE_URL}/pm-decision-frameworks` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Decision Frameworks (2026 Edition)",
+        description:
+          "Decision frameworks PMs actually use. RICE, WSJF, ICE, two-way vs one-way doors, and when to skip frameworks entirely.",
+        image: `${SITE_URL}/api/og?title=PM+Decision+Frameworks+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-decision-frameworks`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +81,12 @@ export default function PmDecisionFrameworksPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Decision Frameworks<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Good PMs under uncertainty lean on five frameworks — RICE, ICE, WSJF, Kano, and the two-way-versus-one-way-door distinction — to organise thinking rather than replace it, then stress-test big calls by running the same decision through two frameworks at once and naming irreversible, one-way-door decisions explicitly. Reversible, low-stakes decisions are usually better made fast, without paying the framework tax at all.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 frameworks and 4 rules for PMs making decisions under uncertainty.
           </p>
@@ -111,6 +132,8 @@ export default function PmDecisionFrameworksPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-decision-frameworks" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Decision Scenarios</h2>

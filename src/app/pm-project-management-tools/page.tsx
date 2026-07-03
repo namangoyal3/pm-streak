@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Project Management Tools (2026) — Jira, Linear, Asana PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmProjectManagementToolsPage() {
+  const dates = pageDates("/pm-project-management-tools");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmProjectManagementToolsPage() {
         { name: "PM Project Management Tools", url: `${SITE_URL}/pm-project-management-tools` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Project Management Tools (2026 Edition)",
+        description: "How PMs build project management tools. Views, workflows, notifications, and why adoption follows the path of least resistance.",
+        image: `${SITE_URL}/api/og?title=PM+Project+Management+Tools+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-project-management-tools`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmProjectManagementToolsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Project Management Tools<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Project management tools split along a flexibility-versus-opinion axis — Jira lets teams configure almost anything while Linear makes the decisions for them — and which one wins depends less on features than on notification defaults, view design across lists, boards, and timelines, and how many workflows a team actually automates rather than how many fields a tool exposes.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for project management tool PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmProjectManagementToolsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-project-management-tools" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Project Management Tool Scenarios</h2>

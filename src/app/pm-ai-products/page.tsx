@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM AI Products (2026) — How to Ship AI Features That Users Trust",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmAiProductsPage() {
+  const dates = pageDates("/pm-ai-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmAiProductsPage() {
         { name: "PM AI Products", url: `${SITE_URL}/pm-ai-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Products (2026 Edition)",
+        description:
+          "How PMs build AI products that earn trust. Prompt design, evaluation, hallucination management, and the ethics of shipping AI features to real users.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,17 @@ export default function PmAiProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Products<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Shipping AI products that users trust comes down to six building blocks — prompt
+            design, model evaluation, fallback UX, hallucination management, latency and cost
+            trade-offs, and visible trust signals — layered on top of an evaluation pipeline
+            (golden datasets, LLM-as-judge, human eval, feedback loops, regression tests); skip
+            the evals and even a demo that works on five inputs breaks the moment real users hit
+            the long tail.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 AI product building blocks, 5 common mistakes, 6 trust signals, and 5 evaluation approaches.
           </p>
@@ -165,6 +191,8 @@ export default function PmAiProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build AI PM Skills Daily</h2>

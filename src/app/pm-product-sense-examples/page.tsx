@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Product Sense Examples (2026) — 10 Questions With Sample Answers",
@@ -93,6 +96,7 @@ const FAQS = [
 ];
 
 export default function PmProductSenseExamplesPage() {
+  const dates = pageDates("/pm-product-sense-examples");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -100,6 +104,17 @@ export default function PmProductSenseExamplesPage() {
         { name: "PM Product Sense Examples", url: `${SITE_URL}/pm-product-sense-examples` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Product Sense Examples (2026 Edition)",
+        description:
+          "10 product sense interview questions with full sample answers. See how great PMs structure their thinking — users, problems, solutions, metrics — in real time.",
+        image: `${SITE_URL}/api/og?title=PM+Product+Sense+Examples+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-product-sense-examples`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -109,6 +124,15 @@ export default function PmProductSenseExamplesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Product Sense Examples<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Ten worked product-sense questions on this page — covering WhatsApp, Zomato, gig-worker finance,
+            Razorpay onboarding, Instagram Reels, and more — each shows a full sample answer moving from
+            clarifying the user through pain point, solution, and a concrete success metric, modelling the
+            structure candidates should internalise rather than memorise word for word.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline font-semibold">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             10 real product sense questions with sample answers. See the structure,
             the user-first thinking, and the specific metrics that separate strong answers from generic ones.
@@ -144,6 +168,8 @@ export default function PmProductSenseExamplesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-product-sense-examples" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Turn Examples Into Instinct</h2>

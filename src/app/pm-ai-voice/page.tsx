@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM AI Voice Products (2026) — ElevenLabs, Sarvam, Voice Agents PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmAiVoicePage() {
+  const dates = pageDates("/pm-ai-voice");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmAiVoicePage() {
         { name: "PM AI Voice", url: `${SITE_URL}/pm-ai-voice` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Voice Products (2026 Edition)",
+        description:
+          "How PMs build AI voice products. TTS, voice cloning, real-time agents, and why voice is the fastest-moving AI category.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Voice+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-voice`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmAiVoicePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Voice Products<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Five hundred milliseconds is the latency ceiling AI voice agents can&apos;t cross without feeling broken, so PMs measure median turn latency and call completion rate alongside intelligibility scores and opt-in rates for voice cloning, which needs consent controls to avoid legal risk; foundation model players like ElevenLabs and Sarvam already dominate TTS while application-layer agents stay fragmented across support, sales, and healthcare triage until 2026–2027 consolidation.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for AI voice product PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmAiVoicePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-voice" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI Voice PM Scenarios</h2>

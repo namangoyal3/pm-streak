@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Pricing Strategy (2026) — How PMs Set and Change Prices",
@@ -63,6 +66,7 @@ const FAQS = [
 ];
 
 export default function PmPricingStrategyPage() {
+  const dates = pageDates("/pm-pricing-strategy");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -70,6 +74,17 @@ export default function PmPricingStrategyPage() {
         { name: "PM Pricing Strategy", url: `${SITE_URL}/pm-pricing-strategy` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Pricing Strategy (2026 Edition)",
+        description:
+          "How PMs approach pricing — value-based, usage-based, tiered, freemium. Frameworks, willingness-to-pay research, and how to run pricing experiments.",
+        image: `${SITE_URL}/api/og?title=PM+Pricing+Strategy+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-pricing-strategy`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -79,6 +94,16 @@ export default function PmPricingStrategyPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Pricing Strategy<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A PM raises prices only when the product has measurably improved, win rates against competitors
+            are high, and churn stays low — applying the increase to new customers first while
+            grandfathering existing ones for six to twelve months — and gets there using frameworks like
+            Van Westendorp, Gabor-Granger, and value-based anchoring rather than the cost-plus pricing and
+            hidden &apos;contact sales&apos; pages that erode trust.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 pricing models, 5 research frameworks, and 5 traps to avoid.
           </p>
@@ -136,6 +161,8 @@ export default function PmPricingStrategyPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-pricing-strategy" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Pricing PM Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Portfolio Guide (2026) — How to Build a Product Portfolio That Gets Interviews",
@@ -96,6 +99,7 @@ const FAQS = [
 ];
 
 export default function PmPortfolioGuidePage() {
+  const dates = pageDates("/pm-portfolio-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -103,6 +107,17 @@ export default function PmPortfolioGuidePage() {
         { name: "PM Portfolio Guide", url: `${SITE_URL}/pm-portfolio-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Portfolio Guide (2026 Edition)",
+        description:
+          "Build a PM portfolio that gets interviews — even if you don't have a PM title. Case studies, teardowns, side projects, PRDs, and real examples that hiring managers love.",
+        image: `${SITE_URL}/api/og?title=PM+Portfolio+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-portfolio-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -112,6 +127,16 @@ export default function PmPortfolioGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Portfolio Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A PM portfolio built from this guide has six possible artefacts — a product teardown,
+            a hypothetical case study, a mock PRD, a metric drop investigation, a user research
+            brief, and a side project with PM artefacts attached — ranked here by effort (3 to
+            20+ hours) and impact, plus four hosting options from a personal website to Notion,
+            so quality beats quantity: 3–4 strong pieces outperform ten mediocre ones.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 6 artefact types that get hiring manager attention, templates for each,
             where to host your portfolio, and real examples from hired PMs.
@@ -180,6 +205,8 @@ export default function PmPortfolioGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-portfolio-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build the Thinking That Goes Into Great Portfolios</h2>

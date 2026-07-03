@@ -1,7 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Deep Work for Product Managers (2026) — Focus Strategies That Ship More",
@@ -145,6 +148,7 @@ const FAQS = [
 ];
 
 export default function PMDeepWorkPage() {
+  const dates = pageDates("/pm-deep-work");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -153,6 +157,16 @@ export default function PMDeepWorkPage() {
         { name: "Deep Work for PMs", url: `${SITE_URL}/pm-deep-work` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Deep Work for Product Managers (2026) — Focus Strategies That Ship More",
+        description: "How PMs can practice deep work in noisy environments. Block focus time, reduce context switching, protect your highest-leverage hours, and ship more with Cal Newport's framework adapted for product management.",
+        image: `${SITE_URL}/api/og?title=Deep+Work+for+Product+Managers+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-deep-work`,
+      })} />
       <main className="max-w-3xl mx-auto px-4 py-8">
         <header className="mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
@@ -165,6 +179,12 @@ export default function PMDeepWorkPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Deep Work for Product Managers (2026) — Focus Strategies That Ship More
           </h1>
+          <p className="text-lg text-gray-700 leading-relaxed mb-2">
+            Deep work for PMs means deliberately protecting blocks of uninterrupted time despite a job built around constant coordination — a single Slack interruption costs roughly 23 minutes of refocusing, and PMs average 3.5 hours of interruptions a day. The fix is structural: 90-minute focus blocks, theme days that batch similar work, a protected morning shield, and fixed communication check-ins instead of always-on availability.
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            By <a href={AUTHOR_URL} className="text-primary hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-gray-600 leading-relaxed">
             PMs are among the most context-switched workers in tech. Between stakeholder calls, Slack pings, roadmap updates, and sprint ceremonies, most product managers report being unable to complete a single uninterrupted thought during the workday. This guide applies Cal Newport's deep work framework specifically to the PM role — with strategies that actually fit a meeting-heavy schedule.
           </p>
@@ -269,6 +289,8 @@ export default function PMDeepWorkPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-deep-work" />
 
         <section className="mb-10 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-3">

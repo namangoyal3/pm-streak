@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Global SaaS from India (2026) — Zoho, Freshworks, Postman PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmGlobalSaasFromIndiaPage() {
+  const dates = pageDates("/pm-global-saas-from-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmGlobalSaasFromIndiaPage() {
         { name: "PM Global SaaS from India", url: `${SITE_URL}/pm-global-saas-from-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Global SaaS from India (2026 Edition)",
+        description:
+          "How Indian SaaS PMs build for global customers. Timezones, buyer empathy, sales motion, and what Zoho, Freshworks, and Postman teach about selling to the West from Bangalore or Chennai.",
+        image: `${SITE_URL}/api/og?title=PM+Global+SaaS+from+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-global-saas-from-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmGlobalSaasFromIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Global SaaS from India<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Zoho, Freshworks, Postman, Chargebee, and BrowserStack prove Indian PMs can build world-class global SaaS, but it requires closing a real buyer-empathy gap, absorbing a timezone tax of late-night calls, and pricing in USD while earning in INR. The fix: embed onsite in target markets, hire domain-native sales and CS early, benchmark against local competitors instead of Indian ones, and design for async since trust takes years to build.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 realities and 5 strategies for Indian PMs building global products.
           </p>
@@ -112,6 +133,8 @@ export default function PmGlobalSaasFromIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-global-saas-from-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Global SaaS PM Scenarios</h2>

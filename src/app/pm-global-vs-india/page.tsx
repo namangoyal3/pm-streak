@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Global vs India PM Roles (2026) — Which Should You Target?",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmGlobalVsIndiaPage() {
+  const dates = pageDates("/pm-global-vs-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,16 @@ export default function PmGlobalVsIndiaPage() {
         { name: "Global vs India PM", url: `${SITE_URL}/pm-global-vs-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Global vs India PM Roles (2026 Edition)",
+        description: "The real differences between global (US/EU) and India-based PM roles. Compensation, scope, career trajectory, and how to decide which path fits you.",
+        image: `${SITE_URL}/api/og?title=Global+vs+India+PM+Roles+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-global-vs-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,9 +104,15 @@ export default function PmGlobalVsIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Global vs India PM Roles<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            7-dimension comparison, when to choose each, 5 hybrid paths,
-            and honest trade-offs on compensation, scope, and trajectory.
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Global PM roles pay roughly 2–4x India roles at senior level ($180K–$500K+ versus
+            ₹50L–2Cr) but come with narrower scope, slower promotion cycles (3–5 years to senior
+            versus 2–3 in India), and more process. Neither wins outright — five hybrid paths
+            exist, from remote US roles worked from India to Indian companies with global
+            ambitions, letting PMs blend both trade-offs.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Prep for Both Paths Daily — Free →
@@ -178,6 +198,8 @@ export default function PmGlobalVsIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-global-vs-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Skills That Work Anywhere</h2>

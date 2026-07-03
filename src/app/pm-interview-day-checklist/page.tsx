@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Day Checklist (2026) — What to Do the 24 Hours Before &amp; Day Of",
@@ -85,6 +88,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewDayChecklistPage() {
+  const dates = pageDates("/pm-interview-day-checklist");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -92,6 +96,17 @@ export default function PmInterviewDayChecklistPage() {
         { name: "PM Interview Day Checklist", url: `${SITE_URL}/pm-interview-day-checklist` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Day Checklist (2026 Edition)",
+        description:
+          "The PM interview day checklist. What to prep 24 hours before, what to eat, what to wear, timing, and how to walk in calm and confident.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Day+Checklist+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-day-checklist`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -101,6 +116,16 @@ export default function PmInterviewDayChecklistPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Day Checklist<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Interview-day prep breaks into four windows — the day before (story review, video-and-clothes
+            checks, sleep), the morning of (real breakfast, a short walk, one final light review), during
+            the interview itself (breathing, pacing, note-taking), and immediately after (writing down every
+            question while it&apos;s fresh) — because physical state and timing matter as much as what you
+            already know.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline font-semibold">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What to do the day before, morning of, during, and after —
             so you walk in calm, prepared, and yourself.
@@ -190,6 +215,8 @@ export default function PmInterviewDayChecklistPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-day-checklist" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Walk in Calm &mdash; Because You&apos;re Ready</h2>

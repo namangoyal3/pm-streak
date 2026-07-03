@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Jobs Platforms (2026) — LinkedIn, Naukri, Apna, Wellfound PM Guide",
@@ -43,6 +46,7 @@ const FAQS = [
 ];
 
 export default function PmJobsPlatformsPage() {
+  const dates = pageDates("/pm-jobs-platforms");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -50,6 +54,16 @@ export default function PmJobsPlatformsPage() {
         { name: "PM Jobs Platforms", url: `${SITE_URL}/pm-jobs-platforms` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Jobs Platforms (India Edition)",
+        description: "How PMs build jobs and hiring products. Candidate quality, match rate, Tier-2/3 market, and why Apna rewrote the blue-collar playbook.",
+        image: `${SITE_URL}/api/og?title=PM+Jobs+Platforms+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-jobs-platforms`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -59,6 +73,12 @@ export default function PmJobsPlatformsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Jobs Platforms<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Jobs platforms are two-sided marketplaces where candidates and employers need fundamentally different products, and the PM&apos;s real job is protecting match quality — apply-to-interview and interview-to-hire conversion — rather than chasing raw listing volume, since spam listings and fake profiles erode trust faster than any growth tactic can rebuild it.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for jobs platform PMs.
           </p>
@@ -104,6 +124,8 @@ export default function PmJobsPlatformsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-jobs-platforms" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Jobs Platform Scenarios</h2>

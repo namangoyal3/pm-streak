@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Empathy Interviews (2026) — How to Run User Interviews That Actually Produce Insight",
@@ -78,6 +81,7 @@ const FAQS = [
 ];
 
 export default function PmEmpathyInterviewsPage() {
+  const dates = pageDates("/pm-empathy-interviews");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -85,6 +89,16 @@ export default function PmEmpathyInterviewsPage() {
         { name: "PM Empathy Interviews", url: `${SITE_URL}/pm-empathy-interviews` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Empathy Interviews Guide (2026 Edition)",
+        description: "The PM guide to empathy interviews. Good vs bad questions, 5-user rule, how to read between the lines, and how to turn interview data into product decisions.",
+        image: `${SITE_URL}/api/og?title=PM+Empathy+Interviews+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-empathy-interviews`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -94,6 +108,17 @@ export default function PmEmpathyInterviewsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Empathy Interviews Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-2">
+            A PM empathy interview is a structured conversation, built on open, story-eliciting
+            questions like walk me through the last time you did this, that surfaces real pain
+            points and workarounds instead of polite opinions. Following the 5-user rule catches
+            85% of usability issues, and a 6-step synthesis process, from transcribing within 24
+            hours to sharing themes with the team, turns those conversations into product
+            decisions rather than notes nobody reads.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 good questions, 5 bad questions to avoid, the 5-user rule explained,
             and a 6-step synthesis process to turn interviews into product decisions.
@@ -170,6 +195,8 @@ export default function PmEmpathyInterviewsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-empathy-interviews" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build User Empathy Daily</h2>

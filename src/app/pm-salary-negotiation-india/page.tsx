@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Salary Negotiation India (2026) — Getting Paid Fairly as a PM",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmSalaryNegotiationIndiaPage() {
+  const dates = pageDates("/pm-salary-negotiation-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmSalaryNegotiationIndiaPage() {
         { name: "PM Salary Negotiation India", url: `${SITE_URL}/pm-salary-negotiation-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Salary Negotiation (India Edition)",
+        description: "How PMs in India negotiate offers. Base, ESOPs, joining bonus, and the levers most candidates leave on the table.",
+        image: `${SITE_URL}/api/og?title=PM+Salary+Negotiation+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-salary-negotiation-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,16 @@ export default function PmSalaryNegotiationIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Salary Negotiation<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Most Indian tech companies leave 10–25% of headroom above their initial PM offer, more for
+            senior or in-demand roles, and rarely penalise candidates who ask. Negotiate beyond base
+            salary — ESOPs, joining bonus, relocation allowance, and review-cycle timing are all levers —
+            while using competing offers, a Friday negotiating window, written confirmations, and a clear
+            walk-away number to hold your ground.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 negotiation levers and 5 tactics for Indian PMs.
           </p>
@@ -112,6 +136,8 @@ export default function PmSalaryNegotiationIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-salary-negotiation-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Negotiation Scenarios</h2>

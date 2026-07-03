@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Product Launch Guide for PMs (2026) — How to Launch Without Drama",
@@ -115,12 +118,23 @@ const FAQS = [
 ];
 
 export default function ProductLaunchGuidePage() {
+  const dates = pageDates("/product-launch-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "Product Launch Guide", url: `${SITE_URL}/product-launch-guide` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "Product Launch Guide (PM Edition 2026)",
+        description: "The complete PM product launch playbook. Pre-launch checklist, staged rollouts, launch day ops, post-launch monitoring, and the 10 launch failure modes to avoid.",
+        image: `${SITE_URL}/api/og?title=Product+Launch+Guide+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-launch-guide`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -131,6 +145,16 @@ export default function ProductLaunchGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Launch Guide<br />(PM Edition 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A PM product launch runs through five phases — pre-launch readiness, staging, a phased
+            rollout day, one week of stabilisation, and a post-mortem four weeks out — with a feature
+            flag moving from 1% to 10% to 50% to 100% only as error rates and guardrail metrics stay
+            healthy. Skipping any phase is how launches fall into the ten failure modes below, from
+            missing rollback plans to shipping straight to 100%.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 5 phases of a safe product launch, checklists for each,
             and the 10 launch failure modes that haunt unprepared PMs.
@@ -194,6 +218,8 @@ export default function ProductLaunchGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-launch-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Launch Intuition Daily</h2>

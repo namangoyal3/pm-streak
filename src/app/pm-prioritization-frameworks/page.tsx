@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Prioritization Frameworks (2026) — RICE, MoSCoW, Kano & More",
@@ -105,12 +108,24 @@ const FAQS = [
 ];
 
 export default function PmPrioritizationFrameworksPage() {
+  const dates = pageDates("/pm-prioritization-frameworks");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Prioritization Frameworks", url: `${SITE_URL}/pm-prioritization-frameworks` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "PM Prioritization Frameworks (2026) — RICE, MoSCoW, Kano & More",
+        description:
+          "The 8 prioritization frameworks every PM should know. RICE, MoSCoW, Kano, Impact-Effort, Cost of Delay, and when to use each.",
+        image: `${SITE_URL}/api/og?title=PM+Prioritization+Frameworks+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-prioritization-frameworks`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -121,6 +136,15 @@ export default function PmPrioritizationFrameworksPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Prioritization Frameworks<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Which prioritization framework should a PM use? This page compares eight —
+            RICE, MoSCoW, Impact-Effort Matrix, Kano, Cost of Delay, Opportunity Scoring,
+            ICE, and Value vs Complexity — alongside their formulas, best-fit contexts,
+            and limitations, so the choice depends on the situation rather than a single default.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             8 prioritization frameworks every PM should know — formula, best use,
             limitations, and when to pick each in real work.
@@ -178,6 +202,8 @@ export default function PmPrioritizationFrameworksPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-prioritization-frameworks" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Prioritisation Intuition Daily</h2>

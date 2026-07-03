@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Beauty Tech (2026) — Nykaa, Purplle, Tira PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmBeautyTechPage() {
+  const dates = pageDates("/pm-beauty-tech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmBeautyTechPage() {
         { name: "PM Beauty Tech", url: `${SITE_URL}/pm-beauty-tech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Beauty Tech (India Edition)",
+        description: "How PMs build beauty tech products. Content-led commerce, AR try-ons, influencer ecosystems, and why beauty blends media and marketplace.",
+        image: `${SITE_URL}/api/og?title=PM+Beauty+Tech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-beauty-tech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmBeautyTechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Beauty Tech<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Beauty tech blends media and marketplace: Nykaa built its lead in India through content moats like reviews and tutorials, early own-label expansion, and offline-online hybrid distribution, which is why Purplle, Tira, and Myntra Beauty hold respectable share but haven&apos;t broken out. The product bar includes AR try-on for makeup and an influencer ecosystem that drives more discovery than search.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for beauty tech PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmBeautyTechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-beauty-tech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Beauty PM Scenarios</h2>

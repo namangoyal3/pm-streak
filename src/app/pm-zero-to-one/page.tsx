@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Zero-to-One (2026) — How PMs Launch New Products From Scratch",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmZeroToOnePage() {
+  const dates = pageDates("/pm-zero-to-one");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,16 @@ export default function PmZeroToOnePage() {
         { name: "PM Zero-to-One", url: `${SITE_URL}/pm-zero-to-one` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Zero-to-One (2026 Edition)",
+        description: "How PMs launch 0→1 products. The skills that matter, the traps to avoid, and the mindset shift from growing existing products to creating new ones.",
+        image: `${SITE_URL}/api/og?title=PM+Zero-to-One+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-zero-to-one`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +103,17 @@ export default function PmZeroToOnePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Zero-to-One<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Zero-to-one product work replaces data-driven optimization with hypothesis-driven bets,
+            since there&apos;s no existing baseline and not enough data for statistical rigor —
+            success depends on deep user research, rapid prototyping, and a comfort with killing
+            most ideas, since most 0→1 ideas fail. The biggest trap is building before validating;
+            conversations, not code, are what actually de-risk a new product before engineering
+            time is spent.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 mindset shifts, 5 skills that matter, 6 traps to avoid, and 5 phases from validation to PMF.
           </p>
@@ -164,6 +189,8 @@ export default function PmZeroToOnePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-zero-to-one" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build 0→1 PM Skills Daily</h2>

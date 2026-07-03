@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Uber & Ola PM Interview Guide (2026) — Mobility Product Manager Questions",
@@ -99,6 +102,7 @@ const FAQS = [
 ];
 
 export default function UberOlaPmInterviewPage() {
+  const dates = pageDates("/uber-ola-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -106,6 +110,17 @@ export default function UberOlaPmInterviewPage() {
         { name: "Uber & Ola PM Interview", url: `${SITE_URL}/uber-ola-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Uber & Ola PM Interview Guide (2026 Edition)",
+        description:
+          "Crack PM interviews at Uber and Ola. Marketplace dynamics, pricing, supply-demand balancing, and the operations-heavy product thinking mobility companies test for.",
+        image: `${SITE_URL}/api/og?title=Uber+&+Ola+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/uber-ola-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -115,6 +130,15 @@ export default function UberOlaPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Uber &amp; Ola PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Uber and Ola interviews are built around four question themes rather than fixed rounds:
+            marketplace and pricing trade-offs, driver-supply product decisions, rider experience and trust,
+            and operations at city scale. Because riders, drivers, and the platform form a three-sided
+            marketplace, answers that improve one side while harming another — such as a rider win that cuts driver earnings — get marked down immediately.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The marketplace, pricing, and operations questions that define mobility PM interviews —
             plus everything you need to know about the India ride-hailing context.
@@ -174,6 +198,8 @@ export default function UberOlaPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="uber-ola-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Marketplace PM Scenarios Daily</h2>

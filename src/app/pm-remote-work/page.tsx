@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Remote PM Jobs Guide (2026) — How to Find & Excel as a Remote Product Manager",
@@ -88,6 +91,7 @@ const FAQS = [
 ];
 
 export default function PmRemoteWorkPage() {
+  const dates = pageDates("/pm-remote-work");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -95,6 +99,17 @@ export default function PmRemoteWorkPage() {
         { name: "Remote PM Jobs", url: `${SITE_URL}/pm-remote-work` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Remote PM Jobs Guide (India Edition 2026)",
+        description:
+          "The complete remote PM guide. Where to find remote PM jobs from India, how to interview for global roles, async communication skills, and remote PM compensation benchmarks.",
+        image: `${SITE_URL}/api/og?title=Remote+PM+Jobs+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-remote-work`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -104,6 +119,12 @@ export default function PmRemoteWorkPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Remote PM Jobs Guide<br />(India Edition 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Remote PM roles from India are realistic, especially at mid and senior levels, and can be found through remote-specific boards like Remote OK and Himalayas, LinkedIn&apos;s global remote filter, Wellfound, and YC&apos;s Work at a Startup — success then depends on five skills (written communication, timezone-aware scheduling, clear PRDs, proactive updates, async video) plus accepting that most mid-size US startups still pay only 50–70% of US comp for India-based hires.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Where to find remote PM roles from India, the 5 skills that separate great remote PMs from average ones,
             compensation benchmarks, and how to interview for global roles.
@@ -169,6 +190,8 @@ export default function PmRemoteWorkPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-remote-work" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Interview for Remote PM Roles Daily</h2>

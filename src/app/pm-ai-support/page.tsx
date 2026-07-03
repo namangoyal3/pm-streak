@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM AI Customer Support (2026) — Decagon, Ada, Fin AI PM Lessons",
@@ -51,12 +54,23 @@ const FAQS = [
 ];
 
 export default function PmAiSupportPage() {
+  const dates = pageDates("/pm-ai-support");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM AI Customer Support", url: `${SITE_URL}/pm-ai-support` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Customer Support (2026 Edition)",
+        description: "How PMs build AI customer support. Deflection, knowledge base quality, human handoff, and the evolution from chatbots to true support agents.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Customer+Support+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-support`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -67,6 +81,12 @@ export default function PmAiSupportPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Customer Support<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Sixty percent-plus deflection is now the benchmark enterprise buyers expect from AI support tools such as Decagon, Ada, and Fin — a bar only reachable when the underlying knowledge base is genuinely good, since a bot is only as useful as what it can retrieve. PMs in this category watch deflection rate, CSAT on AI-handled tickets, and how cleanly unresolved queries hand off to a human.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for AI customer support PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmAiSupportPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-support" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI Support PM Scenarios</h2>

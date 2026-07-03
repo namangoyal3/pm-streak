@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Experiment Design Guide (2026) — A/B Testing for Product Managers",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function PmExperimentDesignPage() {
+  const dates = pageDates("/pm-experiment-design");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,16 @@ export default function PmExperimentDesignPage() {
         { name: "PM Experiment Design", url: `${SITE_URL}/pm-experiment-design` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Experiment Design Guide (2026 Edition)",
+        description: "How PMs design A/B tests that actually produce signal. Hypothesis writing, sample size, guardrail metrics, common mistakes, and when NOT to A/B test.",
+        image: `${SITE_URL}/api/og?title=PM+Experiment+Design+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-experiment-design`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +125,15 @@ export default function PmExperimentDesignPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Experiment Design Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Designing a PM experiment starts with a falsifiable hypothesis, then locks in a primary
+            metric plus two or three guardrail metrics, calculates the sample size needed for your
+            baseline and minimum detectable effect, randomises correctly, and runs for a
+            pre-committed window — usually 7 to 14 days — before deciding to ship, kill, or iterate.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 steps to design A/B tests that produce real signal, when NOT to A/B test at all,
             and the 6 mistakes that make most PM experiments worthless.
@@ -183,6 +206,8 @@ export default function PmExperimentDesignPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-experiment-design" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Experimentation Intuition Daily</h2>

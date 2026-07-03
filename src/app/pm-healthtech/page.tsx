@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Healthtech (2026) — Practo, Pharmeasy, Cult.fit PM Guide",
@@ -58,6 +61,7 @@ const FAQS = [
 ];
 
 export default function PmHealthtechPage() {
+  const dates = pageDates("/pm-healthtech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -65,6 +69,17 @@ export default function PmHealthtechPage() {
         { name: "PM Healthtech", url: `${SITE_URL}/pm-healthtech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Healthtech (India Edition)",
+        description:
+          "How PMs build healthtech products in India. Regulatory constraints, clinician workflows, patient trust, and the peculiar dynamics of health products.",
+        image: `${SITE_URL}/api/og?title=PM+Healthtech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-healthtech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -74,6 +89,12 @@ export default function PmHealthtechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Healthtech<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A healthtech PM designs for two users with conflicting workflows at once — the patient and the clinician — while shifting telemedicine, data, and pharmacy regulations reshape what&apos;s even permitted; trust outweighs convenience, reimbursement blends insurance with out-of-pocket payment, and the real success signal is patient outcomes rather than engagement, across platforms like Practo, Pharmeasy, and HealthifyMe.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics, 5 companies, 4 interview-style questions for healthtech PMs.
           </p>
@@ -131,6 +152,8 @@ export default function PmHealthtechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-healthtech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Healthtech PM Scenarios</h2>

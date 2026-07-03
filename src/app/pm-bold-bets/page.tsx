@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "How PMs Make Bold Bets (2026) — The Skill Senior PMs Need Most",
@@ -72,6 +75,7 @@ const FAQS = [
 ];
 
 export default function PmBoldBetsPage() {
+  const dates = pageDates("/pm-bold-bets");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -79,6 +83,17 @@ export default function PmBoldBetsPage() {
         { name: "PM Bold Bets", url: `${SITE_URL}/pm-bold-bets` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "How PMs Make Bold Bets (2026 Edition)",
+        description:
+          "How PMs make bold product bets when incremental work isn't enough. Distinguishing brave bets from reckless ones, structuring commitments, and recovering from bad bets.",
+        image: `${SITE_URL}/api/og?title=How+PMs+Make+Bold+Bets+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-bold-bets`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -88,6 +103,17 @@ export default function PmBoldBetsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             How PMs Make Bold Bets<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            A bold product bet is brave rather than reckless when it&apos;s grounded in specific user
+            insight, has a clear falsification criterion, survivable downside, and milestones at
+            30/60/90 days rather than a single year-end review. PMs write it as a falsifiable
+            prediction, test the riskiest assumption first, and pre-commit to a kill criterion —
+            because the biggest mistake with bold bets isn&apos;t failing, it&apos;s having no plan
+            for when to stop.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 signals it&apos;s time to bet, 5 dimensions of brave-vs-reckless,
             5 ways to structure bold bets, and 5 moves to recover from bad ones.
@@ -174,6 +200,8 @@ export default function PmBoldBetsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-bold-bets" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Senior PM Judgment Daily</h2>

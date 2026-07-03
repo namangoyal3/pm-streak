@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "10 PM Habits That Compound (2026) — Small Daily Practices of Great Product Managers",
@@ -101,6 +104,7 @@ const FAQS = [
 ];
 
 export default function PmHabitsPage() {
+  const dates = pageDates("/pm-habits");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -108,6 +112,17 @@ export default function PmHabitsPage() {
         { name: "PM Habits", url: `${SITE_URL}/pm-habits` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "10 PM Habits That Compound (2026 Edition)",
+        description:
+          "10 daily, weekly, and monthly habits of great PMs. Small practices that compound into mastery over years. The habits that separate top PMs from average ones.",
+        image: `${SITE_URL}/api/og?title=10+PM+Habits+That+Compound+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-habits`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -117,6 +132,12 @@ export default function PmHabitsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             10 PM Habits That Compound<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            The PMs who compound fastest run a small set of recurring habits: talking to one user a week, reading ten support tickets a week, glancing at their north-star metric daily, and doing a twenty-minute weekly review — nothing dramatic, just consistent. Over a ten-year career that single weekly user conversation alone adds up to roughly 500 conversations, which is where the real edge comes from.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 10 habits that separate great PMs from average ones. Small, consistent,
             and calibrated to compound over a multi-year career.
@@ -167,6 +188,8 @@ export default function PmHabitsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-habits" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Make &quot;Practice PM Daily&quot; Your First Habit</h2>

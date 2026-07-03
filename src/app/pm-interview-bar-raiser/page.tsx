@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Bar Raiser Interview (2026) — How to Pass Amazon&apos;s &amp; Equivalent Final Rounds",
@@ -79,6 +82,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewBarRaiserPage() {
+  const dates = pageDates("/pm-interview-bar-raiser");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -86,6 +90,17 @@ export default function PmInterviewBarRaiserPage() {
         { name: "PM Bar Raiser Interview", url: `${SITE_URL}/pm-interview-bar-raiser` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Bar Raiser Interview Guide (2026 Edition)",
+        description:
+          "How PMs handle bar raiser interviews — Amazon's and equivalent final rounds at top companies. What bar raisers test for and how to signal depth honestly.",
+        image: `${SITE_URL}/api/og?title=PM+Bar+Raiser+Interview+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-bar-raiser`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -95,6 +110,16 @@ export default function PmInterviewBarRaiserPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Bar Raiser Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Bar raisers are trained interviewers — outside the hiring team, with veto power over the hire —
+            who probe intellectual honesty, depth over breadth, judgment on unclear trade-offs, genuine
+            cultural fit, and how a candidate handles pushback, rather than testing whether you can do the
+            specific role; preparation means going deep on a handful of career stories instead of rehearsing
+            more of them.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline font-semibold">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 things bar raisers test for, 6 prep moves, 6 sample questions,
             and 5 moves for after the round.
@@ -173,6 +198,8 @@ export default function PmInterviewBarRaiserPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-bar-raiser" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for Depth Daily</h2>

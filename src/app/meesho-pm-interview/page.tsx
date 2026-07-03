@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Meesho PM Interview Guide (2026) — Bharat Commerce Questions & Rounds",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function MeeshoPmInterviewPage() {
+  const dates = pageDates("/meesho-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,17 @@ export default function MeeshoPmInterviewPage() {
         { name: "Meesho PM Interview", url: `${SITE_URL}/meesho-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Meesho PM Interview Guide (2026 Edition)",
+        description:
+          "Crack the Meesho PM interview. All rounds, Bharat (Tier-2/3) user questions, social commerce product thinking, and real interview examples from Meesho PMs in 2026.",
+        image: `${SITE_URL}/api/og?title=Meesho+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/meesho-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +126,14 @@ export default function MeeshoPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Meesho PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            What does a Meesho PM interview actually test? Four rounds — Bharat product thinking, metrics
+            and operations, strategy against Flipkart&apos;s Shopsy, and behavioural culture fit — all circle
+            back to one throughline: can you design for Tier-2/3 resellers and first-time online shoppers rather than assume a metro-user mental model.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             All Meesho PM interview rounds, the Bharat-user thinking the interviewers reward,
             and real questions on social commerce, resellers, and non-metro product design.
@@ -177,6 +200,8 @@ export default function MeeshoPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="meesho-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for the Bharat PM Bar Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Product Strategy Guide for PMs (2026) — How to Think Strategically as a PM",
@@ -130,12 +133,23 @@ const FAQS = [
 ];
 
 export default function PmStrategyGuidePage() {
+  const dates = pageDates("/pm-strategy-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Strategy Guide", url: `${SITE_URL}/pm-strategy-guide` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "Product Strategy Guide (PM Edition 2026)",
+        description: "How PMs build product strategy. Vision vs strategy, strategic frameworks (moats, bets, Good Strategy/Bad Strategy), and the strategic questions every senior PM is expected to answer.",
+        image: `${SITE_URL}/api/og?title=Product+Strategy+Guide+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-strategy-guide`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -146,6 +160,16 @@ export default function PmStrategyGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Strategy Guide<br />(PM Edition 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Product strategy for PMs breaks into four layers — vision, strategy, roadmap, and
+            execution — each owned by a different level of seniority and each answering a different
+            time horizon. Good strategy names a diagnosis and guiding policy that rules options out,
+            while bad strategy chases every opportunity without trade-offs; frameworks like Moats,
+            JTBD, and Good Strategy/Bad Strategy help PMs tell the two apart.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4 layers of product strategy, how to tell good strategy from bad,
             5 frameworks every PM should know, and the questions senior PMs must answer.
@@ -243,6 +267,8 @@ export default function PmStrategyGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-strategy-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Strategic Thinking in 2 Minutes a Day</h2>

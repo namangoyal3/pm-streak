@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Mentorship Guide (2026) — How to Find Mentors and Be One",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmMentorshipPage() {
+  const dates = pageDates("/pm-mentorship");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmMentorshipPage() {
         { name: "PM Mentorship", url: `${SITE_URL}/pm-mentorship` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Mentorship Guide (2026 Edition)",
+        description:
+          "How PMs find mentors, get the most from mentorship, and become mentors themselves. What works, what doesn&apos;t, and the compounding career value of mentorship.",
+        image: `${SITE_URL}/api/og?title=PM+Mentorship+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-mentorship`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,12 @@ export default function PmMentorshipPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Mentorship Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM mentorship works best as a mix of two to four relationships — a manager or senior PM for craft advice, a peer for reality-checking, and mentors reached through specific, respectful outreach — built before you need anything from them. It compounds both ways: mentoring sharpens your own thinking and signals leadership to your manager.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 sources of PM mentors, 6 rules for being a great mentee, 6 rules for being a great mentor,
             and 5 reasons mentorship compounds both ways.
@@ -166,6 +187,8 @@ export default function PmMentorshipPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-mentorship" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Become the PM Your Mentor Thinks You Can Be</h2>

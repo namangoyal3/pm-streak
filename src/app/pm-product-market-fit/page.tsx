@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Product-Market Fit (2026) — How to Know If You Have It (and What to Do If You Don&apos;t)",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmProductMarketFitPage() {
+  const dates = pageDates("/pm-product-market-fit");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,16 @@ export default function PmProductMarketFitPage() {
         { name: "PM Product-Market Fit", url: `${SITE_URL}/pm-product-market-fit` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Product-Market Fit (2026 Edition)",
+        description: "How PMs recognise product-market fit. Leading indicators, the Sean Ellis test, retention curves, and what to do if PMF isn&apos;t there yet.",
+        image: `${SITE_URL}/api/og?title=PM+Product-Market+Fit+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-product-market-fit`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +103,16 @@ export default function PmProductMarketFitPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Product-Market Fit<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Product-market fit shows up as a flattening retention curve, organic referrals without
+            paid spend, and users who complain when the product breaks — the clearest sign they
+            actually care, even when other metrics look fine. The Sean Ellis test, where over 40%
+            would be &apos;very disappointed&apos; without the product, offers one concrete threshold;
+            without these signals, the right move is narrowing the target user, not scaling.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 PMF signals, 4 stages of PMF, 6 things to do if PMF isn&apos;t there, and 5 common PMF myths.
           </p>
@@ -164,6 +188,8 @@ export default function PmProductMarketFitPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-product-market-fit" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Judgment Daily</h2>

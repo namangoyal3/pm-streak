@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Analyst to PM (2026) — From Data Analyst to Product Manager",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmAnalystToPmPage() {
+  const dates = pageDates("/pm-analyst-to-pm");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,16 @@ export default function PmAnalystToPmPage() {
         { name: "PM Analyst to PM", url: `${SITE_URL}/pm-analyst-to-pm` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Analyst to PM (2026 Edition)",
+        description: "How data analysts become PMs. The strengths they bring, the execution and empathy gaps, and why data-first PMs often win growth roles.",
+        image: `${SITE_URL}/api/og?title=PM+Analyst+to+PM+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-analyst-to-pm`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +78,12 @@ export default function PmAnalystToPmPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Analyst to PM<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Data analysts move into product management by leaning on strengths already built in — SQL fluency, causal reasoning, and quantitative framing — which makes growth PM roles the strongest fit, since data is rich there. The gaps to close are user empathy, engineering and design partnership, and faster delivery cycles than analytics work typically demands.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:text-[#58cc02]">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 strengths analysts bring and 4 gaps to close.
           </p>
@@ -109,6 +129,8 @@ export default function PmAnalystToPmPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-analyst-to-pm" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Analyst-to-PM Scenarios</h2>

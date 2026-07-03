@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Influence Without Authority (2026) — The Core PM Skill",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmInfluencePage() {
+  const dates = pageDates("/pm-influence");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmInfluencePage() {
         { name: "PM Influence", url: `${SITE_URL}/pm-influence` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Influence Without Authority (2026 Edition)",
+        description:
+          "How PMs influence engineers, designers, execs, and partners without formal authority. Trust, narrative, and the quiet tactics that work.",
+        image: `${SITE_URL}/api/og?title=PM+Influence+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-influence`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmInfluencePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Influence Without Authority<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Without formal authority over engineers, designers, or executives, PMs move work forward through six levers — trust built over months, clarity of thinking, evidence-backed arguments, repeatable narrative, reciprocity, and patience — while avoiding shortcuts like escalation-first tactics, blame, over-pitching, and covert lobbying that unravel trust instead of building it.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 influence levers and 4 anti-patterns to avoid.
           </p>
@@ -112,6 +133,8 @@ export default function PmInfluencePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-influence" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Influence Scenarios</h2>

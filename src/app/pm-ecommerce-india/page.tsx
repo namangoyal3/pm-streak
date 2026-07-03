@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM E-commerce India (2026) — Flipkart, Amazon, Meesho PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmEcommerceIndiaPage() {
+  const dates = pageDates("/pm-ecommerce-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmEcommerceIndiaPage() {
         { name: "PM E-commerce India", url: `${SITE_URL}/pm-ecommerce-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM E-commerce India (2026 Edition)",
+        description:
+          "How PMs build e-commerce products in India. COD, RTO, Tier-2/3, social commerce, and the brutal unit economics of Indian e-commerce.",
+        image: `${SITE_URL}/api/og?title=PM+E-commerce+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ecommerce-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmEcommerceIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM E-commerce India<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Indian e-commerce PMs operate on thin, COD-driven unit economics where return-to-origin (RTO) rates by pin code and category can erase margin, so GMV, prepaid ratio, and 90-day repeat rate matter as much as growth. Tier-2/3 expansion and vernacular UX — the playbook Meesho rewired — plus social commerce on WhatsApp and Instagram are fragmenting the traditional funnel, making this a brutal but still-growing category.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for Indian e-commerce PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmEcommerceIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ecommerce-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice E-commerce PM Scenarios</h2>

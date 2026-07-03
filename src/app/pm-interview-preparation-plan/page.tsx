@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Preparation Plan (2026) — 8-Week Study Schedule",
@@ -162,6 +165,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewPreparationPlanPage() {
+  const dates = pageDates("/pm-interview-preparation-plan");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -169,6 +173,17 @@ export default function PmInterviewPreparationPlanPage() {
         { name: "PM Interview Preparation Plan", url: `${SITE_URL}/pm-interview-preparation-plan` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Preparation Plan (8-Week Schedule)",
+        description:
+          "The complete 8-week PM interview preparation plan. Week-by-week schedule, what to study, how to practice, and how to track readiness — for Google, Flipkart, Razorpay, and top startups.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Preparation+Plan+2026++8-Week+Schedule++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-preparation-plan`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -178,6 +193,17 @@ export default function PmInterviewPreparationPlanPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Preparation Plan<br />(8-Week Schedule)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            This plan spans eight weeks at roughly 8–10 hours per week, moving from foundation
+            and self-assessment through product sense, metrics, strategy, behavioural stories,
+            technical fluency, mock interviews, and finally company-specific polish. Each week
+            pairs a study focus with concrete daily tasks and a resource, ending in an eight-item
+            readiness checklist — if you can honestly tick all eight, the plan considers you
+            ready to interview.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Week-by-week PM interview prep — what to study, how to practice, and how to know
             you&apos;re ready for Google, Flipkart, Razorpay, and top startups.
@@ -245,6 +271,8 @@ export default function PmInterviewPreparationPlanPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-preparation-plan" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Follow the Plan. Track Your Progress.</h2>

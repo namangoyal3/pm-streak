@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Agritech (2026) — DeHaat, Ninjacart, AgroStar PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmAgritechPage() {
+  const dates = pageDates("/pm-agritech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmAgritechPage() {
         { name: "PM Agritech", url: `${SITE_URL}/pm-agritech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Agritech (India Edition)",
+        description: "How PMs build agritech products in India. Farmer workflows, supply chain, advisory, and the unique PM challenges of rural-first products.",
+        image: `${SITE_URL}/api/og?title=PM+Agritech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-agritech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmAgritechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Agritech<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Agritech product management in India means designing for vernacular languages, voice and video over text, and offline-first connectivity, since field officers — not app UX — still drive most farmer trust and adoption. Companies like DeHaat, Ninjacart, and AgroStar track success through active farmers per season, revenue per farmer, and field officer productivity rather than typical SaaS metrics.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for agritech PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmAgritechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-agritech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Agritech PM Scenarios</h2>

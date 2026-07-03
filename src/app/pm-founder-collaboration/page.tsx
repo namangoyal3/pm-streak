@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM + Founder Collaboration (2026) — Working Directly With the CEO",
@@ -65,6 +68,7 @@ const FAQS = [
 ];
 
 export default function PmFounderCollaborationPage() {
+  const dates = pageDates("/pm-founder-collaboration");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -72,6 +76,17 @@ export default function PmFounderCollaborationPage() {
         { name: "PM + Founder Collaboration", url: `${SITE_URL}/pm-founder-collaboration` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM + Founder Collaboration (2026 Edition)",
+        description:
+          "How PMs at startups collaborate with founders. What works, what doesn&apos;t, and how to keep product decisions rigorous when the founder is the loudest voice in the room.",
+        image: `${SITE_URL}/api/og?title=PM+++Founder+Collaboration+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-founder-collaboration`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -81,6 +96,12 @@ export default function PmFounderCollaborationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM + Founder Collaboration<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Working directly with a founder rewards PMs who become a filter rather than a gatekeeper — bringing three options instead of one recommendation, writing proactive updates the founder never asked for, and using data rather than opinion to settle disagreements. Red flags look different: decisions get overridden without discussion, everything lives only in the founder&apos;s head, and data that contradicts instinct gets dismissed.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 founder dynamics to understand, 6 moves that work, and 5 red flags
             that signal the startup PM role won&apos;t work out.
@@ -142,6 +163,8 @@ export default function PmFounderCollaborationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-founder-collaboration" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train Startup PM Instincts Daily</h2>

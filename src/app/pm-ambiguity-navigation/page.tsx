@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Navigating Ambiguity as a PM (2026) — The Skill That Defines Senior PMs",
@@ -83,6 +86,7 @@ const FAQS = [
 ];
 
 export default function PmAmbiguityNavigationPage() {
+  const dates = pageDates("/pm-ambiguity-navigation");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -90,6 +94,17 @@ export default function PmAmbiguityNavigationPage() {
         { name: "PM Ambiguity Navigation", url: `${SITE_URL}/pm-ambiguity-navigation` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Navigating Ambiguity as a PM (2026 Edition)",
+        description:
+          "How PMs handle ambiguity. When the spec doesn&apos;t exist, leadership has no answer, and you&apos;re the one expected to create structure. The moves senior PMs actually use.",
+        image: `${SITE_URL}/api/og?title=PM+Ambiguity+Navigation+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ambiguity-navigation`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -99,6 +114,12 @@ export default function PmAmbiguityNavigationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Navigating Ambiguity as a PM<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Senior PMs handle ambiguity not by waiting for clarity but by creating it: reframing vague problems into specific unknowns, making bets explicit, writing down what they&apos;ll learn rather than what they&apos;ll build, and running hypothesis-test-iterate loops week by week. Since promotion from PM to senior PM is largely a test of this skill, ambiguity-averse PMs plateau even with strong tactical execution.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 moves senior PMs use, 5 common ambiguous scenarios and how to handle each,
             and why ambiguity handling determines career ceiling.
@@ -160,6 +181,8 @@ export default function PmAmbiguityNavigationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ambiguity-navigation" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Judgment in Ambiguous Scenarios Daily</h2>

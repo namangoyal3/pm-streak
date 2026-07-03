@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Context Windows (2026) — Long Context vs RAG vs Memory",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmContextWindowsPage() {
+  const dates = pageDates("/pm-context-windows");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,16 @@ export default function PmContextWindowsPage() {
         { name: "PM Context Windows", url: `${SITE_URL}/pm-context-windows` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Context Windows (2026 Edition)",
+        description: "How PMs decide between long context, RAG, and memory architectures. Cost, latency, and accuracy tradeoffs for AI products.",
+        image: `${SITE_URL}/api/og?title=PM+Context+Windows+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-context-windows`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +78,12 @@ export default function PmContextWindowsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Context Windows<br />(2026 Edition)
           </h1>
+          <p className="text-base text-white/70 max-w-2xl mx-auto mb-4">
+            Long context, RAG, and memory are tradeoffs, not competitors: long context is simple but expensive and slow, RAG is cheaper and often more accurate for needle-in-haystack queries but depends on retrieval quality, and memory adds persistence across sessions at the cost of complexity. Most production systems end up combining all three rather than picking one.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 architecture tradeoffs and 4 PM questions to ask.
           </p>
@@ -109,6 +129,8 @@ export default function PmContextWindowsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-context-windows" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Context PM Scenarios</h2>

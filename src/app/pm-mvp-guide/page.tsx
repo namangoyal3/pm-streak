@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM MVP Guide (2026) — How to Build an MVP Without It Becoming a Mess",
@@ -72,6 +75,7 @@ const FAQS = [
 ];
 
 export default function PmMvpGuidePage() {
+  const dates = pageDates("/pm-mvp-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -79,6 +83,16 @@ export default function PmMvpGuidePage() {
         { name: "PM MVP Guide", url: `${SITE_URL}/pm-mvp-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM MVP Guide (2026 Edition)",
+        description: "How PMs define and build MVPs correctly. What the M in MVP really means, how to scope, testing vs shipping, and when to skip the MVP entirely.",
+        image: `${SITE_URL}/api/og?title=PM+MVP+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-mvp-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -88,6 +102,15 @@ export default function PmMvpGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM MVP Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            An MVP is the smallest version of a product that tests one real hypothesis with
+            actual users — functional end-to-end, not a screenshot, and scoped to one core flow
+            rather than five starter features. It&apos;s not a prototype, beta, or scaled-down launch;
+            if it takes more than six weeks to build, it probably isn&apos;t minimal anymore.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 things MVPs actually are, 5 things they aren&apos;t, 5 scoping questions,
             and 5 situations where skipping the MVP is the right call.
@@ -164,6 +187,8 @@ export default function PmMvpGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-mvp-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Scoping Muscle Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Feature Flags (2026) — How PMs Use Flags to Ship Safer",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmFeatureFlagsPage() {
+  const dates = pageDates("/pm-feature-flags");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,16 @@ export default function PmFeatureFlagsPage() {
         { name: "PM Feature Flags", url: `${SITE_URL}/pm-feature-flags` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Feature Flags (2026 Edition)",
+        description: "How PMs use feature flags. Rollout strategies, kill switches, segment targeting, and why flags decouple deploy from release.",
+        image: `${SITE_URL}/api/og?title=PM+Feature+Flags+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-feature-flags`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +79,12 @@ export default function PmFeatureFlagsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Feature Flags<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            How do PMs actually use feature flags? Mainly for five things — gradual rollout with kill switches, fast reverts without code changes, segment targeting, in-production A/B variants, and trunk-based development. Discipline matters more after launch than before: sunset flags, document who owns each one, and audit the count quarterly, since hundreds to low thousands is normal at scale and the real risk is untracked, unowned flags lingering past their purpose.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 uses and 4 practices for feature flag PMs.
           </p>
@@ -110,6 +130,8 @@ export default function PmFeatureFlagsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-feature-flags" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Feature Flag PM Scenarios</h2>

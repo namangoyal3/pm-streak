@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Cheat Sheet (2026) — Frameworks, Metrics & Formulas on One Page",
@@ -86,12 +89,24 @@ const FAQS = [
 ];
 
 export default function PmCheatSheetPage() {
+  const dates = pageDates("/pm-cheat-sheet");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Cheat Sheet", url: `${SITE_URL}/pm-cheat-sheet` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "PM Cheat Sheet (2026) — Frameworks, Metrics & Formulas on One Page",
+        description:
+          "The one-page PM cheat sheet. Every essential framework, metric, and formula — RICE, AARRR, PIRATE, north star, TAM/SAM/SOM, and more — in a scannable reference.",
+        image: `${SITE_URL}/api/og?title=PM+Cheat+Sheet+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-cheat-sheet`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -102,6 +117,15 @@ export default function PmCheatSheetPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Cheat Sheet<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A PM cheat sheet is a one-page reference — this one lists 12 frameworks
+            (RICE, AARRR, MoSCoW, Kano, and more), 10 core metrics like DAU:MAU and LTV:CAC,
+            6 formulas, and 6 writing rules — meant to be consulted before interviews or
+            strategy docs, not memorised as a script.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             12 frameworks, 10 metrics, 6 formulas, and the writing rules
             every PM should have memorised. Use as reference — not script.
@@ -181,6 +205,8 @@ export default function PmCheatSheetPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-cheat-sheet" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Internalise Frameworks Through Daily Use</h2>

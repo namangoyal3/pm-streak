@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Fintech PM India (2026) — UPI, Lending, Wealth &amp; the Regulatory Maze",
@@ -66,6 +69,7 @@ const FAQS = [
 ];
 
 export default function PmFintechIndiaPage() {
+  const dates = pageDates("/pm-fintech-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -73,6 +77,17 @@ export default function PmFintechIndiaPage() {
         { name: "Fintech PM India", url: `${SITE_URL}/pm-fintech-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Fintech PM India (2026 Edition)",
+        description:
+          "How fintech PMs build in India. Payment rails, lending unit economics, wealth products, and navigating RBI/SEBI regulation while shipping real products.",
+        image: `${SITE_URL}/api/og?title=Fintech+PM+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-fintech-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -82,6 +97,12 @@ export default function PmFintechIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Fintech PM India<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Fintech PM in India isn&apos;t one job — it&apos;s six, split across payments, consumer lending, wealth and investing, neo-banking, insurance, and crypto, each answering to a different regulator (RBI, SEBI, or IRDAI) with its own compliance surface. Since UPI itself is essentially free, payments companies monetise through adjacent lending and wealth products instead, and PMs who treat compliance as someone else&apos;s problem watch legal reverse their decisions weeks later.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 fintech categories to understand, 6 unique challenges, and 5 skills that separate fintech PMs from other domains.
           </p>
@@ -143,6 +164,8 @@ export default function PmFintechIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-fintech-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Fintech PM Skills Daily</h2>

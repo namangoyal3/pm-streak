@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Pricing Experiments (2026) — How to Test Pricing Without Breaking Trust",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmPricingExperimentsPage() {
+  const dates = pageDates("/pm-pricing-experiments");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmPricingExperimentsPage() {
         { name: "PM Pricing Experiments", url: `${SITE_URL}/pm-pricing-experiments` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Pricing Experiments (2026 Edition)",
+        description:
+          "How PMs run pricing experiments that generate real signal. What to test, how to segment, legal considerations, and why most pricing tests go wrong.",
+        image: `${SITE_URL}/api/og?title=PM+Pricing+Experiments+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-pricing-experiments`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,16 @@ export default function PmPricingExperimentsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Pricing Experiments<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Because showing different prices to different users carries real legal and trust risk, PM
+            pricing experiments are safest run on new signups only — grandfathering existing customers —
+            testing variables like price points, packaging, billing cadence, and trial length, then judging
+            results not by conversion rate alone but by ARPU, retention, and LTV, since a cheaper price
+            often wins short-term signups while quietly attracting churn-prone users.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 things to test, 5 approaches, 5 gotchas to watch for, and 6 metrics to track.
           </p>
@@ -165,6 +190,8 @@ export default function PmPricingExperimentsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-pricing-experiments" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Pricing Skills Daily</h2>

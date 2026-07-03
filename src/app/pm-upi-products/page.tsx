@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM UPI Products (2026) — Building on India&apos;s Rails",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmUpiProductsPage() {
+  const dates = pageDates("/pm-upi-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmUpiProductsPage() {
         { name: "PM UPI Products", url: `${SITE_URL}/pm-upi-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM UPI Products (India Edition)",
+        description: "How PMs build UPI-first products. P2P, P2M, credit on UPI, and why UPI is the most important payments rail built this century.",
+        image: `${SITE_URL}/api/og?title=PM+UPI+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-upi-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmUpiProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM UPI Products<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Product managers on UPI navigate a rail with zero MDR on P2P transactions, so monetisation happens through adjacent services rather than the payment itself. Day-to-day work spans NPCI-set constraints, fast-moving features like UPI Lite and Credit on UPI, and treating bank-level failure codes as a UX problem product teams must own.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for UPI-first product PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmUpiProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-upi-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice UPI PM Scenarios</h2>

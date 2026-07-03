@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM AI Tool Use (2026) — Designing Agents That Use APIs Reliably",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmToolUsePage() {
+  const dates = pageDates("/pm-tool-use");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,16 @@ export default function PmToolUsePage() {
         { name: "PM AI Tool Use", url: `${SITE_URL}/pm-tool-use` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Tool Use (2026 Edition)",
+        description: "How PMs design tool-using agents. Tool selection, error handling, and why tool-use reliability is the bottleneck for agentic products.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Tool+Use+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-tool-use`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +79,12 @@ export default function PmToolUsePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Tool Use<br />(2026 Edition)
           </h1>
+          <p className="text-base text-white/70 max-w-2xl mx-auto mb-4">
+            Tool-use reliability is the real bottleneck for AI agents because errors compound across calls: a tool with 95 percent success used ten times in a row drops end-to-end reliability to roughly 60 percent. PMs manage this by choosing a few well-described tools instead of dozens, validating inputs before execution, retrying failures intelligently, and logging every call for debugging.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 principles and 4 traps for PMs designing tool-using agents.
           </p>
@@ -110,6 +130,8 @@ export default function PmToolUsePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-tool-use" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Tool-Use PM Scenarios</h2>

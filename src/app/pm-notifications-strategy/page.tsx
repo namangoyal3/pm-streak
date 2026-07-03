@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Notifications Strategy (2026) — Push, Email, In-App Done Right",
@@ -56,6 +59,7 @@ const FAQS = [
 ];
 
 export default function PmNotificationsStrategyPage() {
+  const dates = pageDates("/pm-notifications-strategy");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -63,6 +67,17 @@ export default function PmNotificationsStrategyPage() {
         { name: "PM Notifications Strategy", url: `${SITE_URL}/pm-notifications-strategy` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Notifications Strategy (2026 Edition)",
+        description:
+          "How PMs design notification systems that drive retention without burning trust. Push, email, in-app, SMS — when to use each and how to measure.",
+        image: `${SITE_URL}/api/og?title=PM+Notifications+Strategy+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-notifications-strategy`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -72,6 +87,12 @@ export default function PmNotificationsStrategyPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Notifications Strategy<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A sound notifications strategy treats push, email, in-app, SMS, and WhatsApp as different tools for different urgency levels — SMS for critical transactional only, in-app for the highest-converting contextual nudges — governed by frequency caps per user, quiet hours, and one-tap unsubscribe, with most consumer apps topping out around 2–4 pushes a week before uninstalls spike.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 channels compared and 6 principles that separate thoughtful notification PMs from spam.
           </p>
@@ -117,6 +138,8 @@ export default function PmNotificationsStrategyPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-notifications-strategy" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Notification PM Scenarios</h2>

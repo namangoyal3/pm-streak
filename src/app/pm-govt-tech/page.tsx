@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM GovTech &amp; Digital Public Goods (2026) — DPI, Aadhaar, DigiLocker",
@@ -52,6 +55,7 @@ const FAQS = [
 ];
 
 export default function PmGovTechPage() {
+  const dates = pageDates("/pm-govt-tech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -59,6 +63,16 @@ export default function PmGovTechPage() {
         { name: "PM GovTech", url: `${SITE_URL}/pm-govt-tech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM GovTech & DPI (India Edition)",
+        description: "How PMs build on India Stack. Aadhaar, DigiLocker, ONDC, Account Aggregator, and what it means to work on digital public infrastructure.",
+        image: `${SITE_URL}/api/og?title=PM+GovTech+&amp;+DPI+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-govt-tech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -68,6 +82,12 @@ export default function PmGovTechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM GovTech &amp; DPI<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Working as a GovTech PM means building on India Stack primitives — Aadhaar for identity, DigiLocker for documents, UPI for payments, Account Aggregator for data portability, and ONDC for open commerce — while policy from MeitY and NPCI moves faster than product cycles. Compensation typically runs 20–30% below pure private-sector roles, but mission-driven PMs stay for the impact and the path toward policy advisory or international DPI work.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 India Stack primitives and 5 dynamics for DPI-focused PMs.
           </p>
@@ -113,6 +133,8 @@ export default function PmGovTechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-govt-tech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice GovTech Scenarios</h2>

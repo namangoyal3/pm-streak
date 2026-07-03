@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Roadmap Template (2026) — How to Structure a Product Roadmap That Works",
@@ -86,12 +89,24 @@ const FAQS = [
 ];
 
 export default function PmRoadmapTemplatePage() {
+  const dates = pageDates("/pm-roadmap-template");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Roadmap Template", url: `${SITE_URL}/pm-roadmap-template` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "PM Roadmap Template (2026) — How to Structure a Product Roadmap That Works",
+        description:
+          "The PM roadmap template that actually gets used. Outcome-based structure, visualisation patterns, how to handle stakeholder asks, and the now/next/later format.",
+        image: `${SITE_URL}/api/og?title=PM+Roadmap+Template+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-roadmap-template`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -102,6 +117,16 @@ export default function PmRoadmapTemplatePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Roadmap Template<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Structuring a product roadmap starts with picking a format — Now/Next/Later,
+            an outcome roadmap, quarterly themes, or a timeline view — then filling in the
+            seven sections this page covers, from vision and strategic pillars down to an
+            explicit list of what the team is not doing, while avoiding the six common
+            mistakes below.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 roadmap formats (with best-use guidance), 7 sections every roadmap needs,
             and 6 mistakes that turn roadmaps into neglected spreadsheets.
@@ -164,6 +189,8 @@ export default function PmRoadmapTemplatePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-roadmap-template" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Roadmap Thinking Daily</h2>

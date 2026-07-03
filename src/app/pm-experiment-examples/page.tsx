@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Experiment Examples (2026) — Real A/B Test Designs",
@@ -91,6 +94,7 @@ const FAQS = [
 ];
 
 export default function PmExperimentExamplesPage() {
+  const dates = pageDates("/pm-experiment-examples");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -98,6 +102,16 @@ export default function PmExperimentExamplesPage() {
         { name: "PM Experiment Examples", url: `${SITE_URL}/pm-experiment-examples` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Experiment Examples (2026 Edition)",
+        description: "5 real-style PM experiment examples with hypothesis, setup, primary + guardrail metrics, and decision criteria. See how great PMs design tests.",
+        image: `${SITE_URL}/api/og?title=PM+Experiment+Examples+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-experiment-examples`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -107,8 +121,18 @@ export default function PmExperimentExamplesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Experiment Examples<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Five real-style experiment write-ups — onboarding simplification, streak reminder timing, pricing page
+            redesign, search layout, and paywall placement — each show a specific hypothesis, test setup, primary
+            metric, guardrails, and pre-committed decision criteria. Across all five, hypotheses name an exact
+            metric and target, guardrails catch local wins that cause global losses, and decisions get locked in
+            before results arrive to prevent mid-test rationalisation.
+          </p>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
             5 real-style A/B test examples with hypothesis, setup, metrics, and pre-committed decision criteria.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Build PM Experiment Skills Daily — Free →
@@ -176,6 +200,8 @@ export default function PmExperimentExamplesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-experiment-examples" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Experiment Design Daily</h2>

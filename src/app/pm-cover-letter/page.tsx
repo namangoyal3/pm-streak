@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Cover Letter Guide (2026) — Template, Examples & What Hiring Managers Want",
@@ -98,6 +101,7 @@ const FAQS = [
 ];
 
 export default function PmCoverLetterPage() {
+  const dates = pageDates("/pm-cover-letter");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -105,6 +109,16 @@ export default function PmCoverLetterPage() {
         { name: "PM Cover Letter", url: `${SITE_URL}/pm-cover-letter` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Cover Letter Guide (2026 Edition)",
+        description: "Write a PM cover letter that actually gets read. The structure that works, real examples, what to include, what to cut, and when to skip the cover letter entirely.",
+        image: `${SITE_URL}/api/og?title=PM+Cover+Letter+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-cover-letter`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -114,6 +128,12 @@ export default function PmCoverLetterPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Cover Letter Guide<br />(2026 Edition)
           </h1>
+          <p className="text-base text-white/60 max-w-2xl mx-auto mb-2">
+            A PM cover letter follows four paragraphs — a specific hook, one proof story with a measurable outcome, a fit paragraph tied to the company&apos;s actual work, and a short close — kept to 300–400 words total. Skip it for ATS-heavy applications at large companies; write it when applying directly, at small companies, or for a non-obvious career pivot.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4-paragraph structure that works, two complete examples,
             and when to skip the cover letter entirely.
@@ -173,6 +193,8 @@ export default function PmCoverLetterPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-cover-letter" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Great Cover Letter. Now Ace the Interview.</h2>

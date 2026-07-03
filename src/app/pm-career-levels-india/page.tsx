@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Career Levels in India (2026) — Titles, Scope & Promotion Criteria",
@@ -105,6 +108,7 @@ const FAQS = [
 ];
 
 export default function PmCareerLevelsIndiaPage() {
+  const dates = pageDates("/pm-career-levels-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -112,6 +116,16 @@ export default function PmCareerLevelsIndiaPage() {
         { name: "PM Career Levels India", url: `${SITE_URL}/pm-career-levels-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Career Levels in India (2026 Edition)",
+        description: "The complete PM level ladder in India. What each title means at Flipkart, Razorpay, Google, and more. Promotion criteria, typical years, and how companies calibrate levels.",
+        image: `${SITE_URL}/api/og?title=PM+Career+Levels+in+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-career-levels-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -121,6 +135,15 @@ export default function PmCareerLevelsIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Career Levels in India<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            India&apos;s PM ladder runs from APM through PM, Senior PM, Group or Staff PM, Director or
+            Principal PM, VP Product, and finally CPO, with scope — not tenure — driving each promotion.
+            Titles vary sharply between companies, so a &apos;Senior PM&apos; at a small startup often maps
+            to a plain PM at Flipkart, and operating above your current level is what gets you promoted to it.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The complete PM ladder from APM to CPO — years of experience, scope,
             promotion signals, and the reality of how promotions actually happen.
@@ -187,6 +210,8 @@ export default function PmCareerLevelsIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-career-levels-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Skills for the Next Level</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Microservices Strategy (2026) — When PMs Should Care About Architecture",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmMicroservicesStrategyPage() {
+  const dates = pageDates("/pm-microservices-strategy");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,16 @@ export default function PmMicroservicesStrategyPage() {
         { name: "PM Microservices Strategy", url: `${SITE_URL}/pm-microservices-strategy` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Microservices Strategy (2026 Edition)",
+        description: "When microservices help, when they hurt, and what PMs need to know to navigate architecture decisions without overstepping into engineering territory.",
+        image: `${SITE_URL}/api/og?title=PM+Microservices+Strategy+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-microservices-strategy`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +78,12 @@ export default function PmMicroservicesStrategyPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Microservices Strategy<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Microservices strategy isn&apos;t a PM&apos;s call to make, but four situations still demand PM engagement: when architecture gates time-to-market, when team boundaries mirror service boundaries, when migration cost blocks the roadmap, and when cost-of-change shapes prioritisation. The tradeoff PMs need to grasp is that microservices solve organisational coordination more often than technical complexity — and premature decomposition usually hurts worse than monolith debt.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 situations PMs should engage and 4 realities to keep in mind.
           </p>
@@ -109,6 +129,8 @@ export default function PmMicroservicesStrategyPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-microservices-strategy" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Architecture-Aware PM Scenarios</h2>

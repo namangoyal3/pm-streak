@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Paytm PM Interview Guide (2026) — Payments, Merchant & Lending PM Questions",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function PaytmPmInterviewPage() {
+  const dates = pageDates("/paytm-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,17 @@ export default function PaytmPmInterviewPage() {
         { name: "Paytm PM Interview", url: `${SITE_URL}/paytm-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Paytm PM Interview Guide (2026 Edition)",
+        description:
+          "Crack the Paytm PM interview. All rounds, payment and merchant product questions, lending and financial services expansion, and the pragmatic product thinking Paytm rewards.",
+        image: `${SITE_URL}/api/og?title=Paytm+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/paytm-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +126,15 @@ export default function PaytmPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Paytm PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Paytm&apos;s interview process spans four rounds — product and user thinking, a dedicated
+            merchant-product round, financial-services metrics covering lending and insurance, and a
+            strategy-plus-behavioural round on the super-app thesis — testing whether candidates can operate
+            across payments, lending, insurance, and broking while staying execution-pragmatic and aware of RBI and SEBI constraints.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             All Paytm PM interview rounds, the pragmatic product thinking it rewards,
             and the fintech domain knowledge you need before you walk in.
@@ -177,6 +201,8 @@ export default function PaytmPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="paytm-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for Super-App PM Scale Daily</h2>

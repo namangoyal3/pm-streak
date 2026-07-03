@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "North Star Metric Guide for PMs (2026) — How to Choose & Use It",
@@ -80,6 +83,7 @@ const FAQS = [
 ];
 
 export default function PmNorthStarMetricPage() {
+  const dates = pageDates("/pm-north-star-metric");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -87,6 +91,16 @@ export default function PmNorthStarMetricPage() {
         { name: "PM North Star Metric", url: `${SITE_URL}/pm-north-star-metric` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "North Star Metric Guide (PM Edition 2026)",
+        description: "How PMs choose and use a north star metric. Good vs bad examples, how to decompose it into input metrics, and how companies like Duolingo and Airbnb picked theirs.",
+        image: `${SITE_URL}/api/og?title=North+Star+Metric+Guide+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-north-star-metric`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -96,6 +110,16 @@ export default function PmNorthStarMetricPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             North Star Metric Guide<br />(PM Edition 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A north star metric is the single number — like Duolingo&apos;s daily lesson completers
+            or Airbnb&apos;s nights booked — that captures real user value, moves before revenue
+            does, updates weekly, and stays hard to game; it excludes lagging or gameable stand-ins
+            such as revenue, signups, or time on app, and gets decomposed into input metrics like
+            acquisition, activation, and retention that different PMs can each own.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 criteria for a great north star, 6 real company examples of good ones,
             5 common bad choices, and how to decompose your north star into input metrics.
@@ -183,6 +207,8 @@ export default function PmNorthStarMetricPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-north-star-metric" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Metric Definition Daily</h2>

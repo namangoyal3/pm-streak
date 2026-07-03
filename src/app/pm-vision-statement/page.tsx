@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Product Vision Guide (2026) — How to Write a Vision That Rallies Teams",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmVisionStatementPage() {
+  const dates = pageDates("/pm-vision-statement");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmVisionStatementPage() {
         { name: "PM Product Vision", url: `${SITE_URL}/pm-vision-statement` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Product Vision Guide (2026 Edition)",
+        description:
+          "How PMs write a product vision that people actually use. Structure, length, testing it against a team, and examples from great product companies.",
+        image: `${SITE_URL}/api/og?title=PM+Product+Vision+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-vision-statement`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,16 @@ export default function PmVisionStatementPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Product Vision Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Great product visions pass five tests: specific enough to guide decisions, ambitious enough to
+            rally a team, honest about the trade-offs they imply, readable back in thirty seconds, and
+            emotional rather than purely rational. Duolingo&apos;s &apos;best education in the world&apos; and
+            Stripe&apos;s &apos;increase the GDP of the internet&apos; show what that looks like, while common
+            mistakes — like writing a mission instead of a vision — dilute the effect.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 criteria for a great vision, 6 real company examples, 6 mistakes to avoid,
             and 5 tests to run before you commit to your vision statement.
@@ -166,6 +191,8 @@ export default function PmVisionStatementPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-vision-statement" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Vision &amp; Strategy Daily</h2>

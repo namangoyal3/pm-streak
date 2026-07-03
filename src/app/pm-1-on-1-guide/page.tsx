@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM 1:1 Guide (2026) — How Product Managers Run Great 1:1s",
@@ -107,6 +110,7 @@ const FAQS = [
 ];
 
 export default function Pm1On1GuidePage() {
+  const dates = pageDates("/pm-1-on-1-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -114,6 +118,17 @@ export default function Pm1On1GuidePage() {
         { name: "PM 1:1 Guide", url: `${SITE_URL}/pm-1-on-1-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM 1:1 Guide (2026 Edition)",
+        description:
+          "How PMs run great 1:1s — with their manager, direct reports, and cross-functional partners. Agenda templates, question prompts, and the cadence that works.",
+        image: `${SITE_URL}/api/og?title=PM+1:1+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-1-on-1-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -123,6 +138,16 @@ export default function Pm1On1GuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM 1:1 Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Great PM 1:1s follow a type-specific agenda: weekly check-ins with your manager to
+            align on priorities and get feedback, weekly syncs with engineering leads and
+            designers to unblock decisions, and protected weekly time with direct reports
+            focused on their growth. Each meeting works best when the PM drives the agenda
+            instead of turning it into a status update.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Agenda templates for 4 types of 1:1s (manager, engineering, design, reports),
             6 prompts that open real conversations, and how to never waste 1:1 time again.
@@ -187,6 +212,8 @@ export default function Pm1On1GuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-1-on-1-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Relationship Skills Daily</h2>

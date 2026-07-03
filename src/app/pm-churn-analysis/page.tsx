@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Churn Analysis (2026) — Find Why Users Leave and Fix It",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmChurnAnalysisPage() {
+  const dates = pageDates("/pm-churn-analysis");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmChurnAnalysisPage() {
         { name: "PM Churn Analysis", url: `${SITE_URL}/pm-churn-analysis` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Churn Analysis Guide (2026 Edition)",
+        description:
+          "How PMs diagnose churn. Types of churn, root-cause analysis, and the 5 levers PMs use to reduce churn meaningfully.",
+        image: `${SITE_URL}/api/og?title=PM+Churn+Analysis+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-churn-analysis`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,12 @@ export default function PmChurnAnalysisPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Churn Analysis Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Churn shows up in five different shapes — from users who never activate after signup to those who actively cancel or simply stop paying — so diagnosis means segmenting by cohort, channel, and usage pattern before running exit surveys or churned-user interviews to find root causes like unclear first-session value, UX friction, or pricing tension, then applying levers such as better onboarding, habit loops, or win-back flows.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 types of churn, 6 diagnosis steps, 6 root causes, and 5 levers to reduce churn meaningfully.
           </p>
@@ -165,6 +186,8 @@ export default function PmChurnAnalysisPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-churn-analysis" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Retention Skills Daily</h2>

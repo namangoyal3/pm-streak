@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Collaboration Tools (2026) — Notion, Figma, Linear PM Playbook",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmCollaborationToolsPage() {
+  const dates = pageDates("/pm-collaboration-tools");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmCollaborationToolsPage() {
         { name: "PM Collaboration Tools", url: `${SITE_URL}/pm-collaboration-tools` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Collaboration Tools (2026 Edition)",
+        description: "How PMs build collaboration products. Multiplayer UX, permissions, templates, and why collaboration tools compound through networks of users.",
+        image: `${SITE_URL}/api/og?title=PM+Collaboration+Tools+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-collaboration-tools`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmCollaborationToolsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Collaboration Tools<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            The math behind collaboration tools is simple: every new user invites two to five teammates, so growth looks slow until the user base crosses roughly 100,000 active users — the inflection point Notion, Figma, and Linear all passed — and then compounds. That&apos;s why PMs in this category treat multiplayer editing, permissions, and templates as core product surfaces, tracking seats-per-account expansion, time-to-second-seat, and cross-workspace invitations as the real growth signals.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for collaboration product PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmCollaborationToolsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-collaboration-tools" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Collaboration PM Scenarios</h2>

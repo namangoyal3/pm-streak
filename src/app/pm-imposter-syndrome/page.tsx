@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Imposter Syndrome (2026) — Why PMs Feel It and How to Deal",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmImposterSyndromePage() {
+  const dates = pageDates("/pm-imposter-syndrome");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,17 @@ export default function PmImposterSyndromePage() {
         { name: "PM Imposter Syndrome", url: `${SITE_URL}/pm-imposter-syndrome` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Imposter Syndrome (2026 Edition)",
+        description:
+          "Why PMs experience imposter syndrome more than most roles, what to do about it, and which parts of the feeling are actually useful.",
+        image: `${SITE_URL}/api/og?title=PM+Imposter+Syndrome+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-imposter-syndrome`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +81,12 @@ export default function PmImposterSyndromePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Imposter Syndrome<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PMs feel imposter syndrome more acutely than most roles because the career path has no formal training, the job spans engineers, designers, data, and sales without being deepest in any one, and outcomes stay ambiguous while failures play out publicly. It rarely disappears fully, but writing down weekly learnings and remembering that confidence lags competence by a year or two make it manageable rather than paralysing.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 reasons PMs feel it and 5 ways to handle it.
           </p>
@@ -111,6 +132,8 @@ export default function PmImposterSyndromePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-imposter-syndrome" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Confidence Scenarios</h2>

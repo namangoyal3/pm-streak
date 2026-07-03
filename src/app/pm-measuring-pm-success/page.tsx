@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "How to Measure PM Success (2026) — What Great PMs Are Actually Evaluated On",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmMeasuringPmSuccessPage() {
+  const dates = pageDates("/pm-measuring-pm-success");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,16 @@ export default function PmMeasuringPmSuccessPage() {
         { name: "Measuring PM Success", url: `${SITE_URL}/pm-measuring-pm-success` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "How to Measure PM Success (2026 Edition)",
+        description: "How PMs are actually measured. Beyond 'did you ship features?' — the real signals PM managers and companies use to evaluate PMs across levels.",
+        image: `${SITE_URL}/api/og?title=How+to+Measure+PM+Success+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-measuring-pm-success`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,9 +104,15 @@ export default function PmMeasuringPmSuccessPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             How to Measure PM Success<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            7 dimensions PMs are actually evaluated on, 5 signals you&apos;re tracking up,
-            5 signals you&apos;re stuck, and 5 moves to unstick.
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Great PMs aren&apos;t measured by how many features they ship — they&apos;re evaluated
+            on seven dimensions: outcomes moved, judgment under uncertainty, cross-team influence,
+            communication quality, team health, predictability, and growth trajectory. Senior PMs
+            are judged on outcomes, not outputs; a PM who ships ten features but moves no metrics
+            is still seen as failing.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Build PM Career Velocity Daily — Free →
@@ -166,6 +186,8 @@ export default function PmMeasuringPmSuccessPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-measuring-pm-success" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Skills That Get You Promoted</h2>

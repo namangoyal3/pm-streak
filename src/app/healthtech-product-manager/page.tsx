@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Healthtech Product Manager Guide (2026) — How to Become a Healthtech PM in India",
@@ -81,6 +84,7 @@ const FAQS = [
 ];
 
 export default function HealthtechProductManagerPage() {
+  const dates = pageDates("/healthtech-product-manager");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -88,6 +92,16 @@ export default function HealthtechProductManagerPage() {
         { name: "Healthtech Product Manager", url: `${SITE_URL}/healthtech-product-manager` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Healthtech Product Manager Guide (2026)",
+        description: "The complete healthtech PM playbook for India. Top companies, unique domain challenges, regulatory context, interview questions, and how to break into healthtech PM.",
+        image: `${SITE_URL}/api/og?title=Healthtech+PM+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/healthtech-product-manager`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -97,6 +111,16 @@ export default function HealthtechProductManagerPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Healthtech PM Guide<br />(India 2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Healthtech product management in India centres on companies like PharmEasy, Tata 1mg,
+            Practo, Cult.fit, and Pristyn Care, where trust, regulatory complexity (DPDP, RBI,
+            ABDM/NDHM), multi-sided incentives, and prescription workflows make the work
+            slower-moving than consumer tech — though mid-career PMs at top firms still earn
+            roughly ₹25L–70L.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             8 top healthtech companies, 5 unique domain challenges, 6 interview questions,
             and how to break into healthtech PM roles in India.
@@ -175,6 +199,8 @@ export default function HealthtechProductManagerPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="healthtech-product-manager" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Healthtech PM Domain Depth Daily</h2>

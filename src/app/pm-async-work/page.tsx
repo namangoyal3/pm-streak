@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Async Work (2026) — How Great PMs Write Instead of Meet",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmAsyncWorkPage() {
+  const dates = pageDates("/pm-async-work");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,17 @@ export default function PmAsyncWorkPage() {
         { name: "PM Async Work", url: `${SITE_URL}/pm-async-work` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Async Work Guide (2026 Edition)",
+        description:
+          "How PMs default to async communication — doc-first decisions, when to meet, and the writing skills that replace meetings.",
+        image: `${SITE_URL}/api/og?title=PM+Async+Work+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-async-work`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +104,12 @@ export default function PmAsyncWorkPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Async Work Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM async work means defaulting to written docs and updates instead of meetings — because writing clarifies thinking, reaches teams across time zones, and creates searchable decision records — while still reserving live conversation for deadlocked debates, high-stakes calls, and delicate feedback. The practice rests on six specific skills, from TL;DR-first docs to structured status updates, since the goal is async by default, not async at all costs.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 reasons async compounds, 5 scenarios async works best, 5 scenarios sync wins,
             and 6 async PM skills to develop.
@@ -165,6 +186,8 @@ export default function PmAsyncWorkPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-async-work" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Writing Muscle Daily</h2>

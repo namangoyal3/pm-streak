@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Neo Banking (2026) — Jupiter, Fi, Niyo PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmNeoBankingPage() {
+  const dates = pageDates("/pm-neo-banking");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmNeoBankingPage() {
         { name: "PM Neo Banking", url: `${SITE_URL}/pm-neo-banking` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Neo Banking (India Edition)",
+        description: "How PMs build neo banks in India. BaaS partnerships, RBI constraints, and why neobanks survive on adjacent product strength, not core banking.",
+        image: `${SITE_URL}/api/og?title=PM+Neo+Banking+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-neo-banking`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmNeoBankingPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Neo Banking<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Because India has no neobank licence, every product rides on a partner bank, and profit comes from cross-sold investments, credit, and insurance rather than deposits themselves. That BaaS dependency also shapes the roadmap and creates a real support burden, which is why Jupiter, Fi, and Niyo all pivoted toward full-stack ecosystems to stay sustainable.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for neo banking PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmNeoBankingPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-neo-banking" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Neo Banking PM Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Prioritisation Examples (2026) — Real RICE &amp; Impact Decisions",
@@ -86,6 +89,7 @@ const FAQS = [
 ];
 
 export default function PmPrioritizationExamplesPage() {
+  const dates = pageDates("/pm-prioritization-examples");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -93,6 +97,17 @@ export default function PmPrioritizationExamplesPage() {
         { name: "PM Prioritisation Examples", url: `${SITE_URL}/pm-prioritization-examples` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Prioritisation Examples (2026 Edition)",
+        description:
+          "5 real-style prioritisation examples using RICE, impact-effort, and Kano. See how PMs actually weigh features and make trade-offs.",
+        image: `${SITE_URL}/api/og?title=PM+Prioritisation+Examples+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-prioritization-examples`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -102,6 +117,12 @@ export default function PmPrioritizationExamplesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Prioritisation Examples<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Five worked scenarios show prioritisation frameworks in practice: RICE scoring a Q3 backlog, an impact-effort 2x2 for onboarding ideas, Kano classification for a fintech release, a strategic override where RICE loses to competitive timing, and making a trade-off visible to push back on a founder&apos;s request. The through-line across all five: frameworks organise the reasoning, but PMs who score honestly and document trade-offs stay calibrated where others get overconfident.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 real-style examples using RICE, impact-effort, and Kano — with reasoning and takeaway for each.
           </p>
@@ -155,6 +176,8 @@ export default function PmPrioritizationExamplesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-prioritization-examples" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Prioritisation Daily</h2>

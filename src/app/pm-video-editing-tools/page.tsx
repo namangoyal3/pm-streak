@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Video Editing Tools (2026) — CapCut, Descript, Premiere PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmVideoEditingToolsPage() {
+  const dates = pageDates("/pm-video-editing-tools");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmVideoEditingToolsPage() {
         { name: "PM Video Editing", url: `${SITE_URL}/pm-video-editing-tools` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Video Editing Tools (2026 Edition)",
+        description:
+          "How PMs build video editing tools. Mobile vs desktop, AI assists, templates, and why CapCut disrupted the category by owning creator workflows on mobile.",
+        image: `${SITE_URL}/api/og?title=PM+Video+Editing+Tools+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-video-editing-tools`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmVideoEditingToolsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Video Editing Tools<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Mobile-first, free, and TikTok-integrated — that&apos;s how CapCut overtook Adobe Premiere among creators, even against a 30-year incumbent. This page maps the five dynamics behind that shift (AI assists, template marketplaces, platform lock-in) alongside the five metrics PMs use to track a video editing product, from export volume to free-to-paid conversion.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for video editing tool PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmVideoEditingToolsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-video-editing-tools" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Video Editing PM Scenarios</h2>

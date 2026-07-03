@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Competitive Analysis for PMs (2026) — How to Study Competitors Without Copying Them",
@@ -115,6 +118,7 @@ const FAQS = [
 ];
 
 export default function PmCompetitiveAnalysisPage() {
+  const dates = pageDates("/pm-competitive-analysis");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -122,6 +126,17 @@ export default function PmCompetitiveAnalysisPage() {
         { name: "PM Competitive Analysis", url: `${SITE_URL}/pm-competitive-analysis` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Competitive Analysis for PMs (2026 Edition)",
+        description:
+          "The PM guide to competitive analysis. How to study competitors, what to track, when to copy vs differentiate, and the anti-patterns that make competitive research useless.",
+        image: `${SITE_URL}/api/og?title=Competitive+Analysis+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-competitive-analysis`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -131,6 +146,15 @@ export default function PmCompetitiveAnalysisPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Competitive Analysis for PMs<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Competitive analysis for PMs is the discipline of tracking six dimensions — product features, user
+            reviews, pricing, hiring signals, strategic announcements, and behavioural data — without letting it
+            become a distraction from your own users. Budget roughly two hours a week for ongoing awareness plus a
+            quarterly deep-dive, and resist the urge to copy a rival&apos;s feature the moment it ships.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             What to track about your competitors, how often, what to do when they make moves,
             and the anti-patterns that make most competitive research useless.
@@ -203,6 +227,8 @@ export default function PmCompetitiveAnalysisPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-competitive-analysis" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Strategic Intuition Daily</h2>

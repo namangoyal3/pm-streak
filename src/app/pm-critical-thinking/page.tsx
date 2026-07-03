@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Critical Thinking for PMs (2026) — The Habit of Mind That Separates Great PMs",
@@ -88,6 +91,7 @@ const FAQS = [
 ];
 
 export default function PmCriticalThinkingPage() {
+  const dates = pageDates("/pm-critical-thinking");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -95,6 +99,17 @@ export default function PmCriticalThinkingPage() {
         { name: "PM Critical Thinking", url: `${SITE_URL}/pm-critical-thinking` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Critical Thinking for PMs (2026 Edition)",
+        description:
+          "How PMs think critically. Question assumptions, distinguish signal from noise, avoid cognitive biases, and develop the intellectual discipline great PMs share.",
+        image: `${SITE_URL}/api/og?title=Critical+Thinking+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-critical-thinking`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -104,6 +119,12 @@ export default function PmCriticalThinkingPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Critical Thinking for PMs<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Great PMs aren&apos;t smarter than everyone else—they practice seven deliberate habits: questioning premises, separating evidence from opinion, catching their own cognitive biases, weighing second-order effects, steelmanning opposing views, staying specifically (falsifiably) wrong, and tracing causality back to root causes. Recognising biases like confirmation bias, sunk cost, and anchoring sharpens every one of these habits.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             7 habits of critical PM thinking with concrete examples, 7 cognitive biases to spot in yourself,
             and how to develop intellectual discipline deliberately.
@@ -156,6 +177,8 @@ export default function PmCriticalThinkingPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-critical-thinking" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Structured Thinking Daily</h2>

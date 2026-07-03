@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM AI Video Products (2026) — Sora, Runway, HeyGen PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmAiVideoPage() {
+  const dates = pageDates("/pm-ai-video");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmAiVideoPage() {
         { name: "PM AI Video", url: `${SITE_URL}/pm-ai-video` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Video Products (2026 Edition)",
+        description:
+          "How PMs build AI video products. Generation vs editing, consistency, length limits, and why AI video is the next wave of creative tooling.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Video+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-video`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmAiVideoPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Video Products<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Character consistency across frames is the hardest unsolved problem in AI video, since footage drifts mid-shot even as Sora and Runway push clip length past ten seconds; PMs track this through re-roll rate and seconds of final video produced per user, while rights and likeness stay a legal landmine that avatars need explicit consent to avoid — which is why hybrid pipelines pairing AI B-roll with human production dominate 2026 workflows.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for AI video product PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmAiVideoPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-video" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI Video PM Scenarios</h2>

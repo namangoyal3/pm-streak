@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "MBA to Product Manager (2026) — IIM, ISB & Top B-School to PM Career",
@@ -70,6 +73,7 @@ const FAQS = [
 ];
 
 export default function MbaToProductManagerPage() {
+  const dates = pageDates("/mba-to-product-manager");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -77,6 +81,16 @@ export default function MbaToProductManagerPage() {
         { name: "MBA to Product Manager", url: `${SITE_URL}/mba-to-product-manager` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "MBA to Product Manager (2026 Guide)",
+        description: "The complete guide to landing a PM role from an MBA. How to position your MBA, APM programs that recruit from campus, what hiring managers actually look for from MBAs.",
+        image: `${SITE_URL}/api/og?title=MBA+to+Product+Manager+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/mba-to-product-manager`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -86,6 +100,12 @@ export default function MbaToProductManagerPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             MBA to Product Manager<br />(2026 Guide)
           </h1>
+          <p className="text-base text-white/60 max-w-2xl mx-auto mb-2">
+            MBA graduates break into PM roles mainly through APM programs — Google APMM, Flipkart&apos;s Product Accelerator, Razorpay APM, or Microsoft&apos;s PM track — sourced heavily from IIM Ahmedabad, IIM Bangalore, IIM Calcutta, and ISB. Landing one usually means closing five common gaps first: a thin shipped-product portfolio, weak tactical execution, and limited technical fluency chief among them.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             How MBA grads land PM roles — top B-school PM scenes, APM programs that recruit from MBA,
             and how to position your MBA so hiring managers take you seriously.
@@ -153,6 +173,8 @@ export default function MbaToProductManagerPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="mba-to-product-manager" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Prep for PM During Your MBA</h2>

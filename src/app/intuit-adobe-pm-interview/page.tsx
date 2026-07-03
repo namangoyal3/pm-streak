@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Intuit &amp; Adobe PM Interview Guide (2026) — Enterprise SaaS PM Prep",
@@ -84,6 +87,7 @@ const FAQS = [
 ];
 
 export default function IntuitAdobePmInterviewPage() {
+  const dates = pageDates("/intuit-adobe-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -91,6 +95,17 @@ export default function IntuitAdobePmInterviewPage() {
         { name: "Enterprise SaaS PM Interview", url: `${SITE_URL}/intuit-adobe-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Enterprise SaaS PM Interview (Intuit, Adobe, Salesforce 2026)",
+        description:
+          "Crack PM interviews at Intuit, Adobe, Salesforce, and enterprise SaaS. The unique dynamics of large enterprise products, creative tools, and the slow-but-steady PM work.",
+        image: `${SITE_URL}/api/og?title=Intuit+&amp;+Adobe+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/intuit-adobe-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -100,6 +115,17 @@ export default function IntuitAdobePmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Enterprise SaaS PM Interview<br />(Intuit, Adobe, Salesforce 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Enterprise SaaS PM interviews at Intuit, Adobe, and Salesforce probe depth over
+            breadth: expect questions on customer-versus-user distinctions, backwards
+            compatibility, extensibility and APIs, and how long sales cycles change
+            prioritisation. The five dynamics tested — slow but deliberate iteration, buyer/user
+            splits, multi-quarter sales cycles, platform thinking, and sacred backwards
+            compatibility — separate consumer-tech candidates from those ready for enterprise depth.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Top enterprise SaaS companies hiring PMs, 5 unique dynamics of enterprise PM work,
             and 6 interview questions that test depth, not breadth.
@@ -163,6 +189,8 @@ export default function IntuitAdobePmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="intuit-adobe-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for Enterprise PM Depth</h2>

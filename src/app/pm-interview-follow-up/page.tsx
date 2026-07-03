@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Interview Follow-Up Guide (2026) — Emails, Thank-You Notes & What to Do After",
@@ -79,6 +82,7 @@ const FAQS = [
 ];
 
 export default function PmInterviewFollowUpPage() {
+  const dates = pageDates("/pm-interview-follow-up");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -86,6 +90,17 @@ export default function PmInterviewFollowUpPage() {
         { name: "PM Interview Follow-Up", url: `${SITE_URL}/pm-interview-follow-up` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Interview Follow-Up Guide (2026 Edition)",
+        description:
+          "What to do after your PM interview. Thank-you email templates, how to follow up without seeming desperate, handling silence, and how to turn a rejection into a future offer.",
+        image: `${SITE_URL}/api/og?title=PM+Interview+Follow-Up+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-interview-follow-up`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -95,6 +110,16 @@ export default function PmInterviewFollowUpPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Interview Follow-Up Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            What happens after a PM interview follows a four-step timeline: a thank-you email
+            within 24 hours, your own notes on questions and answers by day two or three, a
+            light recruiter check-in by day five to seven, and one final nudge by day ten
+            before moving on. If the outcome is rejection, responding graciously and asking for
+            specific feedback often matter more than the interview itself for a future offer.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4-step post-interview playbook, thank-you email templates,
             how to handle silence, and how to turn rejection into a future offer.
@@ -151,6 +176,8 @@ export default function PmInterviewFollowUpPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-interview-follow-up" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Stay Sharp Through the Wait</h2>

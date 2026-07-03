@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM B2B Marketplaces (2026) — Udaan, IndiaMART, Zetwerk PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmB2bMarketplacesPage() {
+  const dates = pageDates("/pm-b2b-marketplaces");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmB2bMarketplacesPage() {
         { name: "PM B2B Marketplaces", url: `${SITE_URL}/pm-b2b-marketplaces` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM B2B Marketplaces (India Edition)",
+        description:
+          "How PMs build B2B marketplaces. Supplier quality, credit, logistics, and why B2B marketplaces are fundamentally different from consumer ones.",
+        image: `${SITE_URL}/api/og?title=PM+B2B+Marketplaces+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-b2b-marketplaces`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmB2bMarketplacesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM B2B Marketplaces<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            B2B marketplace PMs treat supplier quality as the core moat, credit and working capital as the real product beneath the marketplace, and logistics ownership as the lever on margin — because Indian buyers still prefer WhatsApp and phone calls over apps. Success shows up in GMV, take rate, repeat buyer rate, and credit line NPA, and it requires pairing digital product with offline sales and field-agent networks.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2 transition-colors">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for B2B marketplace PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmB2bMarketplacesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-b2b-marketplaces" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice B2B Marketplace Scenarios</h2>

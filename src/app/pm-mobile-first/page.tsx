@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Mobile-First Design (2026) — Why India is Still a Mobile-First PM Market",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmMobileFirstPage() {
+  const dates = pageDates("/pm-mobile-first");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmMobileFirstPage() {
         { name: "PM Mobile-First", url: `${SITE_URL}/pm-mobile-first` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Mobile-First Design (India Edition)",
+        description: "How PMs build mobile-first for India. Android bias, low-end devices, flaky connectivity, and why desktop-first thinking fails in Bharat.",
+        image: `${SITE_URL}/api/og?title=PM+Mobile-First+Design+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-mobile-first`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmMobileFirstPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Mobile-First Design<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            With over 90% of Indian internet users mobile-first or mobile-only and Android holding roughly 95% share on mostly 2–3GB RAM devices, mobile-first practice here means testing against a three-year-old Android phone, keeping bundle size lean, designing offline-first, and supporting vernacular languages like Hindi, Marathi, Tamil, Telugu, Kannada, and Bengali.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 realities and 5 practices for mobile-first PMs in India.
           </p>
@@ -112,6 +132,8 @@ export default function PmMobileFirstPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-mobile-first" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Mobile-First PM Scenarios</h2>

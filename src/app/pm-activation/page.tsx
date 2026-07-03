@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Activation Guide (2026) — How to Define &amp; Improve Activation",
@@ -72,6 +75,7 @@ const FAQS = [
 ];
 
 export default function PmActivationPage() {
+  const dates = pageDates("/pm-activation");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -79,6 +83,17 @@ export default function PmActivationPage() {
         { name: "PM Activation", url: `${SITE_URL}/pm-activation` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Activation Guide (2026 Edition)",
+        description:
+          "How PMs define activation — the moment users get real value — and improve it. The &apos;aha moment&apos;, activation metrics, and the 5 levers PMs use to raise activation.",
+        image: `${SITE_URL}/api/og?title=PM+Activation+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-activation`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -88,6 +103,16 @@ export default function PmActivationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Activation Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Facebook&apos;s aha moment was seven friends in ten days; Dropbox&apos;s was one file uploaded
+            to one folder across two devices — concrete, binary actions that predict Day-30 retention far
+            better than signup itself. This guide covers five traits of a strong activation definition,
+            five steps to find your own product&apos;s aha moment, and five levers PMs pull to raise the
+            activation rate once it&apos;s defined.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 traits of good activation definitions, 5 famous &apos;aha moments&apos;, 5 steps to find yours,
             and 5 levers to raise activation rate.
@@ -164,6 +189,8 @@ export default function PmActivationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-activation" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Activation Skills Daily</h2>

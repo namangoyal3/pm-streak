@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Bay Area vs India (2026) — Career Tradeoffs Compared",
@@ -48,6 +51,7 @@ const FAQS = [
 ];
 
 export default function PmBayAreaVsIndiaPage() {
+  const dates = pageDates("/pm-bay-area-vs-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -55,6 +59,16 @@ export default function PmBayAreaVsIndiaPage() {
         { name: "PM Bay Area vs India", url: `${SITE_URL}/pm-bay-area-vs-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Bay Area vs India (2026 Edition)",
+        description: "How PMs should think about Bay Area vs India career paths. Comp, scope, mission, and the lifestyle differences that compound over a decade.",
+        image: `${SITE_URL}/api/og?title=PM+Bay+Area+vs+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-bay-area-vs-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -64,6 +78,12 @@ export default function PmBayAreaVsIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Bay Area vs India<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Choosing between a Bay Area and India PM career comes down to trading peak comp and frontier-tech access — $250k–$700k+ for senior roles, plus operator networks — against faster scope growth, next-billion-user impact, and lifestyle proximity to family. The honest read: the Bay Area pays off only for the top 1% of opportunities.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:text-[#58cc02]">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 Bay Area pros and 4 India pros — make your call deliberately.
           </p>
@@ -109,6 +129,8 @@ export default function PmBayAreaVsIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-bay-area-vs-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Career Scenarios</h2>

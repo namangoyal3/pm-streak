@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Launch Strategy (2026) — How PMs Run Real Product Launches",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmLaunchStrategyPage() {
+  const dates = pageDates("/pm-launch-strategy");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,17 @@ export default function PmLaunchStrategyPage() {
         { name: "PM Launch Strategy", url: `${SITE_URL}/pm-launch-strategy` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Launch Strategy (2026 Edition)",
+        description:
+          "How PMs plan launches that move metrics, not press. Launch tiers, rollout plans, press vs user-led launches, and common launch mistakes.",
+        image: `${SITE_URL}/api/og?title=PM+Launch+Strategy+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-launch-strategy`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +81,12 @@ export default function PmLaunchStrategyPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Launch Strategy<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Most launches fall into one of four tiers, from rare tentpole press events down to quiet ships tracked only through analytics — the type PMs actually run most often. Regardless of tier, the same five-step discipline applies: define the success metric before shipping, roll out gradually with kill-switches, align GTM and support on Day 1 messaging, instrument before launch, and hold a two-week post-launch review.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             4 launch tiers and a 5-step checklist for PMs running real launches.
           </p>
@@ -111,6 +132,8 @@ export default function PmLaunchStrategyPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-launch-strategy" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Launch Scenarios</h2>

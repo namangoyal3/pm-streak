@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "APM vs PM (2026) — How They Differ &amp; Which to Target",
@@ -70,6 +73,7 @@ const FAQS = [
 ];
 
 export default function PmApmVsPmPage() {
+  const dates = pageDates("/pm-apm-vs-pm");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -77,6 +81,16 @@ export default function PmApmVsPmPage() {
         { name: "APM vs PM", url: `${SITE_URL}/pm-apm-vs-pm` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "APM vs PM (2026 Edition)",
+        description: "APM vs PM — the real differences in scope, expectations, compensation, and promotion timeline. Which should you target based on your background?",
+        image: `${SITE_URL}/api/og?title=APM+vs+PM+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-apm-vs-pm`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -86,9 +100,14 @@ export default function PmApmVsPmPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             APM vs PM<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
-            The real differences between APM and PM roles — scope, autonomy, compensation,
-            and promotion timeline. Which should you target?
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Side by side, APM and PM differ in scope, autonomy, and pay: an APM typically has
+            0–2 years of experience, owns one feature area under guidance, and earns ₹18–40L,
+            while a PM has 2–4 years, owns a product area independently, and earns ₹28–70L. Most
+            APMs promote to PM within 18–24 months in structured programs.
+          </p>
+          <p className="text-sm text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Start PM Prep Daily — Free →
@@ -159,6 +178,8 @@ export default function PmApmVsPmPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-apm-vs-pm" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Prep for Either Path Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Airbnb PM Interview Guide (2026) — Marketplace, Trust & Host PM Questions",
@@ -105,12 +108,23 @@ const FAQS = [
 ];
 
 export default function AirbnbPmInterviewPage() {
+  const dates = pageDates("/airbnb-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "Airbnb PM Interview", url: `${SITE_URL}/airbnb-pm-interview` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "Airbnb PM Interview Guide (2026 Edition)",
+        description: "Crack the Airbnb PM interview. Marketplace dynamics, trust and safety, host and guest experience, and the story-driven product culture Airbnb is famous for.",
+        image: `${SITE_URL}/api/og?title=Airbnb+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/airbnb-pm-interview`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -121,6 +135,16 @@ export default function AirbnbPmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Airbnb PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Marketplace two-sidedness runs through every one of Airbnb&apos;s five interview rounds —
+            product sense and design, analytical and metrics, strategy, trust and safety, and
+            behavioural — because trust between strangers is the entire product. Interviewers score
+            high on design taste and story-driven answers, and solutions that favor guests while
+            ignoring hosts (or vice versa) are treated as automatic misses.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Marketplace dynamics, trust and safety, design craft, and the story-driven product culture
             Airbnb is famous for — all 5 rounds and real questions.
@@ -187,6 +211,8 @@ export default function AirbnbPmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="airbnb-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for Airbnb-Level Design and Marketplace PM</h2>

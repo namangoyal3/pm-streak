@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Learning Habits (2026) — How Great PMs Keep Sharpening",
@@ -52,6 +55,7 @@ const FAQS = [
 ];
 
 export default function PmLearningHabitsPage() {
+  const dates = pageDates("/pm-learning-habits");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -59,6 +63,17 @@ export default function PmLearningHabitsPage() {
         { name: "PM Learning Habits", url: `${SITE_URL}/pm-learning-habits` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Learning Habits (2026 Edition)",
+        description:
+          "Daily, weekly, and monthly learning habits that compound for PMs. Inputs, reflection, and deliberate skill-building.",
+        image: `${SITE_URL}/api/og?title=PM+Learning+Habits+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-learning-habits`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -68,6 +83,16 @@ export default function PmLearningHabitsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Learning Habits<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM learning habits break into three daily practices (reading, reviewing decisions,
+            one user interaction), three weekly rituals (journaling, a long-form read, a product
+            review), and three monthly check-ins (retro on bigger bets, updating your narrative
+            doc, refreshing learning goals) — deliberate practice, not accumulated years, is what
+            separates PMs who keep growing from those who plateau.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Daily, weekly, monthly habits that compound.
           </p>
@@ -125,6 +150,8 @@ export default function PmLearningHabitsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-learning-habits" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice PM Learning Scenarios</h2>

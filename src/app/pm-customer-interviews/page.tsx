@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Customer Interviews (2026) — How to Interview Users and Learn What&apos;s Real",
@@ -83,6 +86,7 @@ const FAQS = [
 ];
 
 export default function PmCustomerInterviewsPage() {
+  const dates = pageDates("/pm-customer-interviews");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -90,6 +94,16 @@ export default function PmCustomerInterviewsPage() {
         { name: "PM Customer Interviews", url: `${SITE_URL}/pm-customer-interviews` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Customer Interviews (2026 Edition)",
+        description: "How PMs run customer interviews that reveal real insight. Question design, listening techniques, avoiding bias, and turning interviews into shipped product decisions.",
+        image: `${SITE_URL}/api/og?title=PM+Customer+Interviews+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-customer-interviews`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -99,6 +113,17 @@ export default function PmCustomerInterviewsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Customer Interviews<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-2">
+            Great customer interviews run on preparation and restraint: prepare open-ended
+            questions like tell me about the last time you did this, walk me through it, then
+            let silence do the work, waiting three seconds after a user stops talking pulls
+            out what matters most. PMs should log at least one interview a week, ramping to
+            three to five during active discovery, since interviews are 80% user talking and
+            20% PM.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 prep moves, 6 questions that work, 5 to avoid, 6 listening techniques, and 6 biases to catch in yourself.
           </p>
@@ -187,6 +212,8 @@ export default function PmCustomerInterviewsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-customer-interviews" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build User Research Skills Daily</h2>

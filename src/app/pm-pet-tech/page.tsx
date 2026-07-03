@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Pet Tech (2026) — Chewy, Heads Up For Tails, Supertails PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmPetTechPage() {
+  const dates = pageDates("/pm-pet-tech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmPetTechPage() {
         { name: "PM Pet Tech", url: `${SITE_URL}/pm-pet-tech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Pet Tech (2026 Edition)",
+        description:
+          "How PMs build pet tech products. Recurring subscriptions, vet integrations, and why pet tech follows a different repeat rate curve than other D2C.",
+        image: `${SITE_URL}/api/og?title=PM+Pet+Tech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-pet-tech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmPetTechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Pet Tech<br />(2026 Edition)
           </h1>
+          <p className="text-base text-white/80 max-w-2xl mx-auto mb-3">
+            India&apos;s pet tech market is still under 5% penetration, but subscription pet food anchors recurring revenue while vet consultations and pharmacy stack on top for cross-sell. Category leaders like Supertails, Heads Up For Tails, and Wiggles are growing 20–40% year over year, nowhere near Chewy&apos;s scale yet, and PMs track monthly recurring revenue, 60/90-day repeat purchase rate, and NPS since pet parents are vocal.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for pet tech PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmPetTechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-pet-tech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Pet Tech PM Scenarios</h2>

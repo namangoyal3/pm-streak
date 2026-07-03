@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Stakeholder Management for PMs (2026) — Influence Without Authority",
@@ -115,6 +118,7 @@ const FAQS = [
 ];
 
 export default function PmStakeholderManagementPage() {
+  const dates = pageDates("/pm-stakeholder-management");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -122,6 +126,16 @@ export default function PmStakeholderManagementPage() {
         { name: "PM Stakeholder Management", url: `${SITE_URL}/pm-stakeholder-management` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Stakeholder Management for PMs (2026 Edition)",
+        description: "How PMs manage stakeholders — engineering, design, sales, leadership, customers. Frameworks, scripts for saying no, and how to build influence without having authority.",
+        image: `${SITE_URL}/api/og?title=Stakeholder+Management+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-stakeholder-management`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -131,6 +145,12 @@ export default function PmStakeholderManagementPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Stakeholder Management for PMs<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Stakeholder management for PMs comes down to influence, not compliance, earned through four ingredients — superior context from talking to users, communication clear enough that updates are easy to follow, trust built by delivering on promises, and genuine relationships built before they&apos;re needed. That craft spans six stakeholder types, from engineering to leadership, and shows up concretely in how a PM says no without burning bridges.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             How PMs work effectively with engineering, design, sales, leadership, and data partners —
             with scripts for saying no and frameworks for building real influence.
@@ -214,6 +234,8 @@ export default function PmStakeholderManagementPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-stakeholder-management" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Stakeholder Muscle Daily</h2>

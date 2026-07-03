@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM AI Recruiting (2026) — Hiring Tech Powered by AI",
@@ -51,12 +54,23 @@ const FAQS = [
 ];
 
 export default function PmAiRecruitingPage() {
+  const dates = pageDates("/pm-ai-recruiting");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM AI Recruiting", url: `${SITE_URL}/pm-ai-recruiting` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Recruiting (2026 Edition)",
+        description: "How PMs build AI recruiting products. Candidate matching, screening, interviewing, and the bias and legal challenges of automated hiring.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Recruiting+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-recruiting`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -67,6 +81,12 @@ export default function PmAiRecruitingPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Recruiting<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Because biased hiring decisions carry real legal exposure, AI recruiting products are judged as much on their audit trails as their matching accuracy: bias audits, explanation logs, and human-review gates are treated as product requirements under the EU AI Act and similar emerging rules, not optional extras. PMs balance that governance load against candidate experience, tracking screen-to-interview conversion, time-to-fill, and diversity impact via demographic parity checks.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for AI recruiting PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmAiRecruitingPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-recruiting" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI Recruiting PM Scenarios</h2>

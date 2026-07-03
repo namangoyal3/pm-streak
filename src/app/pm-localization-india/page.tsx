@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Localization for India (2026) — Designing Products That Work Across Bharat",
@@ -66,6 +69,7 @@ const FAQS = [
 ];
 
 export default function PmLocalizationIndiaPage() {
+  const dates = pageDates("/pm-localization-india");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -73,6 +77,17 @@ export default function PmLocalizationIndiaPage() {
         { name: "PM Localization India", url: `${SITE_URL}/pm-localization-india` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Localization for India (2026 Edition)",
+        description:
+          "How PMs design products that work across India&apos;s diversity. Languages, device constraints, cultural context, and the vernacular-first product thinking Bharat demands.",
+        image: `${SITE_URL}/api/og?title=PM+Localization+for+India+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-localization-india`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -82,6 +97,12 @@ export default function PmLocalizationIndiaPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Localization for India<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Localizing a product for India means designing across six intersecting realities — language, device class, network quality, payment rails, trust patterns, and cultural context — not simply translating text. PMs who succeed test on ₹8–15K Android phones on weak Jio signal, default to UPI and cash on delivery, and start with one specific segment instead of treating &apos;Bharat&apos; as one undifferentiated market.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 dimensions of India&apos;s diversity to design for, 6 design principles,
             and 5 companies leading (and deliberately avoiding) Bharat.
@@ -144,6 +165,8 @@ export default function PmLocalizationIndiaPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-localization-india" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Bharat PM Intuition Daily</h2>

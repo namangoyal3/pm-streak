@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Notion, Linear & Productivity PM Interview Guide (2026) — Dev Tools PM Prep",
@@ -69,12 +72,23 @@ const FAQS = [
 ];
 
 export default function PmTrelloNotionInterviewPage() {
+  const dates = pageDates("/pm-trello-notion-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "Productivity PM Interview", url: `${SITE_URL}/pm-trello-notion-interview` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "Productivity Tool PM Interview Guide (Notion, Linear & More)",
+        description: "Crack PM interviews at Notion, Linear, Atlassian, and other productivity tools. What makes productivity PM unique — extensibility, power users, and the craft-over-growth tension.",
+        image: `${SITE_URL}/api/og?title=Notion+Linear+Atlassian+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-trello-notion-interview`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -85,6 +99,15 @@ export default function PmTrelloNotionInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Productivity Tool PM<br />Interview Guide (Notion, Linear &amp; More)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            What does a productivity-tool PM interview actually test? Across companies like Notion,
+            Linear, and Atlassian, six recurring questions probe how you would navigate the central
+            tension of the category — flexibility versus simplicity — while serving both power users
+            who customise heavily and casual users who just need things to work.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The unique PM culture of productivity tools, 6 interview questions,
             and the 5 product nuances that separate strong candidates from weak ones.
@@ -147,6 +170,8 @@ export default function PmTrelloNotionInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-trello-notion-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for Craft-Level PM Standards</h2>

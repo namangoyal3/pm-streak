@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Maps &amp; Navigation (2026) — Google Maps, MapmyIndia, Apple Maps PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmMapsNavigationPage() {
+  const dates = pageDates("/pm-maps-navigation");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmMapsNavigationPage() {
         { name: "PM Maps & Navigation", url: `${SITE_URL}/pm-maps-navigation` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Maps & Navigation (2026 Edition)",
+        description:
+          "How PMs build maps and navigation products. Routing quality, POI coverage, traffic, and why maps are the most operationally intense consumer category.",
+        image: `${SITE_URL}/api/og?title=PM+Maps+&amp;+Navigation+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-maps-navigation`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmMapsNavigationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Maps &amp; Navigation<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            PM work in maps and navigation is fundamentally a data-compounding game: routing quality, POI coverage, and traffic accuracy all improve as more users generate more data, which is why Google Maps dominates globally while India-specific niches like MapmyIndia compete on hyperlocal data such as small lanes and vernacular search. Success is measured through ETA accuracy, POI search success, and rerouting frequency.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for maps and navigation PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmMapsNavigationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-maps-navigation" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Maps PM Scenarios</h2>

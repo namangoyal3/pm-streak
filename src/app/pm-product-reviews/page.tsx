@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Product Reviews (2026) — Running Reviews That Actually Move Work Forward",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmProductReviewsPage() {
+  const dates = pageDates("/pm-product-reviews");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmProductReviewsPage() {
         { name: "PM Product Reviews", url: `${SITE_URL}/pm-product-reviews` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Product Reviews (2026 Edition)",
+        description:
+          "How PMs run product reviews with leadership. Pre-reads, decision logs, handling pushback, and why most reviews fail.",
+        image: `${SITE_URL}/api/og?title=PM+Product+Reviews+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-product-reviews`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmProductReviewsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Product Reviews<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            A product review earns its place on the calendar only when it produces a decision — pre-read sent 24 hours ahead, the ask stated up front, tradeoffs named explicitly, and decisions captured live with owners and next steps. The reviews that fail skip the ask, bury it in context, treat pushback as a threat rather than free consulting, or leave decisions undocumented so the same debate resurfaces next quarter.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 practices and 4 pitfalls for running high-leverage product reviews.
           </p>
@@ -112,6 +133,8 @@ export default function PmProductReviewsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-product-reviews" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Review Scenarios</h2>

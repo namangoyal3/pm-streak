@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Experimentation Platform (2026) — LaunchDarkly, Statsig, Eppo PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmExperimentationPlatformPage() {
+  const dates = pageDates("/pm-experimentation-platform");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmExperimentationPlatformPage() {
         { name: "PM Experimentation Platform", url: `${SITE_URL}/pm-experimentation-platform` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Experimentation Platform (2026 Edition)",
+        description:
+          "How PMs build experimentation platforms. Feature flags, statistical engines, governance, and why exp platforms are the unsexy infra winners.",
+        image: `${SITE_URL}/api/og?title=PM+Experimentation+Platform+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-experimentation-platform`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmExperimentationPlatformPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Experimentation Platform<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            As feature-flag-only tools commoditize, the real moat for a PM building an experimentation platform is statistical engine quality — CUPED, sequential testing, and honest handling of peeking — plus governance across hundreds of concurrent experiments and integration with the data warehouse, tracked through metrics like active experiments per week, time-to-first-experiment for new users, and the engineer-to-PM ratio of platform users.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for experimentation platform PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmExperimentationPlatformPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-experimentation-platform" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Exp Platform PM Scenarios</h2>

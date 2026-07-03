@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Sprint Retrospectives (2026) — How to Run Retros That Change Behaviour",
@@ -75,6 +78,7 @@ const FAQS = [
 ];
 
 export default function PmSprintRetrospectivesPage() {
+  const dates = pageDates("/pm-sprint-retrospectives");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -82,6 +86,17 @@ export default function PmSprintRetrospectivesPage() {
         { name: "PM Sprint Retrospectives", url: `${SITE_URL}/pm-sprint-retrospectives` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Sprint Retrospectives (2026 Edition)",
+        description:
+          "How PMs run sprint retros that actually improve the team. Structure, facilitation, and why most retros feel like theatre.",
+        image: `${SITE_URL}/api/og?title=PM+Sprint+Retrospectives+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-sprint-retrospectives`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -91,6 +106,16 @@ export default function PmSprintRetrospectivesPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Sprint Retrospectives<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Sprint retros that change behaviour follow a fixed 45-minute structure — review last
+            sprint&apos;s action items, ground in data, celebrate wins, dig into specific root causes,
+            then assign named owners and deadlines before the team verbally commits. The biggest
+            mistake is skipping that follow-up: teams generate good ideas, never implement them, and
+            the next retro feels like déjà vu.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6-step retro structure, 6 facilitation rules, 6 common failures, and 5 retro formats to try.
           </p>
@@ -166,6 +191,8 @@ export default function PmSprintRetrospectivesPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-sprint-retrospectives" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Team Skills Daily</h2>

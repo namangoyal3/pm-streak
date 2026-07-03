@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Negotiation Skills Guide (2026) — How PMs Negotiate Scope, Priorities & Resources",
@@ -93,6 +96,7 @@ const FAQS = [
 ];
 
 export default function PmNegotiationSkillsPage() {
+  const dates = pageDates("/pm-negotiation-skills");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -100,6 +104,17 @@ export default function PmNegotiationSkillsPage() {
         { name: "PM Negotiation Skills", url: `${SITE_URL}/pm-negotiation-skills` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Negotiation Skills Guide (2026 Edition)",
+        description:
+          "How PMs negotiate — scope with engineering, priorities with leadership, resources with peers, and timelines with customers. Scripts, principles, and common pitfalls.",
+        image: `${SITE_URL}/api/og?title=PM+Negotiation+Skills+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-negotiation-skills`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -109,6 +124,16 @@ export default function PmNegotiationSkillsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Negotiation Skills Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            PM negotiation covers four recurring situations: scope trade-offs with engineering,
+            priority trade-offs with leadership, resource splits with peer PMs, and deadline
+            trade-offs with customers. The core techniques are negotiating on interests rather
+            than positions, knowing your BATNA, using silence deliberately, anchoring first when
+            possible, and trading every concession for something in return.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 negotiation principles, 4 PM-specific scenarios with scripts,
             and the pitfalls that turn routine conversations into resentments.
@@ -183,6 +208,8 @@ export default function PmNegotiationSkillsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-negotiation-skills" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Hard Conversations Daily</h2>

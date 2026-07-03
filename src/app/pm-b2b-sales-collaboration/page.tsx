@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM + Sales Collaboration for B2B (2026) — How to Work With Sales Without Being Owned By Sales",
@@ -76,6 +79,7 @@ const FAQS = [
 ];
 
 export default function PmB2bSalesCollaborationPage() {
+  const dates = pageDates("/pm-b2b-sales-collaboration");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -83,6 +87,17 @@ export default function PmB2bSalesCollaborationPage() {
         { name: "PM + Sales Collaboration", url: `${SITE_URL}/pm-b2b-sales-collaboration` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM + Sales Collaboration (B2B 2026 Edition)",
+        description:
+          "How B2B PMs collaborate with sales teams effectively. Intake processes, deal desk alignment, saying no, and turning sales signal into product insight.",
+        image: `${SITE_URL}/api/og?title=PM+++Sales+Collaboration+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-b2b-sales-collaboration`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -92,6 +107,12 @@ export default function PmB2bSalesCollaborationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM + Sales Collaboration<br />(B2B 2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Effective B2B PM-sales collaboration runs on a structured intake process — a single request form, weekly triage, a three-day response guarantee, and a transparent quarterly roadmap — rather than ad-hoc Slack pressure. Sales calls and win/loss reviews then become the signal source that shapes the roadmap, while a clear framework for saying no keeps requests from dictating priorities.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 collaboration principles, 5-step intake process, 5 moves for saying no well,
             and 5 signals sales teams can reliably provide.
@@ -168,6 +189,8 @@ export default function PmB2bSalesCollaborationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-b2b-sales-collaboration" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build B2B PM Muscle Daily</h2>

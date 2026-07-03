@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Funnel Analysis Guide (2026) — How to Diagnose Any Funnel",
@@ -74,6 +77,7 @@ const FAQS = [
 ];
 
 export default function PmFunnelAnalysisPage() {
+  const dates = pageDates("/pm-funnel-analysis");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -81,6 +85,17 @@ export default function PmFunnelAnalysisPage() {
         { name: "PM Funnel Analysis", url: `${SITE_URL}/pm-funnel-analysis` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Funnel Analysis Guide (2026 Edition)",
+        description:
+          "How PMs do funnel analysis that leads to action. Defining funnels correctly, spotting the real drop-off, segmentation, and what to do about it.",
+        image: `${SITE_URL}/api/og?title=PM+Funnel+Analysis+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-funnel-analysis`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -90,6 +105,12 @@ export default function PmFunnelAnalysisPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Funnel Analysis Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Funnel analysis means defining 4–7 observable steps toward one real outcome, then comparing step-to-step conversion — not the aggregate rate — to find where the largest absolute drop happens. The real diagnosis work is asking why: UX friction, unclear value, trust gaps, technical bugs, or mismatched expectations, then testing whether removing steps or adding trust signals moves the number.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 steps to define funnels correctly, 5 moves to find the real drop-off,
             6 reasons users drop off, and 6 ways to fix it.
@@ -166,6 +187,8 @@ export default function PmFunnelAnalysisPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-funnel-analysis" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Funnel Intuition Daily</h2>

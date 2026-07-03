@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Side Projects Guide (2026) — Build Something That Gets You Hired",
@@ -99,6 +102,7 @@ const FAQS = [
 ];
 
 export default function PmSideProjectsPage() {
+  const dates = pageDates("/pm-side-projects");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -106,6 +110,17 @@ export default function PmSideProjectsPage() {
         { name: "PM Side Projects", url: `${SITE_URL}/pm-side-projects` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Side Projects Guide (2026 Edition)",
+        description:
+          "Side projects that actually help PM careers. What to build, how to document PM thinking behind them, no-code options, and real examples of side projects that landed PM offers.",
+        image: `${SITE_URL}/api/og?title=PM+Side+Projects+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-side-projects`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -115,6 +130,12 @@ export default function PmSideProjectsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Side Projects Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            The right PM side project isn&apos;t about the tech — a Chrome extension, Notion template, bot, no-code app, newsletter, or small AI tool all work equally well, since what actually helps a PM career is shipped evidence of judgment: a problem you identified, the user you built for, the metric you defined, and what you learned after launch, documented in a page interviewers can read.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 side project ideas that demonstrate PM judgment, why they work,
             and how to document your PM thinking so interviewers actually see it.
@@ -181,6 +202,8 @@ export default function PmSideProjectsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-side-projects" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Skills While You Build Your Project</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Infrastructure Products (2026) — Building for Infra Engineers",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmInfraProductsPage() {
+  const dates = pageDates("/pm-infra-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmInfraProductsPage() {
         { name: "PM Infrastructure", url: `${SITE_URL}/pm-infra-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Infrastructure (2026 Edition)",
+        description: "How PMs build infrastructure products. SLAs, latency budgets, incident response, and what makes infra PM different from everything else.",
+        image: `${SITE_URL}/api/og?title=PM+Infrastructure+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-infra-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmInfraProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Infrastructure<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            Infra PMs choose durability over new features, using error budgets to make reliability-versus-velocity tradeoffs explicit and judging latency by p99, not p50, because latency is treated as UX. Uptime against SLO, latency percentiles, error budget burn, and MTTD/MTTR define whether the product is working, and observability is treated as a shipping requirement, not an afterthought.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 priorities and 5 metrics for infrastructure PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmInfraProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-infra-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Infra PM Scenarios</h2>

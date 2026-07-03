@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "How PMs Design Habit-Forming Products (2026) — The Hooked Framework Applied",
@@ -70,6 +73,7 @@ const FAQS = [
 ];
 
 export default function PmHabitProductsPage() {
+  const dates = pageDates("/pm-habit-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -77,6 +81,17 @@ export default function PmHabitProductsPage() {
         { name: "PM Habit-Forming Products", url: `${SITE_URL}/pm-habit-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "How PMs Design Habit-Forming Products (2026 Edition)",
+        description:
+          "How PMs design products that form genuine habits — without dark patterns. Nir Eyal&apos;s Hooked framework, habit loops, and examples from Duolingo, WhatsApp, and others.",
+        image: `${SITE_URL}/api/og?title=PM+Habit-Forming+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-habit-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -86,6 +101,16 @@ export default function PmHabitProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             How PMs Design Habit-Forming<br />Products (2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Can a product build genuine habits without manipulating users? This guide applies Nir
+            Eyal&apos;s four-part Hook model — trigger, action, variable reward, investment — to real
+            examples like Duolingo&apos;s streak and WhatsApp&apos;s message notifications, then draws the
+            ethical line: genuine habits serve real value, while dark patterns leave users relieved, not
+            worse off, when they stop.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4-part Hook framework, 4 real product examples, the ethical line between habits and dark patterns,
             and 5 common mistakes.
@@ -179,6 +204,8 @@ export default function PmHabitProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-habit-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Your Own PM Habit Daily</h2>

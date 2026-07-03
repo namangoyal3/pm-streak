@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Networking Guide (2026) — How PMs Build Real Networks That Help Their Careers",
@@ -80,6 +83,7 @@ const FAQS = [
 ];
 
 export default function PmNetworkingGuidePage() {
+  const dates = pageDates("/pm-networking-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -87,6 +91,16 @@ export default function PmNetworkingGuidePage() {
         { name: "PM Networking Guide", url: `${SITE_URL}/pm-networking-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Networking Guide (2026)",
+        description: "How PMs build real networks without being transactional. Where to meet other PMs, how to ask for coffee chats, and how to turn weak connections into strong ones.",
+        image: `${SITE_URL}/api/og?title=PM+Networking+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-networking-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -96,6 +110,16 @@ export default function PmNetworkingGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Networking Guide<br />(India 2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Most PM jobs in India are filled through referrals rather than cold applications,
+            which is why PMs build networks across six channels — alumni groups, PM-specific
+            Slack/Discord communities, LinkedIn, Twitter/X, in-person meetups, and public writing —
+            investing roughly two hours a week. The PMs with the strongest networks lead with
+            giving years before they ever need anything back.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Where to meet PMs, how to ask for coffee chats that actually convert,
             and how to build networks that compound over your career.
@@ -179,6 +203,8 @@ export default function PmNetworkingGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-networking-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Stay Interesting to Your Network</h2>

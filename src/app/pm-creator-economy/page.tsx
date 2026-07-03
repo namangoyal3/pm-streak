@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Creator Economy (2026) — How PMs Build Products for Creators",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmCreatorEconomyPage() {
+  const dates = pageDates("/pm-creator-economy");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmCreatorEconomyPage() {
         { name: "PM Creator Economy", url: `${SITE_URL}/pm-creator-economy` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Creator Economy (2026 Edition)",
+        description:
+          "How PMs build for the creator economy. Monetisation, creator tools, audience growth, and the tension between creators and platforms.",
+        image: `${SITE_URL}/api/og?title=PM+Creator+Economy+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-creator-economy`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmCreatorEconomyPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Creator Economy<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            In the creator economy, a small share of top creators generate most platform value, publish across three or more platforms at once, and can lose everything overnight to an algorithm change — which is why direct monetisation such as subscriptions, tips, paid courses, and brand sponsorships now outperforms ad revenue share, and why community, not the platform, is what actually keeps an audience loyal.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 monetisation models for creator platform PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmCreatorEconomyPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-creator-economy" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Creator Economy PM Scenarios</h2>

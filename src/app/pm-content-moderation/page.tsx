@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Content Moderation (2026) — How PMs Build Trust & Safety Systems",
@@ -52,6 +55,7 @@ const FAQS = [
 ];
 
 export default function PmContentModerationPage() {
+  const dates = pageDates("/pm-content-moderation");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -59,6 +63,17 @@ export default function PmContentModerationPage() {
         { name: "PM Content Moderation", url: `${SITE_URL}/pm-content-moderation` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Content Moderation (2026 Edition)",
+        description:
+          "How PMs build content moderation at scale. Policy, automation, human review, and the tough calls no framework makes for you.",
+        image: `${SITE_URL}/api/og?title=PM+Content+Moderation+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-content-moderation`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -68,6 +83,12 @@ export default function PmContentModerationPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Content Moderation<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Behind every moderated platform sits a policy layer defining what&apos;s allowed, automated detection through classifiers and hash matching, a human review queue, user reports, reversible appeals, and public transparency reports — and PM success in this stack is measured by prevalence of violating content, proactive detection rate, time-to-action on severe cases, appeal overturn rate, and how consistently reviewers agree with each other.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 stack layers and 5 metrics for trust &amp; safety PMs.
           </p>
@@ -113,6 +134,8 @@ export default function PmContentModerationPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-content-moderation" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Trust &amp; Safety Scenarios</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM AI Hardware (2026) — Rabbit, Humane, Friend PM Lessons",
@@ -50,6 +53,7 @@ const FAQS = [
 ];
 
 export default function PmAiHardwarePage() {
+  const dates = pageDates("/pm-ai-hardware");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -57,6 +61,17 @@ export default function PmAiHardwarePage() {
         { name: "PM AI Hardware", url: `${SITE_URL}/pm-ai-hardware` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM AI Hardware (2026 Edition)",
+        description:
+          "How PMs build AI-first hardware. Why standalone AI devices keep failing, what&apos;s actually working, and the lessons from Rabbit R1 and Humane AI Pin.",
+        image: `${SITE_URL}/api/og?title=PM+AI+Hardware+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ai-hardware`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -66,6 +81,12 @@ export default function PmAiHardwarePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM AI Hardware<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Standalone AI devices that try to replace the phone keep failing — Humane&apos;s AI Pin launched expensive and under-utilised before being discontinued in 2024, and Rabbit&apos;s R1 shipped fast but under-delivered on its LAM promises — while products that augment hardware people already wear, like Meta&apos;s Ray-Ban Smart Glasses, succeed by being glasses first and AI second. The pattern holds because utility beats novelty: demos win press, not users.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 4 lessons from AI hardware launches so far.
           </p>
@@ -111,6 +132,8 @@ export default function PmAiHardwarePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ai-hardware" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice AI Hardware PM Scenarios</h2>

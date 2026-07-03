@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM B2B Products (2026) — How B2B PM Differs From Consumer",
@@ -73,6 +76,7 @@ const FAQS = [
 ];
 
 export default function PmB2bProductsPage() {
+  const dates = pageDates("/pm-b2b-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -80,6 +84,17 @@ export default function PmB2bProductsPage() {
         { name: "PM B2B Products", url: `${SITE_URL}/pm-b2b-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM B2B Products (2026 Edition)",
+        description:
+          "How PMs build B2B products. Buyer vs user, sales-led motion, enterprise deal cycles, and the dynamics that separate B2B from consumer product work.",
+        image: `${SITE_URL}/api/og?title=PM+B2B+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-b2b-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -89,6 +104,12 @@ export default function PmB2bProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM B2B Products<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-3">
+            In B2B, the person who pays and the person who uses the product are rarely the same — the fact that reshapes everything else: sales cycles stretch three to twelve months, one large lost account can outweigh a thousand small ones, and the product needs separate admin and end-user interfaces plus audit logs and configurability for enterprise buyers. Metrics like ARR, NRR, ACV, and logo churn track it all.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 B2B dynamics, 6 key metrics, 5 design principles, and 5 common traps.
           </p>
@@ -164,6 +185,8 @@ export default function PmB2bProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-b2b-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build B2B PM Skills Daily</h2>

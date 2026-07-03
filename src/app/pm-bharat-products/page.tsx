@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Building for Bharat (2026) — How Great PMs Design for India&apos;s Next Half-Billion Users",
@@ -75,6 +78,7 @@ const FAQS = [
 ];
 
 export default function PmBharatProductsPage() {
+  const dates = pageDates("/pm-bharat-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -82,6 +86,17 @@ export default function PmBharatProductsPage() {
         { name: "PM Bharat Products", url: `${SITE_URL}/pm-bharat-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Building for Bharat (2026 Edition)",
+        description:
+          "How PMs design for Bharat — Tier-2/3/4 India. Vernacular UX, device constraints, trust signals, and the patterns that work where English-first products fail.",
+        image: `${SITE_URL}/api/og?title=PM+Building+for+Bharat+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-bharat-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -91,6 +106,12 @@ export default function PmBharatProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Building for Bharat<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            Meesho, PhonePe, ShareChat/Josh, Dream11, and DailyHunt all win in Bharat by getting six things right: vernacular-first UX, voice and video over text, visible trust signals like COD and verified badges, low-data modes, large tap targets, and simple default-driven flows. Products fail this test when metro PMs design for themselves — translating without cultural adaptation, assuming credit cards over UPI and cash, and leaning on urban imagery Tier-3 users don&apos;t relate to.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6 design patterns, 6 user types to know, 5 companies leading Bharat, and 6 mistakes to avoid.
           </p>
@@ -166,6 +187,8 @@ export default function PmBharatProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-bharat-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Bharat PM Intuition Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "How to Write a Product Strategy Doc (2026) — PM Template + Examples",
@@ -67,12 +70,23 @@ const FAQS = [
 ];
 
 export default function PmStrategyDocPage() {
+  const dates = pageDates("/pm-strategy-doc");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "PM Strategy Doc", url: `${SITE_URL}/pm-strategy-doc` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "How to Write a Product Strategy Doc (2026)",
+        description: "The complete guide to writing a product strategy doc. Structure, section-by-section breakdown, common mistakes, and how to make your strategy doc actually get read and used.",
+        image: `${SITE_URL}/api/og?title=PM+Strategy+Doc+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-strategy-doc`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -83,6 +97,16 @@ export default function PmStrategyDocPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             How to Write a Product<br />Strategy Doc (2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A product strategy doc runs 4–6 pages across nine sections — TL;DR, context, the bet,
+            diagnosis, guiding policy, coherent actions, success metrics, risks, and what you&apos;re
+            not doing — written for executives, not your product team, and refreshed annually rather
+            than every quarter. The single biggest failure mode is skipping the guiding policy and
+            &quot;what we&apos;re not doing&quot; sections, which is how scope creep sneaks back in.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 9-section template senior PMs use to write strategy docs that actually get read —
             with real examples for each section and 8 common mistakes to avoid.
@@ -134,6 +158,8 @@ export default function PmStrategyDocPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-strategy-doc" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Strategic Thinking Daily</h2>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "How to Run a PM Beta Program (2026) — Recruit, Learn, Iterate",
@@ -78,6 +81,7 @@ const FAQS = [
 ];
 
 export default function PmBetaProgramPage() {
+  const dates = pageDates("/pm-beta-program");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -85,6 +89,16 @@ export default function PmBetaProgramPage() {
         { name: "PM Beta Program", url: `${SITE_URL}/pm-beta-program` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Beta Program Guide (2026 Edition)",
+        description: "How PMs run beta programs that generate real signal. Recruiting beta users, feedback loops, managing expectations, and turning beta into a compounding asset.",
+        image: `${SITE_URL}/api/og?title=PM+Beta+Program+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-beta-program`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -94,6 +108,17 @@ export default function PmBetaProgramPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Beta Program Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-2">
+            A PM beta program runs 6&ndash;12 weeks, enough for two or three full iteration
+            cycles, recruiting 20 to 50 users who match the target persona, then compressing
+            learning into weekly loops of one survey plus five deep interviews. The point
+            isn&apos;t bug-catching: teams that treat beta only as QA miss 80% of the signal,
+            since the real questions are whether it solves the right problem and where users
+            hit friction.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-white/70 hover:text-[#89e219] underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             6-phase beta playbook, 5 recruitment moves, 5 rules for managing expectations,
             and 6 mistakes that make betas worthless.
@@ -170,6 +195,8 @@ export default function PmBetaProgramPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-beta-program" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Launch Muscle Daily</h2>

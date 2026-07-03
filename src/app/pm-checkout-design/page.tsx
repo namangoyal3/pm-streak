@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Checkout Design (2026) — Designing Checkouts That Convert",
@@ -49,6 +52,7 @@ const FAQS = [
 ];
 
 export default function PmCheckoutDesignPage() {
+  const dates = pageDates("/pm-checkout-design");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -56,6 +60,16 @@ export default function PmCheckoutDesignPage() {
         { name: "PM Checkout Design", url: `${SITE_URL}/pm-checkout-design` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Checkout Design (2026 Edition)",
+        description: "How PMs design checkout flows that convert. Field count, payment options, trust signals, and the small details that move conversion 5–15%.",
+        image: `${SITE_URL}/api/og?title=PM+Checkout+Design+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-checkout-design`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -65,6 +79,12 @@ export default function PmCheckoutDesignPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Checkout Design<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            Good checkout design removes friction: fewer required fields, saved payment methods, localised options such as UPI, COD, and EMI, visible trust signals, and mobile-first layouts. It also avoids four traps — forced account creation, which alone can kill 20–40% of conversions, fees hidden until the final step, address forms that fight autofill, and missing progress indicators on multi-step flows.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 principles and 4 traps for checkout design.
           </p>
@@ -110,6 +130,8 @@ export default function PmCheckoutDesignPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-checkout-design" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Checkout PM Scenarios</h2>

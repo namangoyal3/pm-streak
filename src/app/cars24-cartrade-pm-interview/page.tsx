@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Cars24, CarTrade & OLX Autos PM Interview Guide (2026) — Used Car PM Questions",
@@ -95,6 +98,7 @@ const FAQS = [
 ];
 
 export default function Cars24CartradePmInterviewPage() {
+  const dates = pageDates("/cars24-cartrade-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -102,6 +106,17 @@ export default function Cars24CartradePmInterviewPage() {
         { name: "Auto PM Interview", url: `${SITE_URL}/cars24-cartrade-pm-interview` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Auto Tech PM Interview Guide (Cars24, Spinny, OLX 2026)",
+        description:
+          "Crack PM interviews at Cars24, CarTrade, OLX Autos, and Spinny. The used car marketplace dynamics, inspection-pricing-financing flows, and what auto PMs actually build.",
+        image: `${SITE_URL}/api/og?title=Auto+PM+Interview+Guide+2026++Cars24+Spinny+OLX+Autos++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/cars24-cartrade-pm-interview`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -111,6 +126,15 @@ export default function Cars24CartradePmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Auto Tech PM Interview Guide<br />(Cars24, Spinny, OLX 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Interviews at Cars24, Spinny, CarTrade, and OLX Autos cover four question themes: marketplace
+            dynamics around inventory turnover and pricing, inspection-and-quality systems for field agents,
+            financing flows that often carry higher margin than retail, and customer experience for anxious,
+            low-frequency buyers. The physical-digital overlap — inspection apps, RC transfer rules, NBFC financing — is what separates auto tech PM rounds from typical consumer-app interviews.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The used car marketplace context, 4 question themes covering inspection, financing,
             and customer experience, and what auto PMs actually build day-to-day.
@@ -170,6 +194,8 @@ export default function Cars24CartradePmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="cars24-cartrade-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Physical-Digital PM Scenarios</h2>

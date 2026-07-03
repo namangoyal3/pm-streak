@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM D2C Brands (2026) — Mamaearth, boAt, Sugar PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmD2cBrandsPage() {
+  const dates = pageDates("/pm-d2c-brands");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmD2cBrandsPage() {
         { name: "PM D2C Brands", url: `${SITE_URL}/pm-d2c-brands` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM D2C Brands (India Edition)",
+        description: "How PMs build for D2C brands in India. Shopify economics, performance marketing, repeat rate, and what makes D2C PM unique.",
+        image: `${SITE_URL}/api/og?title=PM+D2C+Brands+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-d2c-brands`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmD2cBrandsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM D2C Brands<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A D2C product manager in India owns the full brand stack — pricing, packaging, retention, and acquisition all run through product, unlike marketplace PMs who share ownership with other sellers. Success is tracked through CAC/LTV ratio, repeat purchase rate, contribution margin per order, and RTO/NDR, since performance marketing CAC is the binding constraint on growth.
+          </p>
+          <p className="text-xs text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for D2C PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmD2cBrandsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-d2c-brands" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice D2C PM Scenarios</h2>

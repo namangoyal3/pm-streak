@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Growth Loops (2026) — PM Guide to Viral, Content & Paid Loops",
@@ -100,6 +103,7 @@ const FAQS = [
 ];
 
 export default function ProductGrowthLoopsPage() {
+  const dates = pageDates("/product-growth-loops");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -107,6 +111,17 @@ export default function ProductGrowthLoopsPage() {
         { name: "Product Growth Loops", url: `${SITE_URL}/product-growth-loops` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Growth Loops (PM Guide 2026)",
+        description:
+          "Master product growth loops as a PM. Viral loops, content loops, paid acquisition loops, and how to identify and strengthen the loops in your product — with real company examples.",
+        image: `${SITE_URL}/api/og?title=Product+Growth+Loops+2026++PM+Guide++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/product-growth-loops`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -116,6 +131,15 @@ export default function ProductGrowthLoopsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Growth Loops<br />(PM Guide 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            A product growth loop is a self-reinforcing cycle — unlike a linear funnel — where each user who
+            gets value generates the input for the next user&apos;s acquisition. This guide covers four loop
+            types product managers use: viral, content, product-led growth, and paid acquisition, each with
+            real examples from WhatsApp, Stack Overflow, Slack, and Zepto.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             Viral, content, product-led, and paid growth loops — what they are, how they compound,
             real company examples, and how PMs identify and strengthen them.
@@ -179,6 +203,8 @@ export default function ProductGrowthLoopsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="product-growth-loops" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Growth Intuition in 2 Minutes a Day</h2>

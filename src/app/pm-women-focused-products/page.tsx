@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM Women-Focused Products (2026) — SHEROES, Plum, Sugar PM Lessons",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmWomenFocusedProductsPage() {
+  const dates = pageDates("/pm-women-focused-products");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,17 @@ export default function PmWomenFocusedProductsPage() {
         { name: "PM Women-Focused Products", url: `${SITE_URL}/pm-women-focused-products` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Women-Focused Products (India Edition)",
+        description:
+          "How PMs build products for women. Safety, financial inclusion, health, community — and why women-first products demand women-first teams.",
+        image: `${SITE_URL}/api/og?title=PM+Women-Focused+Products+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-women-focused-products`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +82,12 @@ export default function PmWomenFocusedProductsPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Women-Focused Products<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-4">
+            To build credibly for India&apos;s women-first market, PMs treat safety as a first-order feature rather than an afterthought, lean on community before commerce (as SHEROES and Meesho did), and design finance, health, safety, career, and beauty products with women embedded on the core team — since lived experience, not observation, shapes the judgment these categories demand.
+          </p>
+          <p className="text-sm text-white/40 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 principles and 5 categories for women-first product PMs.
           </p>
@@ -112,6 +133,8 @@ export default function PmWomenFocusedProductsPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-women-focused-products" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Women-Focused PM Scenarios</h2>

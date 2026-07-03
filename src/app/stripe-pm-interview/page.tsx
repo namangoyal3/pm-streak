@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "Stripe PM Interview Guide (2026) — API Products, Developer PM Questions",
@@ -80,12 +83,23 @@ const FAQS = [
 ];
 
 export default function StripePmInterviewPage() {
+  const dates = pageDates("/stripe-pm-interview");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "Stripe PM Interview", url: `${SITE_URL}/stripe-pm-interview` },
       ])} />
+      <JsonLd data={articleSchema({
+        headline: "Stripe PM Interview Guide (2026 Edition)",
+        description: "Crack the Stripe PM interview. What makes Stripe PM unique — developer-first products, API design, writing quality, and the Stripe operating principles that shape every interview.",
+        image: `${SITE_URL}/api/og?title=Stripe+PM+Interview+Guide+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/stripe-pm-interview`,
+      })} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
@@ -96,6 +110,16 @@ export default function StripePmInterviewPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Stripe PM Interview Guide<br />(2026 Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Expect five rounds — a written take-home, product and API design, strategy and market,
+            execution and craft, and behavioural — built around Stripe&apos;s defining signal: writing
+            quality that doubles as thinking quality. Interviewers weigh technical depth and
+            long-horizon platform judgment over charisma, and the take-home alone trips up many
+            candidates who clear every technical round.
+          </p>
+          <p className="text-sm text-white/50 mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The Stripe PM interview context, 5 rounds including the take-home,
             and what makes Stripe PM different from every other payments company.
@@ -148,6 +172,8 @@ export default function StripePmInterviewPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="stripe-pm-interview" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Train for the Stripe Writing Bar Daily</h2>

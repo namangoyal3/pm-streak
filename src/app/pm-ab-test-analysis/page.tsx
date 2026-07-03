@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "PM A/B Test Analysis (2026) — How to Read Results Like a Pro",
@@ -75,6 +78,7 @@ const FAQS = [
 ];
 
 export default function PmAbTestAnalysisPage() {
+  const dates = pageDates("/pm-ab-test-analysis");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -82,6 +86,16 @@ export default function PmAbTestAnalysisPage() {
         { name: "PM A/B Test Analysis", url: `${SITE_URL}/pm-ab-test-analysis` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM A/B Test Analysis Guide (2026 Edition)",
+        description: "How PMs analyse A/B test results correctly. Statistical significance, effect size, segmentation, and the biases that lead to bad decisions.",
+        image: `${SITE_URL}/api/og?title=PM+A+B+Test+Analysis+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-ab-test-analysis`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -91,9 +105,19 @@ export default function PmAbTestAnalysisPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM A/B Test Analysis Guide<br />(2026 Edition)
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Reading an A/B test well means working through a seven-point checklist covering sample size,
+            statistical significance, effect size, guardrail health, segment consistency, and novelty effects,
+            then applying five decision rules that separate a real win from a costly illusion. The default
+            significance threshold is p &lt; 0.05, tightened to 0.01 for high-stakes launches like major
+            redesigns or monetisation changes.
+          </p>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
             7-point checklist for reading results, 5 segmentation lenses, 6 common biases,
             and 5 decision rules for shipping or killing.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
           </p>
           <Link href="/signup" className="inline-block bg-[#58cc02] hover:bg-[#46a302] border-b-4 border-[#46a302] active:border-b-2 active:translate-y-[2px] text-black font-black px-8 py-3 rounded-2xl transition-all">
             Build Experimentation Skills Daily — Free →
@@ -167,6 +191,8 @@ export default function PmAbTestAnalysisPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-ab-test-analysis" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Experimentation Intuition Daily</h2>

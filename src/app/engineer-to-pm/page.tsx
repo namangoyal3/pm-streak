@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Engineer to Product Manager (2026) — How SWEs Transition to PM",
@@ -110,6 +113,7 @@ const FAQS = [
 ];
 
 export default function EngineerToPmPage() {
+  const dates = pageDates("/engineer-to-pm");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -117,6 +121,16 @@ export default function EngineerToPmPage() {
         { name: "Engineer to PM", url: `${SITE_URL}/engineer-to-pm` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Engineer to Product Manager (2026 Guide)",
+        description: "How software engineers transition to PM. The 4 paths that work, what hiring managers look for, how to reposition your engineering experience, and avoiding common transition pitfalls.",
+        image: `${SITE_URL}/api/og?title=Engineer+to+Product+Manager+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/engineer-to-pm`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -126,6 +140,12 @@ export default function EngineerToPmPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Engineer to Product Manager<br />(2026 Guide)
           </h1>
+          <p className="text-base text-white/60 max-w-2xl mx-auto mb-2">
+            Software engineers move into PM through four routes, ranked easiest to hardest: an internal transfer, a structured APM program, a small-startup PM role, or a direct jump to Senior PM at an engineering-heavy company. The transition mostly hinges on closing habits like jumping to solutions too fast and under-investing in stakeholder management, while leaning on the system design intuition and SQL comfort non-technical PMs rarely have.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-white/60 hover:text-[#89e219] underline underline-offset-2">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 4 transition paths, 5 gaps engineers must close, and the strengths
             engineering-turned PMs should actively use to stand out.
@@ -197,6 +217,8 @@ export default function EngineerToPmPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="engineer-to-pm" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build PM Intuition While You Engineer</h2>

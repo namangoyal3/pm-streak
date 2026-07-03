@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import RelatedPages from "@/components/RelatedPages";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
 
 export const metadata: Metadata = {
   title: "Product Onboarding Guide for PMs (2026) — Design Flows That Activate Users",
@@ -82,6 +85,7 @@ const FAQS = [
 ];
 
 export default function PmOnboardingGuidePage() {
+  const dates = pageDates("/pm-onboarding-guide");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -89,6 +93,17 @@ export default function PmOnboardingGuidePage() {
         { name: "PM Onboarding Guide", url: `${SITE_URL}/pm-onboarding-guide` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "Product Onboarding Guide (PM Edition 2026)",
+        description:
+          "The complete user onboarding playbook for PMs. How to design flows that activate, the psychology of first-time users, key metrics, and 10 onboarding anti-patterns to avoid.",
+        image: `${SITE_URL}/api/og?title=Product+Onboarding+Guide+for+PMs+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-onboarding-guide`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -98,6 +113,15 @@ export default function PmOnboardingGuidePage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             Product Onboarding Guide<br />(PM Edition 2026)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-3">
+            Most products lose users in the first session, which is why this guide breaks onboarding into
+            five phases — pre-onboarding, signup, activation, early retention, and long-term engagement —
+            plus ten concrete anti-patterns, from feature tours right after signup to skipping
+            mobile-specific flows, that quietly kill activation before a PM ever notices the drop-off.
+          </p>
+          <p className="text-xs text-white/40 max-w-2xl mx-auto mb-6">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The 5 phases of user onboarding, what to do in each,
             the metrics to track, and 10 anti-patterns that kill activation.
@@ -168,6 +192,8 @@ export default function PmOnboardingGuidePage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-onboarding-guide" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Build Onboarding Intuition Daily</h2>

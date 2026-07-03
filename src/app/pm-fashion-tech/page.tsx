@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema } from "@/components/JsonLd";
+import JsonLd, { SITE_URL, faqSchema, breadcrumbSchema, articleSchema } from "@/components/JsonLd";
+import { AUTHOR_NAME, AUTHOR_URL, AUTHOR_CREDENTIAL } from "@/lib/seo/byline";
+import { pageDates, formatPageDate } from "@/lib/seo/page-dates";
+import RelatedPages from "@/components/RelatedPages";
 
 export const metadata: Metadata = {
   title: "PM Fashion Tech (2026) — Myntra, Ajio, Nykaa Fashion PM Guide",
@@ -51,6 +54,7 @@ const FAQS = [
 ];
 
 export default function PmFashionTechPage() {
+  const dates = pageDates("/pm-fashion-tech");
   return (
     <>
       <JsonLd data={breadcrumbSchema([
@@ -58,6 +62,16 @@ export default function PmFashionTechPage() {
         { name: "PM Fashion Tech", url: `${SITE_URL}/pm-fashion-tech` },
       ])} />
       <JsonLd data={faqSchema(FAQS.map(f => ({ question: f.q, answer: f.a })))} />
+      <JsonLd data={articleSchema({
+        headline: "PM Fashion Tech (India Edition)",
+        description: "How PMs build fashion tech products. Size and fit, returns, visual search, and why fashion is the hardest category in e-commerce.",
+        image: `${SITE_URL}/api/og?title=PM+Fashion+Tech+2026++PM+Streak`,
+        datePublished: dates.published,
+        dateModified: dates.modified,
+        author: { name: AUTHOR_NAME, url: AUTHOR_URL.startsWith("http") ? AUTHOR_URL : `${SITE_URL}${AUTHOR_URL}` },
+        publisher: { name: "PM Streak", url: SITE_URL },
+        url: `${SITE_URL}/pm-fashion-tech`,
+      })} />
 
       <main className="min-h-screen bg-[#0e1113] text-white">
         <section className="max-w-4xl mx-auto px-4 pt-20 pb-10 text-center">
@@ -67,6 +81,12 @@ export default function PmFashionTechPage() {
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
             PM Fashion Tech<br />(India Edition)
           </h1>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-2">
+            Fashion e-commerce runs 30–40% return rates in India because COD shoppers treat delivery as a fitting room — buyers can&apos;t try before they buy, so size-and-fit mismatches, not product quality, drive most returns. PMs fight this with visual search, AI-powered fit recommendations, and inventory strategies tuned to seasonality, but the physical-to-digital trying gap stays structural rather than solvable.
+          </p>
+          <p className="text-sm text-white/50 max-w-2xl mx-auto mb-8">
+            By <a href={AUTHOR_URL} className="text-[#89e219] hover:underline">{AUTHOR_NAME}</a> · {AUTHOR_CREDENTIAL} · Updated {formatPageDate(dates.modified)}
+          </p>
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             5 dynamics and 5 metrics for fashion tech PMs.
           </p>
@@ -112,6 +132,8 @@ export default function PmFashionTechPage() {
             ))}
           </div>
         </section>
+
+        <RelatedPages slug="pm-fashion-tech" />
 
         <section className="max-w-2xl mx-auto px-4 pb-20 text-center">
           <h2 className="text-2xl font-bold mb-3">Practice Fashion PM Scenarios</h2>
