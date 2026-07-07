@@ -6701,6 +6701,68 @@
           "google": null
         }
       }
+    },
+    {
+      "ts": "2026-07-07T15:38:53.375Z",
+      "sitemapUrls": 1393,
+      "sitemapHash": "a13eb4a1dd2a7d3f1377ae184b67ac916a414d07ec24c1b5b50cb9c29544a841",
+      "indexnowSubmitted": 0,
+      "bingIndexed": 0,
+      "googleChecked": true,
+      "googleIndexedFirstPage": 10,
+      "gsc": {
+        "sitemapIndexed": 0,
+        "sitemapSubmitted": 1393,
+        "impressions": 6,
+        "clicks": 0,
+        "topQuery": {
+          "q": "flipkart apm program 2026",
+          "impressions": 1,
+          "pos": 6
+        }
+      },
+      "ranks": {
+        "product manager interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "pm interview prep": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product sense interview": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "how to become a product manager": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product manager salary india": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "flipkart pm interview": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "razorpay pm interview": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "duolingo for product managers": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        }
+      }
     }
   ]
 }
