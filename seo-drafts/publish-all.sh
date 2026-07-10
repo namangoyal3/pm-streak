@@ -15,6 +15,8 @@ ARTICLES=(
   "seo-drafts/article-stakeholder-management-pm.json"
   "seo-drafts/pm-metrics-stack-north-star-okr-kpi.json"
   "seo-drafts/how-to-break-into-apm-program-2026.json"
+  "seo-drafts/pm-behavioral-interview-questions-star-method.json"
+  "seo-drafts/product-prioritization-frameworks-rice-ice-moscow.json"
 )
 
 for file in "${ARTICLES[@]}"; do
