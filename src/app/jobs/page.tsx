@@ -16,6 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { previewJobs } from "@/lib/jobs-preview";
 import Navbar from "@/components/Navbar";
 
 interface Job {
@@ -314,7 +315,7 @@ export default function JobsPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {jobs.slice(0, user?.plan === "pro" ? 999 : 3).map((job) => (
+            {previewJobs(jobs, user?.plan === "pro").map((job) => (
               <div
                 key={job.id}
                 className={cn(

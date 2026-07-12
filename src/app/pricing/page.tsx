@@ -17,20 +17,7 @@ import JsonLd, { faqSchema, breadcrumbSchema } from "@/components/JsonLd";
 import PricingPageTrialCTA from "@/components/PricingPageTrialCTA";
 import RazorpayCheckoutButton from "@/components/RazorpayCheckoutButton";
 import { getVariant } from "@/lib/ab";
-
-function calculateMRP(discountedPrice: string, isIndia: boolean): string {
-  const numMatch = discountedPrice.match(/[\d,.]+/);
-  if (!numMatch) return discountedPrice;
-
-  const num = parseFloat(numMatch[0].replace(/,/g, ""));
-  // Increase by 70% as requested (num * 1.7)
-  const mrp = Math.round(num * 1.7);
-
-  if (isIndia) {
-    return `₹${mrp.toLocaleString("en-IN")}`;
-  }
-  return `$${mrp}`;
-}
+import { calculateMRP } from "@/lib/pricing-display";
 
 export const metadata: Metadata = {
   title: "PM Streak Pro Pricing — Plans & Features",
