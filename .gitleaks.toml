@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "IndexNow key is public by protocol design (served at /<key>.txt)"
+regexes = ['''6c4abe7e9345accd405ac3549b82cd1d''']
