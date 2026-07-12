@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://learnanything.pro";
 const HOST = "learnanything.pro";
-const INDEXNOW_KEY = "6c4abe7e9345accd405ac3549b82cd1d"; // public by protocol design (served at /<key>.txt)
+const INDEXNOW_KEY = "6c4abe7e9345accd405ac3549b82cd1d"; // gitleaks:allow — public by protocol design (served at /<key>.txt)
 const HISTORY_FILE = join(ROOT, "scripts", "seo-rank-history.json");
 const MAX_RANK = 30; // how deep we look before calling it unranked
 

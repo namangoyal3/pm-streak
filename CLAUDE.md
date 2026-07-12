@@ -92,3 +92,9 @@ SEO/GEO page images use [nanaban](https://github.com/paperfoot/nanaban-cli) (pap
 - Lyzr tool route: `POST /api/geo/tools/image-gen` (wraps nanaban --json for GEO swarm agents)
 - Forge calls this tool when generating article images via the GEO pipeline
 - Claude Code skill auto-installed at `~/.claude/skills/nanaban/SKILL.md`
+
+## Secrets policy (added after 2026-07 history purge)
+- NEVER commit secrets: no API keys, JWTs, session tokens, private keys, or `.env*` files (only `.env.example` with empty values is allowed).
+- All credentials come from environment variables / Vercel env config. If a script needs a token, read `process.env.*` and fail loudly when missing.
+- `gitleaks` runs in CI on every push/PR (`.github/workflows/gitleaks.yml`) and will fail the build on findings. Run `gitleaks dir .` locally before committing.
+- Intentionally-public values (e.g. the IndexNow key served at `/<key>.txt`) must carry a `// gitleaks:allow` comment explaining why.
