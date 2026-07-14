@@ -30314,6 +30314,177 @@
           "google": null
         }
       }
+    },
+    {
+      "ts": "2026-07-14T05:44:58.147Z",
+      "sitemapUrls": 1393,
+      "sitemapHash": "a54f9765c2bef291c17f25a8605274670c56e267fe800c36ffc3a9321ad7beb3",
+      "indexnowSubmitted": 0,
+      "bingIndexed": 0,
+      "googleChecked": false,
+      "googleIndexedFirstPage": null,
+      "gsc": {
+        "sitemapIndexed": 0,
+        "sitemapSubmitted": 1393,
+        "impressions": 5,
+        "clicks": 0,
+        "topQuery": {
+          "q": "average product manager salary in india",
+          "impressions": 1,
+          "pos": 45
+        }
+      },
+      "gscIndexedPct": 0,
+      "circuitBreaker": {
+        "halted": true,
+        "reason": "sitemap indexed 0.0% < 30% — publishing halted until index health recovers"
+      },
+      "clusterVerdicts": {
+        "learn-pm": {
+          "stage": "90d",
+          "verdict": "kill",
+          "reason": "~0 impressions after 90d, indexed 0% — negative-value inventory; 410 via prune plan",
+          "metrics": {
+            "impressions30d": 0,
+            "impressionsPrev30d": 0,
+            "clicks30d": 0,
+            "hasTop30Query": false,
+            "pagesWithImpressions": 0
+          }
+        },
+        "company-interviews": {
+          "stage": "90d",
+          "verdict": "continue",
+          "reason": "alive: 21 impressions/30d + top-30 query",
+          "metrics": {
+            "impressions30d": 21,
+            "impressionsPrev30d": 0,
+            "clicks30d": 0,
+            "hasTop30Query": true,
+            "pagesWithImpressions": 2
+          }
+        },
+        "interview-skills": {
+          "stage": "90d",
+          "verdict": "continue",
+          "reason": "alive: 37 impressions/30d + top-30 query",
+          "metrics": {
+            "impressions30d": 37,
+            "impressionsPrev30d": 0,
+            "clicks30d": 0,
+            "hasTop30Query": true,
+            "pagesWithImpressions": 2
+          }
+        },
+        "salary-comp": {
+          "stage": "90d",
+          "verdict": "continue",
+          "reason": "alive: 40 impressions/30d",
+          "metrics": {
+            "impressions30d": 40,
+            "impressionsPrev30d": 0,
+            "clicks30d": 0,
+            "hasTop30Query": false,
+            "pagesWithImpressions": 1
+          }
+        },
+        "career-transitions": {
+          "stage": "90d",
+          "verdict": "watch",
+          "reason": "low but rising (0→3) — Google testing; don't kill",
+          "metrics": {
+            "impressions30d": 3,
+            "impressionsPrev30d": 0,
+            "clicks30d": 0,
+            "hasTop30Query": false,
+            "pagesWithImpressions": 1
+          }
+        },
+        "guides-frameworks": {
+          "stage": "90d",
+          "verdict": "continue",
+          "reason": "alive: 105 impressions/30d + top-30 query",
+          "metrics": {
+            "impressions30d": 105,
+            "impressionsPrev30d": 0,
+            "clicks30d": 0,
+            "hasTop30Query": true,
+            "pagesWithImpressions": 15
+          }
+        }
+      },
+      "ranks": {
+        "product roadmap planning guide 2026": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "ab testing guide for product managers": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "flipkart pm interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "razorpay pm interview process": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "swiggy pm interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product sense interview framework": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "pm metrics interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "pm behavioral interview star method": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product manager salary india 2026": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "senior product manager salary bangalore": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "engineer to product manager transition plan": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "become a product manager without mba": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product management frameworks cheat sheet": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product prioritization frameworks rice": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        }
+      }
     }
   ]
 }
