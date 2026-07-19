@@ -48440,6 +48440,104 @@
           "google": null
         }
       }
+    },
+    {
+      "ts": "2026-07-19T08:40:26.390Z",
+      "sitemapUrls": 1393,
+      "sitemapHash": "1767b8630b67424d1f25eb8751bf5376cb97068da24832e9284481a61b6d5563",
+      "indexnowSubmitted": 0,
+      "bingIndexed": 0,
+      "googleChecked": false,
+      "googleIndexedFirstPage": null,
+      "gsc": {
+        "sitemapIndexed": 0,
+        "sitemapSubmitted": 1393,
+        "impressions": 5,
+        "clicks": 0,
+        "topQuery": {
+          "q": "associate product manager salary",
+          "impressions": 1,
+          "pos": 40
+        }
+      },
+      "gscIndexedPct": null,
+      "circuitBreaker": {
+        "halted": true,
+        "reason": "indexed% unknown — no GSC API creds and no scripts/seo/gsc-manual.json fallback; failing closed"
+      },
+      "clusterVerdicts": {},
+      "ranks": {
+        "product roadmap planning guide 2026": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "ab testing guide for product managers": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "flipkart pm interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "razorpay pm interview process": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "swiggy pm interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product sense interview framework": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "pm metrics interview questions": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "pm behavioral interview star method": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product manager salary india 2026": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "senior product manager salary bangalore": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "engineer to product manager transition plan": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "become a product manager without mba": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product management frameworks cheat sheet": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        },
+        "product prioritization frameworks rice": {
+          "bing": null,
+          "mojeek": null,
+          "google": null
+        }
+      }
     }
   ]
 }
